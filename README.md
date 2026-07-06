@@ -4,3 +4,5 @@
 
 - 在线播放：https://geronimomiao.github.io/agent-talk-deck/
 - 操作：← → 或空格翻页 · 点屏幕左/右也可翻 · 按 `S` 看每页口播备注
+
+- PPT 版下载：https://github.com/Geronimomiao/agent-talk-deck/raw/main/agent-talk-deck-v2.pptx（含每页口播备注）
