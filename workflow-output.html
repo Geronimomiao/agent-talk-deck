@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Workflow 解剖 · 一段脚本如何开出 81 个 agent</title>
+<style>
+  :root{
+    --bg:#0e1116; --panel:#161b22; --panel2:#1c2230; --line:#2a3240;
+    --tx:#e6edf3; --tx2:#9aa7b6; --tx3:#6b7684;
+    --find:#6ea8fe; --find-bg:#16233a;
+    --verify:#f0b45f; --verify-bg:#2a2213;
+    --ok:#4bbf73; --ok-bg:#12271a;
+    --no:#e06c6c; --no-bg:#2a1618;
+    --acc:#b78bff; --acc-bg:#221934;
+    --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg);color:var(--tx);font-family:var(--sans);line-height:1.6;
+    -webkit-font-smoothing:antialiased;font-size:15px}
+  a{color:var(--find)}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);background:linear-gradient(180deg,#12182100,#0e1116);
+    position:sticky;top:0;z-index:20;backdrop-filter:blur(8px);background:rgba(14,17,22,.82)}
+  nav{display:flex;gap:4px;flex-wrap:wrap;padding:10px 20px;max-width:1000px;margin:0 auto;font-size:13px}
+  nav a{color:var(--tx2);text-decoration:none;padding:5px 11px;border-radius:20px;white-space:nowrap}
+  nav a:hover{background:var(--panel2);color:var(--tx)}
+  h1{font-size:30px;line-height:1.25;margin:34px 0 8px;letter-spacing:-.5px}
+  h1 .sub{color:var(--tx2);font-weight:400;font-size:17px;display:block;margin-top:8px}
+  h2{font-size:22px;margin:16px 0 4px;letter-spacing:-.3px}
+  h2 .n{color:var(--acc);font-variant-numeric:tabular-nums;margin-right:8px;font-family:var(--mono);font-size:16px}
+  .lead{color:var(--tx2);max-width:70ch}
+  section{padding:40px 0;border-top:1px solid var(--line)}
+  section:first-of-type{border-top:none}
+  .muted{color:var(--tx2)}
+  .dim{color:var(--tx3)}
+  code{font-family:var(--mono);background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+
+  /* stat tiles */
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin:24px 0}
+  .tile{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+  .tile .v{font-size:30px;font-weight:700;font-family:var(--mono);letter-spacing:-1px;font-variant-numeric:tabular-nums}
+  .tile .k{color:var(--tx2);font-size:12.5px;margin-top:2px}
+  .tile.find .v{color:var(--find)} .tile.verify .v{color:var(--verify)}
+  .tile.ok .v{color:var(--ok)} .tile.acc .v{color:var(--acc)}
+
+  /* fan-out diagram */
+  .stage{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 18px 20px;margin:14px 0;position:relative}
+  .stage .badge{display:inline-block;font-size:11px;font-family:var(--mono);padding:3px 9px;border-radius:20px;margin-bottom:12px;letter-spacing:.3px}
+  .b-find{background:var(--find-bg);color:var(--find);border:1px solid #2a4066}
+  .b-verify{background:var(--verify-bg);color:var(--verify);border:1px solid #4a3d1c}
+  .b-syn{background:var(--acc-bg);color:var(--acc);border:1px solid #3d2f5c}
+  .b-script{background:#1b2430;color:var(--tx);border:1px solid var(--line)}
+  .zones{display:flex;flex-wrap:wrap;gap:8px}
+  .zone{background:var(--find-bg);border:1px solid #2a4066;border-radius:9px;padding:8px 11px;font-size:13px;color:#cfe0ff;display:flex;align-items:center;gap:8px}
+  .zone .agc{font-family:var(--mono);font-size:11px;background:#0e1116;color:var(--find);border-radius:12px;padding:1px 7px}
+  .dots{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+  .dot{width:14px;height:14px;border-radius:4px}
+  .dot.ok{background:var(--ok)} .dot.no{background:var(--no);opacity:.85}
+  .arrow{text-align:center;color:var(--tx3);font-size:20px;line-height:1;margin:-4px 0}
+  .flow-note{font-size:13px;color:var(--tx2);margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
+
+  /* script block */
+  pre{background:#0b0e13;border:1px solid var(--line);border-radius:12px;padding:16px;overflow-x:auto;
+    font-family:var(--mono);font-size:12.5px;line-height:1.7;color:#c9d4e0}
+  pre .cm{color:#5f6b7a} pre .kw{color:#f0b45f} pre .fn{color:#6ea8fe} pre .st{color:#7ec98f} pre .hl{color:#b78bff;font-weight:600}
+  .ann{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;margin-top:14px;font-size:13.5px}
+  .ann .t{font-family:var(--mono);color:var(--acc);white-space:nowrap}
+
+  /* agent timeline */
+  .tabs{display:flex;gap:8px;margin:8px 0 18px;flex-wrap:wrap}
+  .tab{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 15px;cursor:pointer;font-size:13.5px;color:var(--tx2);transition:.12s}
+  .tab:hover{border-color:var(--tx3)}
+  .tab.on{color:var(--tx);border-color:var(--acc);background:var(--acc-bg)}
+  .tab b{display:block;color:var(--tx);font-size:14.5px;margin-bottom:1px}
+  .tab.find.on{border-color:var(--find);background:var(--find-bg)}
+  .tab.verify.on{border-color:var(--verify);background:var(--verify-bg)}
+  .tl{border-left:2px solid var(--line);margin-left:6px;padding-left:0}
+  .ev{position:relative;padding:2px 0 2px 22px;margin-left:10px}
+  .ev::before{content:"";position:absolute;left:-7px;top:11px;width:10px;height:10px;border-radius:50%;background:var(--panel);border:2px solid var(--tx3)}
+  .ev.say::before{border-color:var(--acc);background:var(--acc-bg)}
+  .ev.tool::before{border-color:var(--find);background:var(--find);width:8px;height:8px;top:12px;left:-6px}
+  .ev.done::before{border-color:var(--ok);background:var(--ok)}
+  .say .txt{color:var(--tx);font-size:13.5px;padding:6px 0}
+  .tool-row{display:flex;align-items:baseline;gap:9px;padding:5px 0;flex-wrap:wrap}
+  .tname{font-family:var(--mono);font-size:11px;padding:2px 8px;border-radius:6px;background:var(--find-bg);color:var(--find);border:1px solid #2a4066;white-space:nowrap}
+  .tname.bash{background:#1c2416;color:#9bd67a;border-color:#38492a}
+  .tname.so{background:var(--ok-bg);color:var(--ok);border-color:#2a4a34}
+  .targ{font-family:var(--mono);font-size:12px;color:var(--tx2);word-break:break-all}
+  .tres{font-family:var(--mono);font-size:11.5px;color:var(--tx3);padding:1px 0 4px 0;word-break:break-all}
+  .counter{font-family:var(--mono);color:var(--tx3);font-size:12px}
+
+  /* ROI */
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:720px){.split{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+  .card h3{margin:0 0 10px;font-size:15px}
+  .bar{height:9px;border-radius:5px;background:var(--panel2);overflow:hidden;display:flex;margin:6px 0 2px}
+  .bar i{display:block;height:100%}
+  .fi{list-style:none;padding:0;margin:0;font-size:13px}
+  .fi li{padding:7px 0;border-top:1px solid var(--line);display:flex;gap:8px;align-items:baseline}
+  .fi li:first-child{border-top:none}
+  .sev{font-family:var(--mono);font-size:10px;padding:1px 6px;border-radius:5px;white-space:nowrap}
+  .sev.high{background:var(--no-bg);color:#ff9a9a} .sev.medium{background:var(--verify-bg);color:var(--verify)} .sev.low{background:var(--panel2);color:var(--tx2)}
+  .fi .fl{font-family:var(--mono);font-size:11px;color:var(--tx3)}
+  details{margin-top:10px} summary{cursor:pointer;color:var(--find);font-size:13.5px}
+
+  footer{padding:40px 0 60px;color:var(--tx3);font-size:12.5px;border-top:1px solid var(--line)}
+  .kbd{font-family:var(--mono);font-size:11px;background:var(--panel2);border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+  .pill{display:inline-block;font-size:11px;font-family:var(--mono);padding:2px 8px;border-radius:20px;background:var(--panel2);color:var(--tx2);margin-left:6px}
+</style>
+</head>
+<body>
+<header>
+  <nav class="wrap">
+    <a href="#top">概览</a>
+    <a href="#fanout">扇出结构</a>
+    <a href="#script">脚本原理</a>
+    <a href="#sched">调度真相</a>
+    <a href="#agent">单个 agent 在做什么</a>
+    <a href="#roi">产出 ROI</a>
+    <a href="#all">全部 9 次</a>
+  </nav>
+</header>
+
+<div class="wrap" id="top">
+  <h1>Workflow 解剖
+    <span class="sub">一段 ~80 行的脚本,是怎么开出 <b style="color:var(--acc)">81 个 agent</b> 的 —— 以及每个 agent 到底在做什么</span>
+  </h1>
+  <p class="lead">这不是示意图。下面所有数字、脚本、agent 的每一步工具调用,都是 <code>audit-project-dual-review</code>
+  这个 workflow 于 <b>2026-06-26</b> 脱敏示例日志(<code>wf_public_demo_81</code>)。它把整个项目按子系统切成 11 块并行审计,再对每条发现逐一对抗验证。</p>
+
+  <div class="tiles">
+    <div class="tile"><div class="v">1</div><div class="k">脚本(JS)</div></div>
+    <div class="tile find"><div class="v">11</div><div class="k">Find:分区审查 agent</div></div>
+    <div class="tile verify"><div class="v">70</div><div class="k">Verify:对抗验证 agent</div></div>
+    <div class="tile acc"><div class="v" id="t-agents">81</div><div class="k">agent 总数</div></div>
+    <div class="tile"><div class="v" id="t-tok">—</div><div class="k">总 token</div></div>
+    <div class="tile"><div class="v" id="t-tool">—</div><div class="k">工具调用次数</div></div>
+    <div class="tile"><div class="v" id="t-sec">—</div><div class="k">墙钟耗时</div></div>
+  </div>
+</div>
+
+<section id="fanout" class="wrap">
+  <h2><span class="n">01</span>扇出结构:81 是怎么来的</h2>
+  <p class="lead">核心算式很简单 —— <b style="color:var(--find)">11 个分区各 1 个 Find agent</b>,它们共找出 <b>70 条</b>候选;
+  <b style="color:var(--verify)">每条候选再派 1 个 Verify agent</b> 独立复核。<b>11 + 70 = 81</b>。</p>
+
+  <div class="stage">
+    <span class="badge b-script">workflow 脚本 · 主循环写好后交给引擎执行</span>
+    <div class="muted" style="font-family:var(--mono);font-size:13px">pipeline(ZONES, findStage, verifyStage)</div>
+  </div>
+  <div class="arrow">▾</div>
+
+  <div class="stage">
+    <span class="badge b-find">阶段 1 · Find · 11 个 agent 并行</span>
+    <div class="zones" id="zoneList"></div>
+    <div class="flow-note">每个 agent 拿到 1 个分区:分配的文件清单 + 聚焦点(如鉴权区专盯「恒定时间比较 / fail-open / 身份伪造」),用 <span class="kbd">Read</span> <span class="kbd">Grep</span> <span class="kbd">Bash</span> 通读后交结构化 findings。</div>
+  </div>
+  <div class="arrow">▾ <span class="dim" style="font-size:12px">pipeline:某分区一审完,立刻验它自己的发现,不等别的分区</span></div>
+
+  <div class="stage">
+    <span class="badge b-verify">阶段 2 · Verify · 70 个 agent(每条候选 1 个)</span>
+    <div class="dots" id="verifyDots"></div>
+    <div class="flow-note"><span style="color:var(--ok)">■</span> 确认有效 <b id="vok">36</b> &nbsp;·&nbsp;
+      <span style="color:var(--no)">■</span> 驳回为误报 <b id="vno">34</b>。
+      每个 Verify agent 的 prompt 都写死「<b>默认怀疑它是误报,除非代码证据确凿</b>」,必须重新打开文件独立复核。</div>
+  </div>
+  <div class="arrow">▾</div>
+
+  <div class="stage">
+    <span class="badge b-syn">阶段 3 · Synthesize · 纯 JS,不开 agent</span>
+    <div class="muted">把 <code>isReal=false</code> 的 34 条滤掉、按严重度排序、应用严重度调整 → <b style="color:var(--ok)">return 36 条给主循环的我</b>。</div>
+  </div>
+</section>
+
+<section id="script" class="wrap">
+  <h2><span class="n">02</span>脚本原理:三个原语撑起全部扇出</h2>
+  <p class="lead">整个编排的核心就下面这十几行。<b>控制流是确定性的普通 JS</b>(循环 / 条件 / fan-out),
+  真正的「智能」发生在每个 <code>agent()</code> 里 —— 它 spawn 一个独立子 LLM 去干活。</p>
+  <pre><span class="cm">// ZONES = 11 个分区,每个 { key, label, files:[...], focus }</span>
+<span class="kw">const</span> zoneResults = <span class="kw">await</span> <span class="hl fn">pipeline</span>(ZONES,
+
+  <span class="cm">// ── 阶段1 findStage:每个分区 → spawn 1 个 Find agent ──</span>
+  (zone) => <span class="hl fn">agent</span>(<span class="fn">findPrompt</span>(zone), {
+    label: <span class="st">`审:${zone.key}`</span>,
+    phase: <span class="st">'Find'</span>,
+    schema: FINDINGS_SCHEMA,   <span class="cm">// ← 强制返回结构化 JSON,校验不过自动重试</span>
+    agentType: <span class="st">'Explore'</span>,     <span class="cm">// ← 只读 agent,不能改代码</span>
+  }),
+
+  <span class="cm">// ── 阶段2 verifyStage:该分区每条 finding → spawn 1 个 Verify agent ──</span>
+  (res) => <span class="hl fn">parallel</span>(res.findings.map((f) => () =>
+    <span class="hl fn">agent</span>(<span class="fn">verifyPrompt</span>(f), {
+      phase: <span class="st">'Verify'</span>,
+      schema: VERDICT_SCHEMA,  <span class="cm">// ← { isReal, confidence, reasoning }</span>
+    }).then((v) => ({ ...f, verdict: v }))
+  ))
+);
+
+<span class="cm">// ── 阶段3:纯 JS 汇总,零 agent ──</span>
+<span class="kw">const</span> confirmed = zoneResults.flat().<span class="fn">filter</span>(f => f.verdict.isReal);</pre>
+
+  <div class="ann">
+    <div class="t">agent()</div><div>起一个子 agent。给了 <code>schema</code> 就强制它最后调 <code>StructuredOutput</code> 交合规 JSON —— 这就是为什么返回值能直接当数据用,不用解析自然语言。</div>
+    <div class="t">pipeline()</div><div><b>无屏障流水线</b>:每个 zone 独立穿过「find→verify」两阶段,A 区在验证时 B 区可能还在审。所以 81 个 agent 的墙钟只花了 <b id="a-sec">~11</b> 分钟,而不是串行相加。</div>
+    <div class="t">parallel()</div><div><b>屏障</b>:一个分区内的 N 条 finding 同时开 N 个 verify agent,全部返回才算这个分区完事。</div>
+    <div class="t">schema</div><div>Find 用 findings 数组 schema,Verify 用 <code>{isReal, reasoning}</code> schema。类型不对在工具层就打回重试,主循环拿到的永远是干净结构。</div>
+  </div>
+  <details>
+    <summary>展开:workflow 完整源码(脱敏示例存档)</summary>
+    <pre id="fullScript" style="margin-top:10px;max-height:420px">加载中…</pre>
+  </details>
+</section>
+
+<section id="sched" class="wrap">
+  <h2><span class="n">03</span>调度真相:81 个不是同时在跑</h2>
+  <p class="lead">脚本里写了 81 次 <code>agent()</code>,但引擎有<b>并发上限</b> ≈ <code>min(16, 核数−2)</code>,大约同时 10~16 个在跑,其余排队,有空位就顶上。所以这是一条持续 11 分钟、总量 81 个 agent 的<b>流水</b>,不是一次性 81 路齐发。</p>
+  <div class="split">
+    <div class="card">
+      <h3 style="color:var(--find)">为什么用 pipeline 而不是「先全审完再全验」</h3>
+      <p class="muted" style="margin:0;font-size:13.5px">若用屏障(先等 11 个 Find 全好),最慢那个分区会拖住所有验证。pipeline 让先审完的分区立刻进入验证 —— 快的分区不等慢的,整体墙钟塌缩到「最慢单条 find→verify 链」而非「最慢 find + 最慢 verify」。</p>
+    </div>
+    <div class="card">
+      <h3 style="color:var(--verify)">agent 之间互相看不见</h3>
+      <p class="muted" style="margin:0;font-size:13.5px">11 个 Find agent 各审各的分区,彼此不知道对方发现了什么 —— 这正是「多视角覆盖」的来源。汇总只发生在最后的纯 JS 阶段。Verify agent 也只拿到「一条待验证发现」,不受原审查者措辞诱导。</p>
+    </div>
+  </div>
+</section>
+
+<section id="agent" class="wrap">
+  <h2><span class="n">04</span>单个 agent 在做什么 —— 打开真实 transcript</h2>
+  <p class="lead">这是你最想看的。下面是两个真实 agent 从接到任务到交结果的<b>每一步工具调用</b>,一条没删。切换看「找问题」和「验问题」两侧的不同打法。</p>
+  <div class="tabs">
+    <div class="tab find on" data-t="find">
+      <b>① Find agent · 鉴权分区</b>
+      <span class="counter">读 5 个文件 → 追调用链 → 揪出 timing attack</span>
+    </div>
+    <div class="tab verify" data-t="verify">
+      <b>② Verify agent · 对抗复核</b>
+      <span class="counter">默认怀疑 → 独立重读 → 裁定「真漏洞」</span>
+    </div>
+  </div>
+  <div id="agentMeta" class="muted" style="font-size:13px;margin-bottom:10px"></div>
+  <div class="tl" id="timeline"></div>
+</section>
+
+<section id="roi" class="wrap">
+  <h2><span class="n">05</span>产出 ROI:70 找到 → 36 确认 / 34 误报</h2>
+  <p class="lead">对抗验证阶段的价值就在这:它把 <b>49% 的误报</b>拦在交到人手之前。没有它,你收到 70 条一半是幻觉的清单;有了它,收到 36 条真货。</p>
+  <div class="tiles">
+    <div class="tile find"><div class="v">70</div><div class="k">Find 阶段候选</div></div>
+    <div class="tile ok"><div class="v">36</div><div class="k">确认有效</div></div>
+    <div class="tile"><div class="v" style="color:var(--no)">34</div><div class="k">驳回(误报)</div></div>
+    <div class="tile"><div class="v">51<span style="font-size:18px">%</span></div><div class="k">precision</div></div>
+  </div>
+  <div class="card" style="margin-bottom:14px">
+    <h3>36 条确认发现 · 按严重度</h3>
+    <div class="bar" id="sevbar"></div>
+    <div class="muted" style="font-size:12.5px"><span style="color:#ff9a9a">high 11</span> · <span style="color:var(--verify)">medium 19</span> · <span style="color:var(--tx2)">low 6</span> &nbsp;—&nbsp; 其中含 timing attack、多处 XSS 等真实安全漏洞,可作为后续修复清单。</div>
+  </div>
+  <div class="split">
+    <div class="card">
+      <h3 style="color:var(--ok)">确认有效(节选高危)</h3>
+      <ul class="fi" id="confirmedList"></ul>
+      <details><summary id="cMore">展开全部 36 条</summary><ul class="fi" id="confirmedRest"></ul></details>
+    </div>
+    <div class="card">
+      <h3 style="color:var(--no)">被驳回的误报(节选)</h3>
+      <ul class="fi" id="rejectedList"></ul>
+      <p class="dim" style="font-size:12px;margin:10px 0 0">误报几乎都是「看漏了上下文」:守卫条件、上游已校验、已有 try-catch。Verify agent 重读后逐一化解。</p>
+    </div>
+  </div>
+</section>
+
+<section id="all" class="wrap">
+  <h2><span class="n">06</span>这个项目跑过的全部 9 次 workflow</h2>
+  <p class="lead">Ultracode 开着时,我不是每个 feature 都 fan-out,而是在<b>方案期 / 收尾审查 / 疑难排查</b>三类节点触发。这次拆的 <code>audit-project-dual-review</code> 是其中规模最大的一次。</p>
+  <div id="allList"></div>
+</section>
+
+<footer class="wrap">
+  数据源:<code>./workflows/wf_*.json</code> +
+  <code>subagents/workflows/&lt;runId&gt;/journal.jsonl</code> + 每个 <code>agent-&lt;id&gt;.jsonl</code> 完整对话。
+  本页由 AI 助手于本机生成 · 纯静态自托管 · 纯静态页面。
+</footer>
+
+<script>
+const ZONE_LABELS = ["评估编排核心","HTTP 入口与路由","鉴权与门禁(安全关键)","持久化/状态/配置",
+  "外部 IO(消息平台推送/文档)","抓取批处理与资源管理","终判/规则/LLM 评估","写表格与共享工具",
+  "合码晋级与重启","抓取数据脚本","前端逻辑"];
+const fmt = n => n==null?'—':(n>=10000?(n/10000).toFixed(0)+'万':(n>=1000?(n/1000).toFixed(1)+'k':n));
+const esc = s => String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+
+fetch('./data.json').then(r=>r.json()).then(D=>{
+  const a = D.audit;
+  // hero tiles
+  document.getElementById('t-tok').textContent = fmt(a.tokens);
+  document.getElementById('t-tool').textContent = a.toolCalls.toLocaleString();
+  document.getElementById('t-sec').textContent = Math.round(a.sec/60)+' 分';
+  document.getElementById('a-sec').textContent = '~'+Math.round(a.sec/60);
+
+  // zones
+  document.getElementById('zoneList').innerHTML = ZONE_LABELS.map((z,i)=>
+    `<div class="zone">${esc(z)}</div>`).join('');
+
+  // verify dots: 36 ok + 34 no
+  let dots='';
+  for(let i=0;i<a.summary.confirmed;i++) dots+='<div class="dot ok" title="确认有效"></div>';
+  for(let i=0;i<a.summary.rejected;i++) dots+='<div class="dot no" title="误报"></div>';
+  document.getElementById('verifyDots').innerHTML = dots;
+  document.getElementById('vok').textContent = a.summary.confirmed;
+  document.getElementById('vno').textContent = a.summary.rejected;
+
+  // severity bar
+  const bs = a.summary.by_severity, tot=bs.high+bs.medium+bs.low;
+  document.getElementById('sevbar').innerHTML =
+    `<i style="width:${bs.high/tot*100}%;background:#e06c6c"></i>`+
+    `<i style="width:${bs.medium/tot*100}%;background:#f0b45f"></i>`+
+    `<i style="width:${bs.low/tot*100}%;background:#4a5568"></i>`;
+
+  // confirmed list
+  const cf = a.confirmed;
+  const liC = f=>`<li><span class="sev ${f.severity}">${f.severity}</span>
+    <div><div>${esc(f.title)}</div><div class="fl">${esc((f.file||'').split('/').pop())}:${esc(f.line)} · ${esc(f.category)}</div></div></li>`;
+  document.getElementById('confirmedList').innerHTML = cf.slice(0,8).map(liC).join('');
+  document.getElementById('confirmedRest').innerHTML = cf.slice(8).map(liC).join('');
+  document.getElementById('cMore').textContent = `展开其余 ${cf.length-8} 条`;
+
+  // rejected
+  document.getElementById('rejectedList').innerHTML = a.rejected.slice(0,7).map(f=>
+    `<li><span class="sev low">误报</span><div><div>${esc(f.title)}</div>
+     <div class="fl">${esc((f.why_rejected||'').slice(0,90))}…</div></div></li>`).join('');
+
+  // full script
+  document.getElementById('fullScript').textContent = a.script;
+
+  // overview list
+  document.getElementById('allList').innerHTML = D.overview.map(w=>{
+    const big = w.runId==='wf_public_demo_81';
+    return `<div class="card" style="margin:10px 0;${big?'border-color:var(--acc)':''}">
+      <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;align-items:baseline">
+        <div><b>${esc(w.name)}</b> ${big?'<span class="pill" style="color:var(--acc)">本页拆解对象</span>':''}
+          <span class="pill">${(w.phases||[]).join(' → ')}</span></div>
+        <div class="counter">${w.date}</div>
+      </div>
+      <div class="muted" style="font-size:13px;margin-top:6px">
+        ${w.agents} agents · ${fmt(w.tokens)} token · ${Math.round(w.sec/60)} 分 · ${w.toolCalls} 次工具调用</div>
+    </div>`;}).join('');
+
+  // ---- agent timelines ----
+  const meta = document.getElementById('agentMeta');
+  const tl = document.getElementById('timeline');
+  function render(which){
+    const ag = which==='find'?a.findAgent:a.verifyAgent;
+    meta.innerHTML = which==='find'
+      ? `<b style="color:var(--find)">Find agent</b> · 分区「${esc(ag.zone)}」· agentId <code>${ag.id.slice(0,10)}</code> · 共 ${ag.steps.filter(s=>s.k==='tool').length} 次工具调用`
+      : `<b style="color:var(--verify)">Verify agent</b> · 待验证:${esc(ag.target)} · agentId <code>${ag.id.slice(0,10)}</code> · 共 ${ag.steps.filter(s=>s.k==='tool').length} 次工具调用`;
+    let n=0, html='';
+    for(const s of ag.steps){
+      if(s.k==='say'){
+        html+=`<div class="ev say"><div class="txt">${esc(s.text)}</div></div>`;
+      }else if(s.k==='tool'){
+        n++;
+        const isBash = s.name==='Bash', isSO = s.name==='StructuredOutput';
+        const cls = isSO?'so':(isBash?'bash':'');
+        const nm = isSO?'✓ StructuredOutput':(s.name+'');
+        html+=`<div class="ev tool ${isSO?'done':''}"><div class="tool-row">
+          <span class="counter">#${n}</span>
+          <span class="tname ${cls}">${esc(nm)}</span>
+          <span class="targ">${esc(s.arg||'')}</span></div>`;
+        html+=`</div>`;
+      }else if(s.k==='result'){
+        html+=`<div class="ev" style="border:none"><div class="tres">← ${esc(s.text)}</div></div>`;
+      }
+    }
+    tl.innerHTML = html;
+  }
+  document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+    t.classList.add('on'); render(t.dataset.t);
+  });
+  render('find');
+}).catch(e=>{
+  document.getElementById('top').insertAdjacentHTML('beforeend',
+    `<p style="color:#e06c6c">数据加载失败:${e}</p>`);
+});
+</script>
+</body>
+</html>

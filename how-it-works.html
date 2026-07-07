@@ -1,0 +1,663 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Workflow 原理 · 一段脚本是怎么运行起来的</title>
+<style>
+  :root{
+    --bg:#0e1116; --panel:#161b22; --panel2:#1c2230; --line:#2a3240;
+    --tx:#e6edf3; --tx2:#9aa7b6; --tx3:#6b7684;
+    --find:#6ea8fe; --find-bg:#16233a; --find-br:#2a4066;
+    --verify:#f0b45f; --verify-bg:#2a2213; --verify-br:#4a3d1c;
+    --ok:#4bbf73; --ok-bg:#12271a;
+    --no:#e06c6c; --no-bg:#2a1618;
+    --acc:#b78bff; --acc-bg:#221934; --acc-br:#3d2f5c;
+    --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg);color:var(--tx);font-family:var(--sans);line-height:1.65;font-size:15px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:940px;margin:0 auto;padding:0 20px}
+  header{position:sticky;top:0;z-index:30;background:rgba(14,17,22,.85);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  nav{display:flex;gap:2px;flex-wrap:wrap;padding:9px 20px;max-width:940px;margin:0 auto;font-size:13px}
+  nav a{color:var(--tx2);text-decoration:none;padding:5px 10px;border-radius:20px;white-space:nowrap}
+  nav a:hover{background:var(--panel2);color:var(--tx)}
+  h1{font-size:29px;line-height:1.25;margin:34px 0 6px;letter-spacing:-.5px}
+  h1 .sub{display:block;color:var(--tx2);font-weight:400;font-size:16px;margin-top:8px}
+  h2{font-size:21px;margin:8px 0 6px;letter-spacing:-.3px}
+  h2 .n{font-family:var(--mono);color:var(--acc);font-size:15px;margin-right:8px}
+  h3{font-size:15px;margin:0 0 8px}
+  section{padding:38px 0;border-top:1px solid var(--line)}
+  .lead{color:var(--tx2);max-width:72ch}
+  .muted{color:var(--tx2)} .dim{color:var(--tx3)}
+  code{font-family:var(--mono);background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+  b.hl{color:var(--acc)}
+  pre{background:#0b0e13;border:1px solid var(--line);border-radius:12px;padding:15px;overflow-x:auto;
+    font-family:var(--mono);font-size:12.5px;line-height:1.7;color:#c9d4e0;margin:12px 0}
+  pre .cm{color:#5f6b7a} pre .kw{color:#f0b45f} pre .fn{color:#6ea8fe} pre .st{color:#7ec98f} pre .hl{color:#b78bff;font-weight:600}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+  .grid{display:grid;gap:12px}
+  .g2{grid-template-columns:1fr 1fr} .g3{grid-template-columns:repeat(3,1fr)} .g5{grid-template-columns:repeat(5,1fr)}
+  @media(max-width:760px){.g2,.g3,.g5{grid-template-columns:1fr}}
+
+  /* round-trip diagram */
+  .rt{display:flex;flex-direction:column;gap:0;margin:18px 0}
+  .rt-node{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;position:relative}
+  .rt-node .tag{font-family:var(--mono);font-size:11px;padding:2px 8px;border-radius:20px;position:absolute;right:14px;top:14px}
+  .rt-arrow{text-align:center;color:var(--tx3);font-size:13px;padding:6px 0;font-family:var(--mono)}
+  .t-me{background:var(--acc-bg);color:var(--acc)} .t-eng{background:var(--panel2);color:var(--tx2)}
+  .t-sub{background:var(--find-bg);color:var(--find)} .t-data{background:var(--ok-bg);color:var(--ok)}
+
+  /* primitives */
+  .prim{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+  .prim .nm{font-family:var(--mono);color:var(--find);font-size:14px;font-weight:600}
+  .prim .d{font-size:13px;color:var(--tx2);margin:5px 0 8px}
+  .prim code{font-size:11px;display:block;background:#0b0e13;padding:6px 8px;border-radius:6px;color:#9fb4cc;overflow-x:auto}
+
+  /* knob */
+  .knob{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:8px 0 14px}
+  input[type=range]{width:220px;accent-color:var(--acc)}
+  .knobval{font-family:var(--mono);font-size:15px;color:var(--acc);min-width:150px}
+  .agentbox{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  .abox{width:34px;height:34px;border-radius:7px;background:var(--find-bg);border:1px solid var(--find-br);
+    display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;color:var(--find);
+    animation:pop .18s ease}
+  @keyframes pop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+  .eqline{font-family:var(--mono);font-size:13px;color:var(--tx2);margin-top:10px}
+
+  /* gantt */
+  .modebtns{display:flex;gap:8px;margin:6px 0 14px;flex-wrap:wrap;align-items:center}
+  .mbtn{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:8px 14px;cursor:pointer;font-size:13px;color:var(--tx2)}
+  .mbtn.on{border-color:var(--acc);background:var(--acc-bg);color:var(--tx)}
+  .play{background:var(--acc-bg);border:1px solid var(--acc-br);color:var(--acc);border-radius:9px;padding:8px 16px;cursor:pointer;font-size:13px;font-weight:600}
+  .gantt{background:#0b0e13;border:1px solid var(--line);border-radius:12px;padding:16px 16px 8px;position:relative;overflow:hidden}
+  .grow{display:flex;align-items:center;gap:10px;height:34px;position:relative}
+  .glabel{width:132px;font-size:12px;color:var(--tx2);flex-shrink:0;text-align:right;font-family:var(--mono)}
+  .gtrack{flex:1;position:relative;height:22px}
+  .gbar{position:absolute;height:22px;border-radius:5px;top:0;display:flex;align-items:center;padding:0 7px;
+    font-size:10px;font-family:var(--mono);color:#0b0e13;font-weight:700;white-space:nowrap;overflow:hidden;transition:opacity .2s}
+  .g-find{background:var(--find)} .g-verify{background:var(--verify)}
+  .g-idle{position:absolute;height:22px;top:0;border-radius:5px;
+    background:repeating-linear-gradient(45deg,#2a161822,#2a161822 5px,#e06c6c33 5px,#e06c6c33 10px);border:1px dashed #e06c6c55}
+  .playhead{position:absolute;top:8px;bottom:26px;width:2px;background:var(--acc);box-shadow:0 0 8px var(--acc);opacity:0;z-index:5}
+  .baxis{border-top:1px solid var(--line);margin-top:6px;padding-top:5px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--tx3)}
+  .barrier{position:absolute;top:8px;bottom:26px;width:2px;background:var(--no);opacity:.55;z-index:4}
+  .barrier::after{content:"屏障:等最慢的";position:absolute;top:-2px;left:5px;font-size:9px;color:var(--no);white-space:nowrap;font-family:var(--sans)}
+  .totalline{display:flex;gap:22px;margin-top:12px;font-size:13px;flex-wrap:wrap}
+  .totalline b{font-family:var(--mono)}
+
+  /* concurrency */
+  .pool{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+  .pdot{width:22px;height:22px;border-radius:5px;font-family:var(--mono);font-size:9px;display:flex;align-items:center;justify-content:center}
+  .p-run{background:var(--ok);color:#08130c;animation:pulse 1.4s infinite}
+  .p-queue{background:var(--panel2);color:var(--tx3);border:1px solid var(--line)}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+
+  table{border-collapse:collapse;width:100%;font-size:13.5px;margin-top:10px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--tx2);font-weight:600;font-size:12.5px}
+  td code{font-size:12px}
+  .pill{display:inline-block;font-size:11px;font-family:var(--mono);padding:2px 8px;border-radius:20px;background:var(--panel2);color:var(--tx2)}
+  .link{display:inline-block;margin-top:6px;color:var(--find);font-size:13.5px;text-decoration:none}
+  .link:hover{text-decoration:underline}
+  footer{padding:36px 0 60px;color:var(--tx3);font-size:12.5px;border-top:1px solid var(--line)}
+  .callout{border-left:3px solid var(--acc);background:var(--acc-bg);border-radius:0 10px 10px 0;padding:12px 16px;margin:14px 0;font-size:14px}
+
+  /* two-level fan-out (real audit) */
+  .tl-bar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:14px 0 14px}
+  .tl-count{font-size:13.5px;color:var(--tx2)} .tl-count b{color:var(--acc);font-family:var(--mono);font-size:16px}
+  .zonesrow{display:flex;flex-wrap:wrap;gap:10px}
+  .zonecard{width:calc(25% - 8px);min-width:158px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:10px;display:flex;flex-direction:column;gap:7px}
+  @media(max-width:760px){.zonecard{width:calc(50% - 5px)}}
+  .zc-head{background:var(--find-bg);border:1px solid var(--find-br);border-radius:8px;padding:7px 9px;font-size:12px;color:#cfe0ff;line-height:1.35}
+  .zc-head .t{font-family:var(--mono);font-size:10px;color:var(--find);opacity:.85}
+  .zc-meta{font-family:var(--mono);font-size:10px;color:var(--verify);min-height:12px}
+  .zc-dots{display:flex;flex-wrap:wrap;gap:4px;min-height:14px}
+  .vdot{width:13px;height:13px;border-radius:4px;animation:pop .18s ease}
+  .vdot.ok{background:var(--ok)} .vdot.no{background:var(--no);opacity:.85}
+  .tl-legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;font-size:13px}
+  .tl-legend i.ld{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:4px}
+  .tl-legend i.ld.ok{background:var(--ok)} .tl-legend i.ld.no{background:var(--no)}
+  .tl-legend b{color:var(--tx);font-family:var(--mono)}
+  button:disabled{opacity:.5;cursor:default}
+  .blackbox summary{cursor:pointer;color:var(--find);font-size:14px;padding:8px 0}
+  .blackbox .bbh{font-size:13.5px;margin:16px 0 4px;color:var(--tx)}
+  .blackbox .bbpre{font-size:12px;line-height:1.6;max-height:none;white-space:pre-wrap;word-break:break-word}
+</style>
+</head>
+<body>
+<header><nav class="wrap">
+  <a href="#top">心智模型</a>
+  <a href="#prim">五个原语</a>
+  <a href="#count">agent 数从哪来</a>
+  <a href="#sched">并行 vs 流水线</a>
+  <a href="#cap">并发上限</a>
+  <a href="#model">模型/推理档</a>
+  <a href="#trip">脚本↔存档</a>
+</nav></header>
+
+<div class="wrap" id="top">
+  <h1>Workflow 是怎么运行起来的
+    <span class="sub">不是"选一个模板",而是<b class="hl">我当场写一段 JS,引擎逐行执行它</b> —— 每遇到一次 <code>agent()</code> 就派一个子 LLM 去干活</span>
+  </h1>
+
+  <div class="rt">
+    <div class="rt-node"><span class="tag t-me">我(主循环)</span>
+      <h3>① 写一段 JS 脚本</h3>
+      <div class="muted" style="font-size:13.5px">不是 JSON、不是配置。是带 <code>meta</code> + <code>agent()/parallel()/pipeline()</code> 的普通 JavaScript。控制流(循环/条件/fan-out)由我决定。</div>
+    </div>
+    <div class="rt-arrow">▼ 把整段 script 交给 Workflow 工具</div>
+    <div class="rt-node"><span class="tag t-eng">引擎</span>
+      <h3>② 逐行执行这段脚本</h3>
+      <div class="muted" style="font-size:13.5px">脚本体在一个 async 环境里跑。<code>await agent(...)</code> 时,引擎 <b>spawn 一个独立子 agent</b>(一个新的 LLM 会话)。</div>
+    </div>
+    <div class="rt-arrow">▼ 每个 agent() 调用 = 一个子进程级的 LLM</div>
+    <div class="rt-node"><span class="tag t-sub">子 agent × N</span>
+      <h3>③ 每个子 agent 独立干活</h3>
+      <div class="muted" style="font-size:13.5px">拿到 prompt,自己用 Read/Grep/Bash 等工具查、想、跑,最后返回结果(给了 <code>schema</code> 就返回校验过的 JSON)。彼此互相看不见。</div>
+    </div>
+    <div class="rt-arrow">▼ 返回值 = 数据(不是给人看的话)</div>
+    <div class="rt-node"><span class="tag t-data">数据回到脚本</span>
+      <h3>④ 脚本汇总,return 给我</h3>
+      <div class="muted" style="font-size:13.5px">纯 JS 把结果过滤/排序/合并,<code>return</code> 一个干净对象。我(主循环)拿到它,再决定下一步动作。全程存档成 <code>wf_*.json</code>。</div>
+    </div>
+  </div>
+  <div class="callout"><b>一句话抓住本质:</b>骨架(要开几个 agent、谁先谁后、怎么合)是<b>确定性的代码</b>;每个 agent 内部做什么是<b>非确定性的智能</b>。Workflow 就是"用确定的代码,编排不确定的智能"。</div>
+</div>
+
+<section id="prim" class="wrap">
+  <h2><span class="n">01</span>五个原语 —— 全部编排都由它们拼出</h2>
+  <p class="lead">你不需要学一门新语言。整个 Workflow 的 API 就下面 5 个函数,其余全是普通 JS。</p>
+  <div class="grid g2" style="margin-top:14px">
+    <div class="prim"><div class="nm">agent(prompt, opts?)</div>
+      <div class="d">派 1 个子 agent。给 <code>schema</code> 就强制返回结构化 JSON;给 <code>agentType</code> 换 agent 类型(连带换模型)。这是唯一"真花钱"的原语。</div>
+      <code>const r = await agent('查X', {schema:S})</code></div>
+    <div class="prim"><div class="nm">parallel([fn, fn, …])</div>
+      <div class="d"><b>屏障式</b>并发:同时跑一批,<b>等全部返回</b>才继续。要"所有结果凑齐再算"时用。</div>
+      <code>await parallel(items.map(x=>()=>agent(...)))</code></div>
+    <div class="prim"><div class="nm">pipeline(items, s1, s2, …)</div>
+      <div class="d"><b>无屏障</b>流水线:每个 item 独立穿过所有阶段,<b>互不等待</b>。多阶段的默认选择,墙钟最短。</div>
+      <code>await pipeline(items, find, verify)</code></div>
+    <div class="prim"><div class="nm">phase(title) / log(msg)</div>
+      <div class="d">纯展示:给进度树分组、给你打进度行。不影响逻辑,不花钱。</div>
+      <code>phase('Verify'); log('已确认 36 条')</code></div>
+  </div>
+</section>
+
+<section id="count" class="wrap">
+  <h2><span class="n">02</span>agent 数目从哪来 —— 没有"数量字段",是控制流的结果</h2>
+  <p class="lead">很多人以为有个 <code>agentCount:81</code> 之类的开关。<b>没有。</b>存档里的 <code>agentCount</code> 是引擎跑完<b>数出来</b>的回执。真正的"旋钮"是你 <code>map</code> 的<b>数组长度</b>。拖下面试试:</p>
+  <div class="knob">
+    <input type="range" id="nSlider" min="1" max="24" value="3">
+    <div class="knobval" id="nVal">ITEMS.length = 3</div>
+  </div>
+  <pre style="margin:0 0 12px">const ITEMS = [<span id="itemsPreview" class="st">'a','b','c'</span>]   <span class="cm">// ← 就是这里。加一项 = 多一个 agent</span>
+<span class="kw">await</span> <span class="hl fn">parallel</span>(ITEMS.map(x => () => <span class="hl fn">agent</span>(<span class="st">`处理 ${x}`</span>)))</pre>
+  <div class="agentbox" id="agentBoxes"></div>
+  <div class="eqline">→ 引擎数出来:<code>agentCount === ITEMS.length === <b id="eqN" style="color:var(--acc)">3</b></code> &nbsp;·&nbsp; 没有任何地方写死这个数字</div>
+  <div class="grid g3" style="margin-top:18px">
+    <div class="card"><h3 style="color:var(--find)">静态</h3><div class="muted" style="font-size:13px">数组长度 / 写几次 agent()。如上,你说了算。</div></div>
+    <div class="card"><h3 style="color:var(--verify)">动态</h3><div class="muted" style="font-size:13px">运行时数据决定。audit:Verify 数 = Find <b>实际找出</b>的 70 条,跑之前不知道。</div></div>
+    <div class="card"><h3 style="color:var(--acc)">循环到某条件</h3><div class="muted" style="font-size:13px"><code>while(找到&lt;10)</code> 或 <code>while(预算&gt;50k)</code>,一直派到满足。</div></div>
+  </div>
+
+  <h3 style="margin-top:28px">真实场景:audit 那次 <b class="hl">81 个 agent</b> 的「两层扇出」</h3>
+  <p class="lead" style="margin-top:4px">上面的滑块是最简单的<b>单层</b>(一个数组 → 数组多长就多少 agent)。但 81 那种大扇出是<b>两层</b>,而且<b>我只手写了第一层</b>:
+    <b style="color:var(--find)">第一层</b> = 我写的 <code>ZONES</code>(11 项,下面每张蓝卡);
+    <b style="color:var(--verify)">第二层</b> = 每个 find agent <b>运行时跑出来</b>的 findings,我只写了「对每条都验一下」的 <code>.map</code>,<b>没写这些 item</b>。点播放,看第二层怎么冒出来把 11 撑到 81:</p>
+  <div class="tl-bar">
+    <button class="play" id="tlRun" onclick="runTwoLevel()">▶ 跑 Find,看第二层冒出来</button>
+    <button class="mbtn" onclick="resetTwoLevel()">↺ 重置</button>
+    <div class="tl-count" id="tlCount">当前 agent 数:<b>11</b> <span class="dim">— 只有第一层(你写的 ZONES)</span></div>
+  </div>
+  <div class="zonesrow" id="zonesRow"></div>
+  <div class="tl-legend">
+    <span><i class="ld ok"></i> 确认有效 <b id="tlOk">0</b></span>
+    <span><i class="ld no"></i> 误报驳回 <b id="tlNo">0</b></span>
+    <span class="dim" id="tlSum">第二层还没跑</span>
+  </div>
+  <pre style="margin-top:14px">const ZONES = [ <span class="cm">/* 11 个分区对象,我手写 */</span> ]      <span class="cm">// ← 第一层:唯一我写的数组</span>
+<span class="kw">await</span> <span class="hl fn">pipeline</span>(ZONES,
+  (zone) => <span class="fn">agent</span>(findPrompt(zone), {…}),           <span class="cm">// stage1 → 11 个 find agent</span>
+  (res)  => <span class="fn">parallel</span>(res.<span class="hl">findings</span>.map(f => () =>    <span class="cm">// ★ res.findings 是跑出来的,不是我写的</span>
+              <span class="fn">agent</span>(verifyPrompt(f), {…}))))        <span class="cm">// stage2 → 有几条就几个 verify agent</span></pre>
+  <details class="blackbox" style="margin-top:14px">
+    <summary>🔓 拆开上面的黑盒 —— <code>ZONES</code> / <code>findPrompt</code> / <code>{…}</code> 的脱敏示例完整值(audit 存档逐字原文)</summary>
+    <p class="dim" style="font-size:12.5px;margin:12px 0 4px">下面每一段都是那次 <code>wf_public_demo_81</code> 里我实际写的、已脱敏的源码。</p>
+
+    <h4 class="bbh">① <code>ZONES</code> —— 我手写的 11 个分区对象(第一层扇出的全部输入)</h4>
+    <pre class="bbpre">const ZONES = [
+  {
+    key: &#x27;eval-runner&#x27;,
+    label: &#x27;评估编排核心&#x27;,
+    files: [&#x27;web/lib/eval-runner.mjs&#x27;],
+    focus: &#x27;步骤树/事件映射/防卡死兜底、子任务 fork 并发、Promise 编排、错误传播、状态机一致性&#x27;,
+  },
+  {
+    key: &#x27;http-routes&#x27;,
+    label: &#x27;HTTP 入口与路由&#x27;,
+    files: [&#x27;web/server.mjs&#x27;, &#x27;web/lib/recipients-routes.mjs&#x27;, &#x27;web/lib/release-push-routes.mjs&#x27;, &#x27;web/lib/step-detail.mjs&#x27;, &#x27;web/lib/html.mjs&#x27;],
+    focus: &#x27;路由鉴权挂载顺序、输入校验、路径穿越、未捕获异常导致进程崩溃、SSRF/注入、响应缓存语义&#x27;,
+  },
+  {
+    key: &#x27;auth-gate&#x27;,
+    label: &#x27;鉴权与门禁（安全关键）&#x27;,
+    files: [&#x27;web/lib/auth.mjs&#x27;, &#x27;web/lib/group-gate.mjs&#x27;, &#x27;web/lib/search-tools-gate.mjs&#x27;, &#x27;web/lib/scanner-block.mjs&#x27;, &#x27;web/lib/audit-log.mjs&#x27;],
+    focus: &#x27;token 校验时序安全（恒定时间比较）、fail-open vs fail-close、CSRF、可伪造身份、门禁绕过、审计脱敏、break-glass 总闸是否会被误开&#x27;,
+  },
+  {
+    key: &#x27;state-config&#x27;,
+    label: &#x27;持久化/状态/配置&#x27;,
+    files: [&#x27;web/lib/task-store.mjs&#x27;, &#x27;web/lib/config.mjs&#x27;, &#x27;web/lib/util.mjs&#x27;],
+    focus: &#x27;并发写文件竞态、JSON 损坏恢复、滚动淘汰边界、配置解析回退、原子写、锁&#x27;,
+  },
+  {
+    key: &#x27;external-io&#x27;,
+    label: &#x27;外部 IO（消息/文档/播报）&#x27;,
+    files: [&#x27;web/lib/chat-client.ts&#x27;, &#x27;web/lib/docs-client.ts&#x27;, &#x27;web/lib/release-announce.mjs&#x27;, &#x27;web/lib/recipients.mjs&#x27;],
+    focus: &#x27;await 缺失导致推送丢失、重试/幂等、token 过期处理、推群幂等、@占位、播报取数口径、网络错误吞没&#x27;,
+  },
+  {
+    key: &#x27;pipeline-batch&#x27;,
+    label: &#x27;抓取批处理与资源管理&#x27;,
+    files: [&#x27;decoupled-pipeline/pipeline/run-batch.mjs&#x27;, &#x27;decoupled-pipeline/pipeline/run-one.mjs&#x27;, &#x27;decoupled-pipeline/pipeline/collect/collect-one.mjs&#x27;, &#x27;decoupled-pipeline/pipeline/collect/prefetch-snapshots.mjs&#x27;, &#x27;decoupled-pipeline/shared/proc.mjs&#x27;],
+    focus: &#x27;chromium 进程/上下文泄漏、fetch 无超时挂起、idle watchdog 整树杀、分块续跑、孤儿进程、并发名额争抢、per-item browser 泄漏&#x27;,
+  },
+  {
+    key: &#x27;pipeline-eval&#x27;,
+    label: &#x27;终判/规则/LLM 评估&#x27;,
+    files: [&#x27;decoupled-pipeline/pipeline/evaluate/coco-evaluate.mjs&#x27;, &#x27;decoupled-pipeline/pipeline/evaluate/precision-evaluate.mjs&#x27;, &#x27;decoupled-pipeline/pipeline/evaluate/precision-rules.mjs&#x27;, &#x27;decoupled-pipeline/pipeline/evaluate/rule-override.mjs&#x27;, &#x27;decoupled-pipeline/pipeline/evaluate/landing-probe.mjs&#x27;, &#x27;decoupled-pipeline/pipeline/evaluate/dedupe-suggestions.mjs&#x27;],
+    focus: &#x27;coco 子进程超时与进程树杀、规则判定口径、空壳卡误判、LLM 结果解析健壮性、分母统计漏算、规则 try-catch 缺口&#x27;,
+  },
+  {
+    key: &#x27;pipeline-write&#x27;,
+    label: &#x27;写表格与共享工具&#x27;,
+    files: [&#x27;decoupled-pipeline/pipeline/write/write-feishu-sheet.mjs&#x27;, &#x27;decoupled-pipeline/pipeline/write/render-report.mjs&#x27;, &#x27;decoupled-pipeline/shared/io.mjs&#x27;, &#x27;decoupled-pipeline/shared/prefilter-version.mjs&#x27;],
+    focus: &#x27;写表行定位错位、并发 addSheet 竞态、部分失败处理、写回口径、目标行计算&#x27;,
+  },
+  {
+    key: &#x27;promote&#x27;,
+    label: &#x27;合码晋级与重启（铁律相关）&#x27;,
+    files: [&#x27;scripts/promote.mjs&#x27;, &#x27;scripts/safe-restart.mjs&#x27;],
+    focus: &#x27;受保护分支直推、预演合并测试还原、finalize 已合判定鲁棒性、并发锁、重启前在跑任务检查、事务幂等、播报误用旧 changelog&#x27;,
+  },
+  {
+    key: &#x27;scripts-fetch&#x27;,
+    label: &#x27;抓取数据脚本&#x27;,
+    files: [&#x27;scripts/create-fetch-task.mjs&#x27;, &#x27;scripts/chunked-resume.mjs&#x27;, &#x27;scripts/fetch-review-top3.ts&#x27;, &#x27;scripts/stable-parallel-top3-by-logid.mjs&#x27;, &#x27;scripts/metrics-fetch.ts&#x27;, &#x27;scripts/metrics-cli.ts&#x27;],
+    focus: &#x27;fetch 无超时、SQL 拼接注入、cookie 过期未触发自动刷、并发 chromium 堆积、错误吞没、req() 挂起&#x27;,
+  },
+  {
+    key: &#x27;frontend&#x27;,
+    label: &#x27;前端逻辑&#x27;,
+    files: [&#x27;web/public/app.js&#x27;, &#x27;web/public/dashboard.js&#x27;, &#x27;web/public/board-schema.js&#x27;],
+    focus: &#x27;XSS（innerHTML 未转义）、轮询泄漏、状态不一致、flow-steps 引用解析、错误未处理的 fetch、内存泄漏&#x27;,
+  },
+]</pre>
+
+    <h4 class="bbh">② <code>findPrompt(zone)</code> —— 11 个 find agent 各自收到的 prompt(模板 × 每个 zone 的值)</h4>
+    <pre class="bbpre">function findPrompt(zone) {
+  return `你是资深代码审查者，正在审计「示例评估看板项目」项目（生产中的公开脱敏示例）。
+主链路：读取任务 → 抓取页面/接口结果 → 规则+LLM 终判 → 写回报告。
+项目根目录：${ROOT}
+
+【你负责的审查分区：${zone.label}】
+请用 Read 工具完整读取以下文件（必要时 Grep 它们调用/被调用的上下文，但审查范围聚焦这些文件）：
+${zone.files.map(f =&gt; `  - ${ROOT}/${f}`).join(&#x27;\n&#x27;)}
+
+【重点关注】${zone.focus}
+
+【要求】
+- 找真实的漏洞、缺陷、需重构处。优先正确性 bug、安全漏洞、资源泄漏、并发竞态、错误处理缺口。
+- 每条发现必须引用具体代码作为 evidence（行号 + 关键片段），不能泛泛而谈、不能臆测。
+- 宁缺毋滥：没把握成立的不要报。重构类(refactor)只报真正影响正确性/可维护性的，不报纯风格/命名。
+- 注意这是生产工具，已经过多轮人工 + CodeX review，明显的低级错误大概率已被修过——你要找的是被遗漏的、深层的、边界的问题。
+- 如果某文件确实没发现实质问题，findings 里就别硬凑。
+
+返回结构化 findings 数组。`
+}</pre>
+
+    <h4 class="bbh">③ <code>verifyPrompt(f)</code> —— 70 个 verify agent 各自收到的 prompt(f = 上一层某条 finding)</h4>
+    <pre class="bbpre">function verifyPrompt(f) {
+  return `你是严格的代码审查验证者，任务是【对抗性地验证】下面这条审查发现是否真实成立。默认怀疑它是误报，除非代码证据确凿。
+项目根目录：${ROOT}
+
+【待验证的发现】
+标题：${f.title}
+文件：${f.file}
+行号：${f.line}
+严重度：${f.severity}（${f.category}）
+描述：${f.description}
+证据：${f.evidence}
+建议：${f.suggestion}
+
+【你必须做的】
+1. 用 Read 工具打开 ${ROOT}/${f.file}，定位到 ${f.line} 附近的真实代码。
+2. 核对：审查者引用的代码是否真实存在？逻辑是否真如其所述？有没有它没看到的上下文（如上游已校验、调用方已处理、有 try-catch 兜底、测试已覆盖）使这个&quot;问题&quot;实际不成立？
+3. 必要时 Grep 调用链、相关测试文件（test/ 目录）确认是否已有防护或已被处理。
+4. 给出裁决：isReal=true 仅当你独立确认这确实是个真问题；isReal=false 若它是误报、被上下文化解、或基于对&quot;净 diff/既有代码&quot;的误读。
+reasoning 必须引用你实际看到的代码，不能复述原描述。`
+}</pre>
+
+    <h4 class="bbh">④ 那两个 <code>{…}</code> 到底是什么 —— 真实的 <code>pipeline</code> 调用 + agent opts</h4>
+    <pre class="bbpre">const zoneResults = await pipeline(
+  ZONES,
+  // stage 1: 分区审查
+  (zone) =&gt; agent(findPrompt(zone), {
+    label: `审:${zone.key}`,
+    phase: &#x27;Find&#x27;,
+    schema: FINDINGS_SCHEMA,
+    agentType: &#x27;Explore&#x27;,
+  }).then(r =&gt; ({ zone, findings: (r &amp;&amp; r.findings) || [] })),
+  // stage 2: 对该分区每条发现并行对抗验证
+  (res) =&gt; {
+    if (!res || !res.findings.length) return { zone: res ? res.zone : null, verified: [] }
+    return parallel(res.findings.map(f =&gt; () =&gt;
+      agent(verifyPrompt(f), {
+        label: `验:${f.file.split(&#x27;/&#x27;).pop()}:${f.line}`,
+        phase: &#x27;Verify&#x27;,
+        schema: VERDICT_SCHEMA,
+        agentType: &#x27;Explore&#x27;,
+      }).then(v =&gt; ({ ...f, verdict: v })).catch(() =&gt; ({ ...f, verdict: null }))
+    )).then(verified =&gt; ({ zone: res.zone, verified }))
+  }
+)</pre>
+
+    <h4 class="bbh">⑤ opts 里的 <code>schema</code> 引用的两个校验模板(决定 agent 必须返回什么形状)</h4>
+    <pre class="bbpre">const FINDINGS_SCHEMA = {
+  type: &#x27;object&#x27;,
+  properties: {
+    findings: {
+      type: &#x27;array&#x27;,
+      items: {
+        type: &#x27;object&#x27;,
+        properties: {
+          title: { type: &#x27;string&#x27;, description: &#x27;一句话问题标题&#x27; },
+          file: { type: &#x27;string&#x27;, description: &#x27;文件路径&#x27; },
+          line: { type: &#x27;string&#x27;, description: &#x27;行号或行号范围（尽量精确）&#x27; },
+          severity: { type: &#x27;string&#x27;, enum: [&#x27;high&#x27;, &#x27;medium&#x27;, &#x27;low&#x27;], description: &#x27;high=正确性bug/安全漏洞/数据损坏；medium=边界/健壮性缺口；low=重构/可维护性&#x27; },
+          category: { type: &#x27;string&#x27;, enum: [&#x27;bug&#x27;, &#x27;security&#x27;, &#x27;resource-leak&#x27;, &#x27;race&#x27;, &#x27;error-handling&#x27;, &#x27;refactor&#x27;] },
+          description: { type: &#x27;string&#x27;, description: &#x27;问题是什么、为什么是问题、触发条件&#x27; },
+          evidence: { type: &#x27;string&#x27;, description: &#x27;引用的关键代码片段（证明问题存在）&#x27; },
+          suggestion: { type: &#x27;string&#x27;, description: &#x27;建议怎么修&#x27; },
+        },
+        required: [&#x27;title&#x27;, &#x27;file&#x27;, &#x27;line&#x27;, &#x27;severity&#x27;, &#x27;category&#x27;, &#x27;description&#x27;, &#x27;evidence&#x27;, &#x27;suggestion&#x27;],
+      },
+    },
+  },
+  required: [&#x27;findings&#x27;],
+}
+
+const VERDICT_SCHEMA = {
+  type: &#x27;object&#x27;,
+  properties: {
+    isReal: { type: &#x27;boolean&#x27;, description: &#x27;这个问题是否真实成立（true=确认有效，false=误报/不成立）&#x27; },
+    confidence: { type: &#x27;string&#x27;, enum: [&#x27;high&#x27;, &#x27;medium&#x27;, &#x27;low&#x27;] },
+    reasoning: { type: &#x27;string&#x27;, description: &#x27;为什么成立或为什么是误报（必须引用实际代码，不能凭空）&#x27; },
+    severityAdjust: { type: &#x27;string&#x27;, enum: [&#x27;keep&#x27;, &#x27;upgrade&#x27;, &#x27;downgrade&#x27;], description: &#x27;严重度是否需要调整&#x27; },
+  },
+  required: [&#x27;isReal&#x27;, &#x27;confidence&#x27;, &#x27;reasoning&#x27;, &#x27;severityAdjust&#x27;],
+}</pre>
+  </details>
+
+</section>
+
+<section id="sched" class="wrap">
+  <h2><span class="n">03</span>parallel vs pipeline —— 最关键、最容易忽略的区别</h2>
+  <p class="lead">两者都"并发",区别在<b>阶段之间要不要设屏障</b>。下面 3 个 item(A/B/C)耗时不同,点<b>▶ 播放</b>看两种模式的墙钟差多少。红色斜纹 = 被屏障白白等掉的时间。</p>
+  <div class="modebtns">
+    <div class="mbtn on" id="mPipe" onclick="setMode('pipe')">pipeline(无屏障)</div>
+    <div class="mbtn" id="mPar" onclick="setMode('par')">parallel(屏障)</div>
+    <button class="play" onclick="playGantt()">▶ 播放</button>
+    <span class="dim" style="font-size:12px">■ <span style="color:var(--find)">find 阶段</span> &nbsp; ■ <span style="color:var(--verify)">verify 阶段</span></span>
+  </div>
+  <div class="gantt" id="gantt"></div>
+  <div class="totalline">
+    <div>本模式墙钟:<b id="tCur" style="color:var(--acc)">—</b></div>
+    <div class="dim">另一模式:<b id="tOther">—</b></div>
+    <div id="verdict" style="color:var(--ok)"></div>
+  </div>
+  <div class="grid g2" style="margin-top:16px">
+    <div class="card"><h3 style="color:var(--find)">pipeline:A 验的时候 B 还在审</h3>
+      <p class="muted" style="margin:0;font-size:13px">每个 item 一审完立刻进验证,不等别人。总耗时 = <b>最慢的那条"审+验"链</b>。这是多阶段的默认选择。</p></div>
+    <div class="card"><h3 style="color:var(--no)">parallel:所有人卡在屏障上</h3>
+      <p class="muted" style="margin:0;font-size:13px">必须等最慢的 find 全好,才统一开 verify。快的 item 干等着。总耗时 = <b>最慢find + 最慢verify</b>。只在"要凑齐所有结果再算"时才值得。</p></div>
+  </div>
+</section>
+
+<section id="cap" class="wrap">
+  <h2><span class="n">04</span>并发上限 —— 派 100 个不等于同时跑 100 个</h2>
+  <p class="lead">脚本里写 100 次 <code>agent()</code> 没问题,但引擎同时最多跑 <code>≈ min(16, 核数−2)</code> 个,其余<b>排队</b>,有空位就顶上。所以大扇出是一条<b>流水</b>,不是一次齐发。</p>
+  <div class="card" style="margin-top:12px">
+    <div class="knob" style="margin:0 0 8px">
+      <input type="range" id="poolSlider" min="4" max="60" value="40">
+      <div class="knobval" id="poolVal">40 个 agent</div>
+    </div>
+    <div class="pool" id="poolBoxes"></div>
+    <div class="eqline"><span style="color:var(--ok)">■ 跑</span> ≤16 &nbsp; <span style="color:var(--tx3)">■ 排队</span> 其余 &nbsp;·&nbsp; 上限满了,新 agent 等前面的腾出槽位</div>
+  </div>
+</section>
+
+<section id="model" class="wrap">
+  <h2><span class="n">05</span>子 agent 用什么模型 / 推理档</h2>
+  <p class="lead">默认<b>继承主循环</b>(会话)的模型和 effort;脚本可按 agent 覆盖。以下是从脱敏示例存档实测出来的对应关系:</p>
+  <table>
+    <tr><th>脚本里怎么写</th><th>实际模型</th><th>推理档 effort</th></tr>
+    <tr><td>不传 <code>agentType</code> / <code>model</code></td><td>继承会话模型(如 <code>opus-4-8</code>)</td><td>继承会话 effort(如 xhigh)</td></tr>
+    <tr><td><code>agentType:'Explore'</code></td><td><b style="color:var(--verify)">haiku-4-5</b>(Explore 自带,覆盖继承)</td><td>—</td></tr>
+    <tr><td><code>agentType:'general-purpose'/'Plan'</code></td><td>继承会话模型(opus-4-8)</td><td>继承</td></tr>
+    <tr><td>显式 <code>model:'…'</code> / <code>effort:'high'</code></td><td>按你写的来</td><td>按你写的来</td></tr>
+  </table>
+  <div class="callout" style="border-color:var(--verify);background:var(--verify-bg)">
+    <b>设计要点:</b>广度活(通读找线索)派 <code>Explore</code> → 走便宜的 Haiku,可放心开几十上百个;深度活(对抗验证、方案批判)继承 Opus、按需 <code>effort:'high'</code>。这两个都<b>写在脚本的 opts 里</b>,不是配置文件。
+  </div>
+</section>
+
+<section id="trip" class="wrap">
+  <h2><span class="n">06</span>脚本 ↔ 存档:你只写左边,右边是引擎记的账</h2>
+  <p class="lead">跑完引擎存一个 <code>wf_*.json</code>。它 = <b>你的 script</b> + <b>运行回执</b>。你手写的只有 <code>script</code> 一个字段(还是 JS,不是 JSON)。</p>
+  <div class="grid g2">
+    <div class="card"><h3 style="color:var(--acc)">你写的(script 字段)</h3>
+<pre style="margin:0"><span class="kw">export const</span> meta = { name, description }
+<span class="kw">const</span> ITEMS = [...]              <span class="cm">// 决定 agent 数</span>
+<span class="kw">const</span> r = <span class="kw">await</span> <span class="fn">parallel</span>(
+  ITEMS.map(x => () => <span class="fn">agent</span>(...)))
+<span class="kw">return</span> r                         <span class="cm">// → 进 result 字段</span></pre></div>
+    <div class="card"><h3 style="color:var(--tx2)">引擎记的账(其余 16 字段)</h3>
+      <div style="font-size:12.5px;font-family:var(--mono);color:var(--tx2);line-height:2">
+        <span class="pill" style="color:var(--acc)">script</span> ← 你的 JS<br>
+        <span class="pill" style="color:var(--ok)">result</span> ← 你 return 的值<br>
+        <span class="pill">agentCount</span> · <span class="pill">totalTokens</span> · <span class="pill">durationMs</span><br>
+        <span class="pill">runId</span> · <span class="pill">status</span> · <span class="pill">defaultModel</span><br>
+        <span class="pill">workflowProgress</span> · <span class="pill">phases</span> · …
+      </div>
+      <div class="dim" style="font-size:12px;margin-top:10px">这些全是跑完自动填的回执,改它们没有意义。</div>
+    </div>
+  </div>
+  <div style="margin-top:16px">
+    看真实文件:
+    <a class="link" href="minimal-1.js">▸ 最小脚本 minimal-1.js(1 个 agent)</a> &nbsp;
+    <a class="link" href="minimal-fanout.js">▸ minimal-fanout.js(N=数组长度)</a><br>
+    <a class="link" href="wf-small.json">▸ 最小存档 wf-small.json(2 agent 完整 JSON)</a> &nbsp;
+    <a class="link" href="wf-audit.json">▸ 最大存档 wf-audit.json(81 agent)</a> &nbsp;
+    <a class="link" href="workflow-output.html">▸ audit 那一次的数据可视化</a>
+  </div>
+</section>
+
+<footer class="wrap">
+  纯静态自托管讲解页 · 由 AI 助手生成 · 纯静态页面 ·
+  机制描述基于本机脱敏 workflow 示例存档实测(<code>./wf-*.json</code>)。
+</footer>
+
+<script>
+// ---- §02 agent count knob ----
+const nSlider=document.getElementById('nSlider'), nVal=document.getElementById('nVal'),
+      boxes=document.getElementById('agentBoxes'), eqN=document.getElementById('eqN'),
+      itemsPreview=document.getElementById('itemsPreview');
+function renderKnob(){
+  const n=+nSlider.value;
+  nVal.textContent=`ITEMS.length = ${n}`;
+  eqN.textContent=n;
+  const names=[]; for(let i=0;i<n;i++) names.push("'"+String.fromCharCode(97+(i%26))+(i>=26?Math.floor(i/26):'')+"'");
+  itemsPreview.textContent = n<=8 ? names.join(',') : names.slice(0,6).join(',')+',… /*'+n+'项*/';
+  boxes.innerHTML='';
+  for(let i=0;i<n;i++){const d=document.createElement('div');d.className='abox';d.textContent='#'+(i+1);
+    d.style.animationDelay=(i*14)+'ms';boxes.appendChild(d);}
+}
+nSlider.oninput=renderKnob; renderKnob();
+
+// ---- §02 two-level fan-out (真实 audit 数据) ----
+const ZONES_DATA=[{"key":"eval-runner","label":"评估编排核心","confirmed":4,"rejected":7},{"key":"http-routes","label":"HTTP 入口与路由","confirmed":3,"rejected":0},{"key":"auth-gate","label":"鉴权与门禁（安全关键）","confirmed":2,"rejected":1},{"key":"state-config","label":"持久化/状态/配置","confirmed":3,"rejected":2},{"key":"external-io","label":"外部 IO（消息/文档/播报）","confirmed":4,"rejected":3},{"key":"pipeline-batch","label":"抓取批处理与资源管理","confirmed":4,"rejected":6},{"key":"pipeline-eval","label":"终判/规则/LLM 评估","confirmed":2,"rejected":3},{"key":"pipeline-write","label":"写表格与共享工具","confirmed":3,"rejected":0},{"key":"promote","label":"合码晋级与重启（铁律相关）","confirmed":4,"rejected":4},{"key":"scripts-fetch","label":"抓取数据脚本","confirmed":2,"rejected":5},{"key":"frontend","label":"前端逻辑","confirmed":5,"rejected":3}];
+const zonesRow=document.getElementById('zonesRow');
+let tlTimers=[];
+function renderZoneCards(showMeta){
+  zonesRow.innerHTML='';
+  ZONES_DATA.forEach((z,i)=>{
+    const n=z.confirmed+z.rejected;
+    const card=document.createElement('div');card.className='zonecard';
+    card.innerHTML=`<div class="zc-head"><span class="t">① find #${i+1}</span><br>${z.label}</div>`+
+      `<div class="zc-meta" id="zm${i}">${showMeta?('→ '+n+' 个 verify'):'&nbsp;'}</div>`+
+      `<div class="zc-dots" id="zd${i}"></div>`;
+    zonesRow.appendChild(card);
+  });
+}
+function resetTwoLevel(){
+  tlTimers.forEach(t=>clearTimeout(t));tlTimers=[];
+  renderZoneCards(false);
+  document.getElementById('tlCount').innerHTML='当前 agent 数:<b>11</b> <span class="dim">— 只有第一层(你写的 ZONES)</span>';
+  document.getElementById('tlOk').textContent='0';
+  document.getElementById('tlNo').textContent='0';
+  document.getElementById('tlSum').textContent='第二层还没跑';
+  document.getElementById('tlRun').disabled=false;
+}
+function runTwoLevel(){
+  resetTwoLevel();
+  document.getElementById('tlRun').disabled=true;
+  renderZoneCards(true);
+  let count=11, ok=0, no=0, delay=0;
+  ZONES_DATA.forEach((z,i)=>{
+    const seq=[...Array(z.confirmed).fill('ok'),...Array(z.rejected).fill('no')];
+    seq.forEach(kind=>{
+      delay+=20;
+      tlTimers.push(setTimeout(()=>{
+        const dc=document.getElementById('zd'+i);
+        const d=document.createElement('div');d.className='vdot '+kind;dc.appendChild(d);
+        count++; if(kind==='ok')ok++;else no++;
+        document.getElementById('tlCount').innerHTML=`当前 agent 数:<b>${count}</b> <span class="dim">— 11 find + ${count-11} verify</span>`;
+        document.getElementById('tlOk').textContent=ok;
+        document.getElementById('tlNo').textContent=no;
+      },delay));
+    });
+  });
+  tlTimers.push(setTimeout(()=>{
+    document.getElementById('tlSum').innerHTML='11 find + 70 verify = <b style="color:var(--acc)">81</b> —— 我只写了「11」那一层';
+    document.getElementById('tlRun').disabled=false;
+  },delay+250));
+}
+renderZoneCards(false);
+
+// ---- §04 concurrency pool ----
+const poolSlider=document.getElementById('poolSlider'), poolVal=document.getElementById('poolVal'), poolBoxes=document.getElementById('poolBoxes');
+const CAP=16;
+function renderPool(){
+  const n=+poolSlider.value; poolVal.textContent=n+' 个 agent';
+  poolBoxes.innerHTML='';
+  for(let i=0;i<n;i++){const d=document.createElement('div');
+    const running=i<CAP;
+    d.className='pdot '+(running?'p-run':'p-queue');
+    d.textContent=running?'▶':(i+1);
+    if(running) d.style.animationDelay=(i*80)+'ms';
+    poolBoxes.appendChild(d);}
+}
+poolSlider.oninput=renderPool; renderPool();
+
+// ---- §03 gantt: pipeline vs parallel ----
+// 3 items, each with a find duration and a verify duration (单位:格)
+const ITEMS=[
+  {name:'A · 快', find:1, verify:1},
+  {name:'B · 审慢', find:4, verify:1},
+  {name:'C · 验慢', find:1, verify:4},
+];
+let mode='pipe';
+const UNIT=52;  // px per time unit
+
+function layout(mode){
+  // 返回每个 item 的 {findStart, findLen, verStart, verLen, idleStart?, idleLen?} + total + barrier?
+  if(mode==='pipe'){
+    let total=0;
+    const rows=ITEMS.map(it=>{
+      const r={findStart:0, findLen:it.find, verStart:it.find, verLen:it.verify};
+      total=Math.max(total, it.find+it.verify);
+      return r;
+    });
+    return {rows, total, barrier:null};
+  } else {
+    const barrier=Math.max(...ITEMS.map(i=>i.find));      // 所有 find 全好
+    const verMax=Math.max(...ITEMS.map(i=>i.verify));
+    const total=barrier+verMax;
+    const rows=ITEMS.map(it=>({
+      findStart:0, findLen:it.find,
+      idleStart:it.find, idleLen:barrier-it.find,          // 等屏障的空转
+      verStart:barrier, verLen:it.verify
+    }));
+    return {rows, total, barrier};
+  }
+}
+function renderGantt(){
+  const {rows,total,barrier}=layout(mode);
+  const g=document.getElementById('gantt');
+  const maxT=Math.max(layout('pipe').total, layout('par').total);
+  let html='';
+  rows.forEach((r,i)=>{
+    html+=`<div class="grow"><div class="glabel">${ITEMS[i].name}</div><div class="gtrack">`;
+    html+=`<div class="gbar g-find" style="left:${r.findStart*UNIT}px;width:${r.findLen*UNIT-3}px">find ${ITEMS[i].find}</div>`;
+    if(r.idleLen>0) html+=`<div class="g-idle" style="left:${r.idleStart*UNIT}px;width:${r.idleLen*UNIT-3}px"></div>`;
+    html+=`<div class="gbar g-verify" style="left:${r.verStart*UNIT}px;width:${r.verLen*UNIT-3}px">verify ${ITEMS[i].verify}</div>`;
+    html+=`</div></div>`;
+  });
+  // barrier line
+  if(barrier!=null) html+=`<div class="barrier" style="left:${132+10+barrier*UNIT}px"></div>`;
+  // playhead
+  html+=`<div class="playhead" id="playhead"></div>`;
+  // axis
+  html+=`<div class="baxis" style="margin-left:142px">`;
+  for(let t=0;t<=maxT;t++) html+=`<span>${t}</span>`;
+  html+=`</div>`;
+  g.innerHTML=html;
+  g.style.setProperty('--maxt',maxT);
+  // totals
+  document.getElementById('tCur').textContent=total+' 格';
+  const other=layout(mode==='pipe'?'par':'pipe').total;
+  document.getElementById('tOther').textContent=other+' 格';
+  const v=document.getElementById('verdict');
+  if(mode==='pipe') v.textContent=`pipeline 省下 ${other-total} 格(${Math.round((other-total)/other*100)}%)`;
+  else v.textContent='';
+}
+function setMode(m){mode=m;
+  document.getElementById('mPipe').classList.toggle('on',m==='pipe');
+  document.getElementById('mPar').classList.toggle('on',m==='par');
+  renderGantt();
+}
+let playTimer=null;
+function playGantt(){
+  renderGantt();
+  const ph=document.getElementById('playhead');
+  const {total}=layout(mode);
+  const trackLeft=142;
+  ph.style.opacity=1; ph.style.left=trackLeft+'px';
+  const dur=1400; const t0=performance.now();
+  if(playTimer) cancelAnimationFrame(playTimer);
+  function step(now){
+    const p=Math.min(1,(now-t0)/dur);
+    ph.style.left=(trackLeft+p*total*UNIT)+'px';
+    if(p<1) playTimer=requestAnimationFrame(step);
+    else setTimeout(()=>{ph.style.opacity=0;},400);
+  }
+  playTimer=requestAnimationFrame(step);
+}
+renderGantt();
+</script>
+</body>
+</html>

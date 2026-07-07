@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Goal · Codex 怎么把目标跑成任务循环</title>
+<style>
+  :root{
+    --bg:#fbfaf7; --ink:#25231f; --ink2:#62605a; --ink3:#8c887f; --line:#e4dfd5;
+    --blue:#185fa5; --blue-bg:#e7f1fb; --green:#075444; --green-bg:#e3f5ee;
+    --amber:#88520d; --amber-bg:#faeedb; --red:#a53636; --red-bg:#fae8e7;
+    --soft:#f1eee7; --code:#f3f0e9;
+    --mono:"SFMono-Regular",ui-monospace,Consolas,Menlo,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --bg:#1b1a18; --ink:#eeeae2; --ink2:#b7b2aa; --ink3:#88837a; --line:#34302a;
+    --blue:#8abbef; --blue-bg:#0c447c; --green:#9fe1cb; --green-bg:#084f41;
+    --amber:#f4c471; --amber-bg:#623806; --red:#ef9696; --red-bg:#5a2020;
+    --soft:#26241f; --code:#272520;
+  }}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased}
+  a{color:var(--blue);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--blue),transparent 72%)}
+  .deck{position:fixed;inset:0}
+  .slide{position:absolute;inset:0;display:none;flex-direction:column;justify-content:center;padding:6vh 8vw 8vh;overflow:auto;animation:fade .28s ease}
+  .slide.active{display:flex}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .inner{max-width:960px;width:100%;margin:0 auto}.wide{max-width:1160px}
+  .eyebrow{font-family:var(--mono);font-size:14px;color:var(--blue);letter-spacing:.07em;text-transform:uppercase;margin-bottom:16px}
+  h1{font-size:min(6.8vw,58px);line-height:1.12;font-weight:820;letter-spacing:-.02em;margin-bottom:18px}
+  h2{font-size:min(5vw,40px);line-height:1.18;font-weight:780;letter-spacing:-.01em;margin-bottom:12px}
+  h3{font-size:19px;margin-bottom:8px}
+  p{font-size:18px;color:var(--ink2);line-height:1.62;margin:10px 0}
+  b{color:var(--ink)} code{font-family:var(--mono);font-size:.86em;background:var(--code);border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+  pre{background:var(--code);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin:16px 0;font-family:var(--mono);font-size:min(2.5vw,14px);line-height:1.7;overflow:auto;white-space:pre}
+  .mut{color:var(--ink3)}.blue{color:var(--blue);font-weight:700}.green{color:var(--green);font-weight:700}.amber{color:var(--amber);font-weight:700}.red{color:var(--red);font-weight:700}
+  .divider .inner{text-align:center}.divider .grp{font-family:var(--mono);font-size:15px;color:var(--blue);letter-spacing:.16em;margin-bottom:16px}.divider h1{font-size:min(7.2vw,62px)}.divider p{margin:18px auto 0;max-width:62ch}
+
+  .flow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:22px 0}
+  .node{display:inline-flex;align-items:center;justify-content:center;min-height:42px;border:1px solid var(--line);background:var(--soft);border-radius:11px;padding:9px 13px;font-family:var(--mono);font-size:13px;white-space:nowrap}
+  .node.b{border-color:var(--blue);background:var(--blue-bg);color:var(--blue);font-weight:750}.node.g{border-color:var(--green);background:var(--green-bg);color:var(--green);font-weight:750}.node.a{border-color:var(--amber);background:var(--amber-bg);color:var(--amber);font-weight:750}.node.r{border-color:var(--red);background:var(--red-bg);color:var(--red);font-weight:750}
+  .arrow{font-family:var(--mono);color:var(--ink3);font-size:18px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:20px}
+  @media(max-width:820px){.grid2,.grid3{grid-template-columns:1fr}}
+  .card{background:var(--soft);border:1px solid var(--line);border-radius:16px;padding:16px 18px;min-height:128px}.card p{font-size:16px;margin:4px 0}.card h3{font-family:var(--mono);color:var(--blue)}
+  .state{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:20px}.state .card{text-align:center;min-height:112px}.state .card h3{font-size:18px}.state .card.complete h3{color:var(--green)}.state .card.blocked h3{color:var(--red)}
+  @media(max-width:820px){.state{grid-template-columns:1fr}}
+  .swim{display:grid;grid-template-columns:170px 1fr;gap:10px;margin-top:22px}.lane{display:contents}.lane .who{font-family:var(--mono);font-size:13px;color:var(--ink3);padding-top:10px}.lane .steps{display:flex;align-items:center;gap:8px;flex-wrap:wrap;border-left:2px solid var(--line);padding:6px 0 6px 14px}.small{font-size:14.5px;color:var(--ink3)}
+  .terminal{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;margin-top:22px}.terminal .big{font-size:28px;font-family:var(--mono);font-weight:820;text-align:center}.terminal .big.complete{color:var(--green)}.terminal .big.blocked{color:var(--red)}
+  @media(max-width:760px){.terminal{grid-template-columns:1fr}.terminal .arrow{text-align:center}}
+  .ribbon{display:inline-flex;align-items:center;gap:8px;background:var(--blue-bg);border:1px solid var(--blue);color:var(--blue);border-radius:999px;padding:7px 12px;font-family:var(--mono);font-size:13px;margin-top:14px}
+  .src{font-size:13px;color:var(--ink3);margin-top:14px}.src a{color:var(--ink2)}
+  .bar{position:fixed;left:0;right:0;bottom:0;height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:color-mix(in srgb,var(--bg),transparent 8%);border-top:1px solid var(--line);z-index:20}
+  #prog{position:fixed;left:0;bottom:45px;height:3px;background:var(--blue);width:0;z-index:21;transition:width .18s ease}
+  #counter{font-family:var(--mono);font-size:13px;color:var(--ink3)}.nav{display:flex;gap:8px}.nav button{width:34px;height:30px;border-radius:8px;border:1px solid var(--line);background:var(--soft);color:var(--ink);font-size:18px}.nav span{font-family:var(--mono);font-size:12px;color:var(--ink3)}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<div class="deck">
+
+  <section class="slide">
+    <div class="inner wide">
+      <div class="eyebrow">Codex Goal · 控制流细讲</div>
+      <h1>Goal<br>把一句目标,<br>跑成持续任务循环</h1>
+      <p>它不是换了一个更聪明的模型,而是 harness 多持有了一份状态:目标、预算、进度、完成判据。</p>
+      <div class="ribbon">每页可用 #页码 定位,例如 goal.html#6</div>
+    </div>
+  </section>
+
+  <section class="slide divider">
+    <div class="inner">
+      <div class="grp">组 一</div>
+      <h1>先抓住一句话</h1>
+      <p>Goal 的核心不是"自动干活",而是"有一个可检查的完成标准一直跟着线程走"。</p>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow">心智模型</div>
+      <h2>目标不是放在模型脑子里,是放在线程状态里</h2>
+      <div class="flow">
+        <span class="node b">/goal 目标</span><span class="arrow">→</span>
+        <span class="node">ThreadGoal 状态</span><span class="arrow">→</span>
+        <span class="node">下一轮注入上下文</span><span class="arrow">→</span>
+        <span class="node g">继续推进</span>
+      </div>
+      <p>模型每一轮仍然只看到当前上下文。持续性来自外层系统:把 objective 存起来,后续轮次再把它作为任务上下文喂回模型。</p>
+      <div class="src">参考: <a href="https://developers.openai.com/codex/codex-manual.md" target="_blank" rel="noopener">Codex manual · Goal mode</a> · <a href="https://github.com/openai/codex/blob/main/codex-rs/state/src/runtime/goals.rs" target="_blank" rel="noopener">GoalStore</a></div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow">公开手册怎么说</div>
+      <h2>Goal text 同时是起点,也是完成标准</h2>
+      <div class="grid2">
+        <div class="card"><h3>起点</h3><p>用户用 <code>/goal</code> 设置一段 objective;Codex 用它决定下一步做什么。</p></div>
+        <div class="card"><h3>完成标准</h3><p>Goal 写得越可验证,系统越容易判断"还要不要继续"。</p></div>
+      </div>
+      <pre>/goal Finish the migration and keep tests green</pre>
+      <p class="small">手册也提到:如果 slash command 里没有 <code>/goal</code>,可以启用 <code>[features] goals = true</code>。</p>
+    </div>
+  </section>
+
+  <section class="slide divider">
+    <div class="inner">
+      <div class="grp">组 二</div>
+      <h1>源码里的三块</h1>
+      <p>工具、状态、prompt 注入。把这三块拼起来,Goal 才像"会自己接着干"。</p>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow">第一块 · 工具入口</div>
+      <h2>模型能碰到的,是三个 goal tool</h2>
+      <div class="grid3">
+        <div class="card"><h3>create_goal</h3><p>创建 active goal;如果已有未完成 goal,会失败。</p></div>
+        <div class="card"><h3>get_goal</h3><p>读取当前目标、状态、token/time 用量和剩余额度。</p></div>
+        <div class="card"><h3>update_goal</h3><p>只能标记 <code>complete</code> 或 <code>blocked</code>;暂停/恢复由用户或系统控制。</p></div>
+      </div>
+      <p>这里很关键:Goal 不是让模型任意改状态,而是把"能做什么状态迁移"收进工具 schema 和 handler。</p>
+      <div class="src">源码: <a href="https://github.com/openai/codex/blob/main/codex-rs/ext/goal/src/spec.rs" target="_blank" rel="noopener">ext/goal/src/spec.rs</a> · <a href="https://github.com/openai/codex/blob/main/codex-rs/ext/goal/src/tool.rs" target="_blank" rel="noopener">ext/goal/src/tool.rs</a></div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow">第二块 · 持久化状态</div>
+      <h2>ThreadGoal 是一条线程级记录</h2>
+      <pre>ThreadGoal {
+  thread_id,
+  objective,
+  status,
+  token_budget,
+  tokens_used,
+  time_used_seconds,
+  created_at,
+  updated_at
+}</pre>
+      <div class="state">
+        <div class="card"><h3>active / paused</h3><p>还能继续,或被用户暂停。</p></div>
+        <div class="card blocked"><h3>blocked / limited</h3><p>卡住、预算到顶、用量受限。</p></div>
+        <div class="card complete"><h3>complete</h3><p>目标真的完成,不再自动继续。</p></div>
+      </div>
+      <div class="src">源码: <a href="https://github.com/openai/codex/blob/main/codex-rs/protocol/src/protocol.rs" target="_blank" rel="noopener">ThreadGoal protocol</a> · <a href="https://github.com/openai/codex/blob/main/codex-rs/state/src/runtime/goals.rs" target="_blank" rel="noopener">state runtime</a></div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow">第三块 · 重新注入 prompt</div>
+      <h2>每次继续,Goal 都会变成一段内部上下文</h2>
+      <div class="flow">
+        <span class="node">读 ThreadGoal</span><span class="arrow">→</span>
+        <span class="node b">渲染 continuation.md</span><span class="arrow">→</span>
+        <span class="node">InternalContextSource: goal</span><span class="arrow">→</span>
+        <span class="node g">模型继续工作</span>
+      </div>
+      <pre>Continue working toward the active thread goal.
+
+objective = 用户设置的目标
+budget = tokens used / token budget / remaining
+rules = 继续推进、证据验证、不要缩小目标</pre>
+      <p>这就是"持续性"的来源:不是长记忆魔法,是每一轮都把目标和约束重新放进模型可见的上下文。</p>
+      <div class="src">源码: <a href="https://github.com/openai/codex/blob/main/codex-rs/ext/goal/src/steering.rs" target="_blank" rel="noopener">steering.rs</a> · <a href="https://github.com/openai/codex/blob/main/codex-rs/prompts/templates/goals/continuation.md" target="_blank" rel="noopener">continuation.md</a></div>
+    </div>
+  </section>
+
+  <section class="slide divider">
+    <div class="inner">
+      <div class="grp">组 三</div>
+      <h1>它怎么跑起来</h1>
+      <p>Goal 不是单次工具调用,而是一段线程生命周期。</p>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="inner wide">
+      <div class="eyebrow">执行链路</div>
+      <h2>从设置目标,到下一轮自动推进</h2>
+      <div class="swim">
+        <div class="lane"><div class="who">User / UI</div><div class="steps"><span class="node b">/goal</span><span class="arrow">→</span><span class="node">pause / resume / edit</span></div></div>
+        <div class="lane"><div class="who">App Server</div><div class="steps"><span class="node">thread/goal/set</span><span class="arrow">→</span><span class="node">thread/goal/updated</span></div></div>
+        <div class="lane"><div class="who">State</div><div class="steps"><span class="node">写 SQLite</span><span class="arrow">→</span><span class="node">累计 token/time</span></div></div>
+        <div class="lane"><div class="who">Runtime</div><div class="steps"><span class="node">注入 continuation</span><span class="arrow">→</span><span class="node g">开启下一轮</span></div></div>
+        <div class="lane"><div class="who">Model</div><div class="steps"><span class="node">读目标</span><span class="arrow">→</span><span class="node">调用工具</span><span class="arrow">→</span><span class="node a">验证当前状态</span></div></div>
+      </div>
+      <p class="small">所以你看到的"它接着干",背后其实是 UI / server / state / prompt / tools 几层一起配合。</p>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow">停止条件</div>
+      <h2>Goal 最贵的一点:它要求 evidence-gated completion</h2>
+      <div class="terminal">
+        <div class="card"><div class="big complete">complete</div><p>只能在目标真的达成、且无剩余必需工作时标记。</p></div>
+        <div class="arrow">或</div>
+        <div class="card"><div class="big blocked">blocked</div><p>同一个阻塞连续重复至少 3 个 goal turn,且没有可继续推进的动作。</p></div>
+      </div>
+      <p>这也是它和普通自动循环的区别:它不该因为"看起来差不多"就停,也不该第一次遇到困难就交还。</p>
+      <div class="src">源码: <a href="https://github.com/openai/codex/blob/main/codex-rs/prompts/templates/goals/continuation.md" target="_blank" rel="noopener">completion / blocked audit prompt</a></div>
+    </div>
+  </section>
+
+  <section class="slide divider">
+    <div class="inner">
+      <div class="grp">组 四</div>
+      <h1>设置场景怎么执行</h1>
+      <p>拿"启用 goals"或"改默认模型"这种设置项,看它是怎么穿过 harness 的。</p>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="inner wide">
+      <div class="eyebrow">场景 · 设置 goals 开关</div>
+      <h2>设置不是模型能力,是配置层影响运行时能力</h2>
+      <div class="flow">
+        <span class="node b">你改设置</span><span class="arrow">→</span>
+        <span class="node"><code>~/.codex/config.toml</code></span><span class="arrow">→</span>
+        <span class="node">config loader</span><span class="arrow">→</span>
+        <span class="node">features.goals</span><span class="arrow">→</span>
+        <span class="node g">暴露 /goal 与 goal tools</span>
+      </div>
+      <pre>[features]
+goals = true</pre>
+      <p>手册里这句很有代表性:如果 UI 里没有 <code>/goal</code>,启用 feature flag。也就是说"能不能用 Goal"先由配置层决定,然后才轮到模型在工具边界内推进。</p>
+      <div class="src">参考: <a href="https://developers.openai.com/codex/codex-manual.md" target="_blank" rel="noopener">Codex manual · config / Goal mode</a> · <a href="https://github.com/openai/codex/blob/main/codex-rs/features/src/lib.rs" target="_blank" rel="noopener">features/src/lib.rs</a></div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="inner wide">
+      <div class="eyebrow">同样的逻辑 · 改模型/沙箱/审批</div>
+      <h2>配置进 harness,再影响每一轮执行</h2>
+      <div class="flow">
+        <span class="node b">CLI flags</span><span class="arrow">→</span>
+        <span class="node">project .codex/config.toml</span><span class="arrow">→</span>
+        <span class="node">profile</span><span class="arrow">→</span>
+        <span class="node">user config</span><span class="arrow">→</span>
+        <span class="node">defaults</span>
+      </div>
+      <div class="grid3">
+        <div class="card"><h3>model</h3><p>决定下一轮请求用哪个模型。</p></div>
+        <div class="card"><h3>sandbox_mode</h3><p>决定命令能读写哪里、网络是否受限。</p></div>
+        <div class="card"><h3>approval_policy</h3><p>决定什么动作要停下来问人。</p></div>
+      </div>
+      <p>所以"设置"不是一段提示词,而是 harness 在发请求、暴露工具、执行命令前读取的一组规则。</p>
+      <div class="src">参考: <a href="https://developers.openai.com/codex/codex-manual.md" target="_blank" rel="noopener">Codex manual · Config basics</a></div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow">放回原分享</div>
+      <h2>Goal 和 Workflow 都是控制流,但厚度不同</h2>
+      <div class="grid2">
+        <div class="card"><h3>Workflow</h3><p>你写确定的代码骨架:谁并发、谁串行、怎么合并。</p></div>
+        <div class="card"><h3>Goal</h3><p>系统持有一个完成标准:每轮推进、验证、继续或停止。</p></div>
+      </div>
+      <p>它们都属于 harness:模型负责每一轮推理,外层系统负责把很多轮串成一个任务。</p>
+      <div class="flow"><a class="node b" href="index.html#18">回主 deck</a><span class="arrow">·</span><a class="node a" href="deck.html#1">看 workflow deck</a></div>
+    </div>
+  </section>
+
+  <section class="slide divider">
+    <div class="inner">
+      <div class="grp">END</div>
+      <h1>Goal = 目标状态 + 续跑 prompt + 受限工具</h1>
+      <p>一句话收住:它不是模型突然会项目管理,是 harness 把"什么算完成、怎么继续、什么时候停"工程化了。</p>
+    </div>
+  </section>
+
+</div>
+<div class="bar">
+  <span id="counter"></span>
+  <div class="nav"><span>← → / Space</span></div>
+</div>
+<script>
+  const slides=[...document.querySelectorAll('.slide')];
+  const N=slides.length;
+  function hashIndex(){
+    const m=location.hash.match(/^#(?:p|slide-)?(\d+)$/i);
+    if(!m)return null;
+    return Math.max(0,Math.min(N-1,Number(m[1])-1));
+  }
+  let i=hashIndex() ?? 0;
+  function syncHash(){
+    const h='#'+(i+1);
+    if(location.hash!==h)history.replaceState(null,'',h);
+  }
+  function show(n,updateHash=true){
+    i=Math.max(0,Math.min(N-1,n));
+    slides.forEach((s,k)=>s.classList.toggle('active',k===i));
+    document.getElementById('counter').textContent=(i+1)+' / '+N;
+    document.getElementById('prog').style.width=((i+1)/N*100)+'%';
+    if(updateHash)syncHash();
+  }
+  function go(d){show(i+d)}
+  window.go=go;
+  addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();go(1)}
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(-1)}
+    else if(e.key==='Home'){show(0)}
+    else if(e.key==='End'){show(N-1)}
+  });
+  addEventListener('hashchange',()=>{
+    const n=hashIndex();
+    if(n!==null)show(n,false);
+  });
+  show(i);
+</script>
+</body>
+</html>

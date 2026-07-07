@@ -1,0 +1,710 @@
+{
+  "audit": {
+    "tokens": 3640435,
+    "toolCalls": 1890,
+    "sec": 660,
+    "summary": {
+      "zones": 11,
+      "total_findings": 70,
+      "confirmed": 36,
+      "rejected": 34,
+      "unverified": 0,
+      "by_severity": {
+        "high": 12,
+        "medium": 12,
+        "low": 12
+      }
+    },
+    "confirmed": [
+      {
+        "title": "Token comparison uses direct equality in write gate",
+        "file": "src/core/eval-runner.ts",
+        "line": "40",
+        "severity": "high",
+        "category": "security",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "high",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      },
+      {
+        "title": "Untrusted Host fallback can poison generated approval links",
+        "file": "src/core/eval-runner.ts",
+        "line": "47",
+        "severity": "medium",
+        "category": "bug",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "medium",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      },
+      {
+        "title": "Polling timer is never cleaned up on page lifecycle changes",
+        "file": "src/core/eval-runner.ts",
+        "line": "54",
+        "severity": "low",
+        "category": "resource-leak",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "high",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      },
+      {
+        "title": "Partial write failure is not tracked across multi-row targets",
+        "file": "src/core/eval-runner.ts",
+        "line": "61",
+        "severity": "high",
+        "category": "error-handling",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "medium",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      },
+      {
+        "title": "Browser page leak on failed collection branch",
+        "file": "src/server.ts",
+        "line": "68",
+        "severity": "medium",
+        "category": "race",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "high",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      },
+      {
+        "title": "Missing timeout around external status probe",
+        "file": "src/server.ts",
+        "line": "75",
+        "severity": "low",
+        "category": "refactor",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "medium",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      },
+      {
+        "title": "JSON parse fallback hides HTTP error status",
+        "file": "src/server.ts",
+        "line": "82",
+        "severity": "high",
+        "category": "security",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "high",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      },
+      {
+        "title": "Queue refresh swallows long-running network failures",
+        "file": "src/auth/session.ts",
+        "line": "89",
+        "severity": "medium",
+        "category": "bug",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "medium",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      },
+      {
+        "title": "Token comparison uses direct equality in write gate",
+        "file": "src/auth/session.ts",
+        "line": "96",
+        "severity": "low",
+        "category": "resource-leak",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "high",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      },
+      {
+        "title": "Untrusted Host fallback can poison generated approval links",
+        "file": "src/state/task-store.ts",
+        "line": "103",
+        "severity": "high",
+        "category": "error-handling",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "medium",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      },
+      {
+        "title": "Polling timer is never cleaned up on page lifecycle changes",
+        "file": "src/state/task-store.ts",
+        "line": "110",
+        "severity": "medium",
+        "category": "race",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "high",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      },
+      {
+        "title": "Partial write failure is not tracked across multi-row targets",
+        "file": "src/state/task-store.ts",
+        "line": "117",
+        "severity": "low",
+        "category": "refactor",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "medium",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      },
+      {
+        "title": "Browser page leak on failed collection branch",
+        "file": "src/integrations/chat.ts",
+        "line": "124",
+        "severity": "high",
+        "category": "security",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "high",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      },
+      {
+        "title": "Missing timeout around external status probe",
+        "file": "src/integrations/chat.ts",
+        "line": "131",
+        "severity": "medium",
+        "category": "bug",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "medium",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      },
+      {
+        "title": "JSON parse fallback hides HTTP error status",
+        "file": "src/integrations/chat.ts",
+        "line": "138",
+        "severity": "low",
+        "category": "resource-leak",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "high",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      },
+      {
+        "title": "Queue refresh swallows long-running network failures",
+        "file": "src/integrations/chat.ts",
+        "line": "145",
+        "severity": "high",
+        "category": "error-handling",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "medium",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      },
+      {
+        "title": "Token comparison uses direct equality in write gate",
+        "file": "pipeline/run-batch.ts",
+        "line": "152",
+        "severity": "medium",
+        "category": "race",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "high",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      },
+      {
+        "title": "Untrusted Host fallback can poison generated approval links",
+        "file": "pipeline/run-batch.ts",
+        "line": "159",
+        "severity": "low",
+        "category": "refactor",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "medium",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      },
+      {
+        "title": "Polling timer is never cleaned up on page lifecycle changes",
+        "file": "pipeline/run-batch.ts",
+        "line": "166",
+        "severity": "high",
+        "category": "security",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "high",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      },
+      {
+        "title": "Partial write failure is not tracked across multi-row targets",
+        "file": "pipeline/run-batch.ts",
+        "line": "173",
+        "severity": "medium",
+        "category": "bug",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "medium",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      },
+      {
+        "title": "Browser page leak on failed collection branch",
+        "file": "pipeline/evaluate/final-judge.ts",
+        "line": "180",
+        "severity": "low",
+        "category": "resource-leak",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "high",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      },
+      {
+        "title": "Missing timeout around external status probe",
+        "file": "pipeline/evaluate/final-judge.ts",
+        "line": "187",
+        "severity": "high",
+        "category": "error-handling",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "medium",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      },
+      {
+        "title": "JSON parse fallback hides HTTP error status",
+        "file": "pipeline/write/write-sheet.ts",
+        "line": "194",
+        "severity": "medium",
+        "category": "race",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "high",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      },
+      {
+        "title": "Queue refresh swallows long-running network failures",
+        "file": "pipeline/write/write-sheet.ts",
+        "line": "201",
+        "severity": "low",
+        "category": "refactor",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "medium",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      },
+      {
+        "title": "Token comparison uses direct equality in write gate",
+        "file": "pipeline/write/write-sheet.ts",
+        "line": "208",
+        "severity": "high",
+        "category": "security",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "high",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      },
+      {
+        "title": "Untrusted Host fallback can poison generated approval links",
+        "file": "scripts/promote.ts",
+        "line": "215",
+        "severity": "medium",
+        "category": "bug",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "medium",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      },
+      {
+        "title": "Polling timer is never cleaned up on page lifecycle changes",
+        "file": "scripts/promote.ts",
+        "line": "222",
+        "severity": "low",
+        "category": "resource-leak",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "high",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      },
+      {
+        "title": "Partial write failure is not tracked across multi-row targets",
+        "file": "scripts/promote.ts",
+        "line": "229",
+        "severity": "high",
+        "category": "error-handling",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "medium",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      },
+      {
+        "title": "Browser page leak on failed collection branch",
+        "file": "scripts/promote.ts",
+        "line": "236",
+        "severity": "medium",
+        "category": "race",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "high",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      },
+      {
+        "title": "Missing timeout around external status probe",
+        "file": "scripts/create-fetch-task.ts",
+        "line": "243",
+        "severity": "low",
+        "category": "refactor",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "medium",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      },
+      {
+        "title": "JSON parse fallback hides HTTP error status",
+        "file": "scripts/create-fetch-task.ts",
+        "line": "250",
+        "severity": "high",
+        "category": "security",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "high",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      },
+      {
+        "title": "Queue refresh swallows long-running network failures",
+        "file": "public/app.ts",
+        "line": "257",
+        "severity": "medium",
+        "category": "bug",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "medium",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      },
+      {
+        "title": "Token comparison uses direct equality in write gate",
+        "file": "public/app.ts",
+        "line": "264",
+        "severity": "low",
+        "category": "resource-leak",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "high",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      },
+      {
+        "title": "Untrusted Host fallback can poison generated approval links",
+        "file": "public/app.ts",
+        "line": "271",
+        "severity": "high",
+        "category": "error-handling",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "medium",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      },
+      {
+        "title": "Polling timer is never cleaned up on page lifecycle changes",
+        "file": "public/app.ts",
+        "line": "278",
+        "severity": "medium",
+        "category": "race",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "high",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      },
+      {
+        "title": "Partial write failure is not tracked across multi-row targets",
+        "file": "public/app.ts",
+        "line": "285",
+        "severity": "low",
+        "category": "refactor",
+        "description": "脱敏示例：该发现展示 workflow 如何携带证据、文件、行号和建议；内容已替换为公开示例，不对应真实内部代码。",
+        "suggestion": "补充边界检查、超时/清理逻辑，或将关键校验封装为可复用 helper。",
+        "verify_confidence": "medium",
+        "verify_reasoning": "脱敏示例：verify agent 独立读取相关文件后确认该问题成立，并引用了示例代码路径与行号。"
+      }
+    ],
+    "rejected": [
+      {
+        "title": "Candidate issue already covered by upstream validation",
+        "file": "src/core/eval-runner.ts",
+        "line": "40",
+        "why_rejected": "脱敏示例：verify agent 发现该问题已由上游校验或生命周期清理覆盖，因此判为误报。"
+      },
+      {
+        "title": "Reported timer leak is cleaned up by shared lifecycle hook",
+        "file": "src/core/eval-runner.ts",
+        "line": "47",
+        "why_rejected": "脱敏示例：verify agent 发现该问题已由上游校验或生命周期清理覆盖，因此判为误报。"
+      },
+      {
+        "title": "Potential race is guarded by request sequence id",
+        "file": "src/core/eval-runner.ts",
+        "line": "54",
+        "why_rejected": "脱敏示例：verify agent 发现该问题已由上游校验或生命周期清理覆盖，因此判为误报。"
+      },
+      {
+        "title": "Configuration fallback is test-only and not production reachable",
+        "file": "src/core/eval-runner.ts",
+        "line": "61",
+        "why_rejected": "脱敏示例：verify agent 发现该问题已由上游校验或生命周期清理覆盖，因此判为误报。"
+      },
+      {
+        "title": "Duplicate mapping is redundant but not behaviorally incorrect",
+        "file": "src/core/eval-runner.ts",
+        "line": "68",
+        "why_rejected": "脱敏示例：verify agent 发现该问题已由上游校验或生命周期清理覆盖，因此判为误报。"
+      },
+      {
+        "title": "Candidate issue already covered by upstream validation",
+        "file": "src/core/eval-runner.ts",
+        "line": "75",
+        "why_rejected": "脱敏示例：verify agent 发现该问题已由上游校验或生命周期清理覆盖，因此判为误报。"
+      },
+      {
+        "title": "Reported timer leak is cleaned up by shared lifecycle hook",
+        "file": "src/core/eval-runner.ts",
+        "line": "82",
+        "why_rejected": "脱敏示例：verify agent 发现该问题已由上游校验或生命周期清理覆盖，因此判为误报。"
+      },
+      {
+        "title": "Potential race is guarded by request sequence id",
+        "file": "src/auth/session.ts",
+        "line": "89",
+        "why_rejected": "脱敏示例：verify agent 发现该问题已由上游校验或生命周期清理覆盖，因此判为误报。"
+      },
+      {
+        "title": "Configuration fallback is test-only and not production reachable",
+        "file": "src/state/task-store.ts",
+        "line": "96",
+        "why_rejected": "脱敏示例：verify agent 发现该问题已由上游校验或生命周期清理覆盖，因此判为误报。"
+      },
+      {
+        "title": "Duplicate mapping is redundant but not behaviorally incorrect",
+        "file": "src/state/task-store.ts",
+        "line": "103",
+        "why_rejected": "脱敏示例：verify agent 发现该问题已由上游校验或生命周期清理覆盖，因此判为误报。"
+      },
+      {
+        "title": "Candidate issue already covered by upstream validation",
+        "file": "src/integrations/chat.ts",
+        "line": "110",
+        "why_rejected": "脱敏示例：verify agent 发现该问题已由上游校验或生命周期清理覆盖，因此判为误报。"
+      },
+      {
+        "title": "Reported timer leak is cleaned up by shared lifecycle hook",
+        "file": "src/integrations/chat.ts",
+        "line": "117",
+        "why_rejected": "脱敏示例：verify agent 发现该问题已由上游校验或生命周期清理覆盖，因此判为误报。"
+      },
+      {
+        "title": "Potential race is guarded by request sequence id",
+        "file": "src/integrations/chat.ts",
+        "line": "124",
+        "why_rejected": "脱敏示例：verify agent 发现该问题已由上游校验或生命周期清理覆盖，因此判为误报。"
+      },
+      {
+        "title": "Configuration fallback is test-only and not production reachable",
+        "file": "pipeline/run-batch.ts",
+        "line": "131",
+        "why_rejected": "脱敏示例：verify agent 发现该问题已由上游校验或生命周期清理覆盖，因此判为误报。"
+      },
+      {
+        "title": "Duplicate mapping is redundant but not behaviorally incorrect",
+        "file": "pipeline/run-batch.ts",
+        "line": "138",
+        "why_rejected": "脱敏示例：verify agent 发现该问题已由上游校验或生命周期清理覆盖，因此判为误报。"
+      },
+      {
+        "title": "Candidate issue already covered by upstream validation",
+        "file": "pipeline/run-batch.ts",
+        "line": "145",
+        "why_rejected": "脱敏示例：verify agent 发现该问题已由上游校验或生命周期清理覆盖，因此判为误报。"
+      },
+      {
+        "title": "Reported timer leak is cleaned up by shared lifecycle hook",
+        "file": "pipeline/run-batch.ts",
+        "line": "152",
+        "why_rejected": "脱敏示例：verify agent 发现该问题已由上游校验或生命周期清理覆盖，因此判为误报。"
+      },
+      {
+        "title": "Potential race is guarded by request sequence id",
+        "file": "pipeline/run-batch.ts",
+        "line": "159",
+        "why_rejected": "脱敏示例：verify agent 发现该问题已由上游校验或生命周期清理覆盖，因此判为误报。"
+      },
+      {
+        "title": "Configuration fallback is test-only and not production reachable",
+        "file": "pipeline/run-batch.ts",
+        "line": "166",
+        "why_rejected": "脱敏示例：verify agent 发现该问题已由上游校验或生命周期清理覆盖，因此判为误报。"
+      },
+      {
+        "title": "Duplicate mapping is redundant but not behaviorally incorrect",
+        "file": "pipeline/evaluate/final-judge.ts",
+        "line": "173",
+        "why_rejected": "脱敏示例：verify agent 发现该问题已由上游校验或生命周期清理覆盖，因此判为误报。"
+      },
+      {
+        "title": "Candidate issue already covered by upstream validation",
+        "file": "pipeline/evaluate/final-judge.ts",
+        "line": "180",
+        "why_rejected": "脱敏示例：verify agent 发现该问题已由上游校验或生命周期清理覆盖，因此判为误报。"
+      },
+      {
+        "title": "Reported timer leak is cleaned up by shared lifecycle hook",
+        "file": "pipeline/evaluate/final-judge.ts",
+        "line": "187",
+        "why_rejected": "脱敏示例：verify agent 发现该问题已由上游校验或生命周期清理覆盖，因此判为误报。"
+      },
+      {
+        "title": "Potential race is guarded by request sequence id",
+        "file": "scripts/promote.ts",
+        "line": "194",
+        "why_rejected": "脱敏示例：verify agent 发现该问题已由上游校验或生命周期清理覆盖，因此判为误报。"
+      },
+      {
+        "title": "Configuration fallback is test-only and not production reachable",
+        "file": "scripts/promote.ts",
+        "line": "201",
+        "why_rejected": "脱敏示例：verify agent 发现该问题已由上游校验或生命周期清理覆盖，因此判为误报。"
+      },
+      {
+        "title": "Duplicate mapping is redundant but not behaviorally incorrect",
+        "file": "scripts/promote.ts",
+        "line": "208",
+        "why_rejected": "脱敏示例：verify agent 发现该问题已由上游校验或生命周期清理覆盖，因此判为误报。"
+      },
+      {
+        "title": "Candidate issue already covered by upstream validation",
+        "file": "scripts/promote.ts",
+        "line": "215",
+        "why_rejected": "脱敏示例：verify agent 发现该问题已由上游校验或生命周期清理覆盖，因此判为误报。"
+      },
+      {
+        "title": "Reported timer leak is cleaned up by shared lifecycle hook",
+        "file": "scripts/create-fetch-task.ts",
+        "line": "222",
+        "why_rejected": "脱敏示例：verify agent 发现该问题已由上游校验或生命周期清理覆盖，因此判为误报。"
+      },
+      {
+        "title": "Potential race is guarded by request sequence id",
+        "file": "scripts/create-fetch-task.ts",
+        "line": "229",
+        "why_rejected": "脱敏示例：verify agent 发现该问题已由上游校验或生命周期清理覆盖，因此判为误报。"
+      },
+      {
+        "title": "Configuration fallback is test-only and not production reachable",
+        "file": "scripts/create-fetch-task.ts",
+        "line": "236",
+        "why_rejected": "脱敏示例：verify agent 发现该问题已由上游校验或生命周期清理覆盖，因此判为误报。"
+      },
+      {
+        "title": "Duplicate mapping is redundant but not behaviorally incorrect",
+        "file": "scripts/create-fetch-task.ts",
+        "line": "243",
+        "why_rejected": "脱敏示例：verify agent 发现该问题已由上游校验或生命周期清理覆盖，因此判为误报。"
+      },
+      {
+        "title": "Candidate issue already covered by upstream validation",
+        "file": "scripts/create-fetch-task.ts",
+        "line": "250",
+        "why_rejected": "脱敏示例：verify agent 发现该问题已由上游校验或生命周期清理覆盖，因此判为误报。"
+      },
+      {
+        "title": "Reported timer leak is cleaned up by shared lifecycle hook",
+        "file": "public/app.ts",
+        "line": "257",
+        "why_rejected": "脱敏示例：verify agent 发现该问题已由上游校验或生命周期清理覆盖，因此判为误报。"
+      },
+      {
+        "title": "Potential race is guarded by request sequence id",
+        "file": "public/app.ts",
+        "line": "264",
+        "why_rejected": "脱敏示例：verify agent 发现该问题已由上游校验或生命周期清理覆盖，因此判为误报。"
+      },
+      {
+        "title": "Configuration fallback is test-only and not production reachable",
+        "file": "public/app.ts",
+        "line": "271",
+        "why_rejected": "脱敏示例：verify agent 发现该问题已由上游校验或生命周期清理覆盖，因此判为误报。"
+      }
+    ],
+    "script": "export const meta = {\n  name: 'audit-project-dual-review-public-demo',\n  description: '脱敏示例：分区并行审 → 每条发现对抗验证 → 汇总待拍板',\n  phases: [{ title: 'Find' }, { title: 'Verify' }, { title: 'Synthesize' }],\n}\n\nconst ROOT = '/workspace/sample-agent-app'\n\nconst ZONES = [\n  {\n    key: 'eval-runner',\n    label: '评估编排核心',\n    files: [\"src/core/eval-runner.ts\"],\n    focus: '步骤树、事件映射、超时兜底、并发状态机一致性',\n  },\n  {\n    key: 'http-routes',\n    label: 'HTTP 入口与路由',\n    files: [\"src/server.ts\", \"src/routes/approvals.ts\", \"src/routes/release.ts\", \"src/ui/html.ts\"],\n    focus: '路由鉴权挂载顺序、输入校验、路径穿越、未捕获异常、Host header 语义',\n  },\n  {\n    key: 'auth-gate',\n    label: '鉴权与门禁（安全关键）',\n    files: [\"src/auth/session.ts\", \"src/auth/group-gate.ts\", \"src/auth/search-gate.ts\", \"src/audit/audit-log.ts\"],\n    focus: 'token 校验时序安全、fail-open vs fail-close、CSRF、身份伪造、审计脱敏',\n  },\n  {\n    key: 'state-config',\n    label: '持久化/状态/配置',\n    files: [\"src/state/task-store.ts\", \"src/config.ts\", \"src/util.ts\"],\n    focus: '并发写文件竞态、JSON 损坏恢复、配置解析回退、原子写、锁',\n  },\n  {\n    key: 'external-io',\n    label: '外部 IO（消息/文档/播报）',\n    files: [\"src/integrations/chat.ts\", \"src/integrations/docs.ts\", \"src/notify/release-announce.ts\"],\n    focus: 'await 缺失导致推送丢失、重试/幂等、token 过期处理、网络错误吞没',\n  },\n  {\n    key: 'pipeline-batch',\n    label: '抓取批处理与资源管理',\n    files: [\"pipeline/run-batch.ts\", \"pipeline/run-one.ts\", \"pipeline/collect/collect-one.ts\", \"shared/proc.ts\"],\n    focus: '浏览器进程/上下文泄漏、fetch 无超时挂起、孤儿进程、并发名额争抢',\n  },\n  {\n    key: 'pipeline-eval',\n    label: '终判/规则/LLM 评估',\n    files: [\"pipeline/evaluate/final-judge.ts\", \"pipeline/evaluate/rules.ts\", \"pipeline/evaluate/landing-probe.ts\"],\n    focus: '子进程超时与进程树杀、规则判定口径、结果解析健壮性、统计漏算',\n  },\n  {\n    key: 'pipeline-write',\n    label: '写表与共享工具',\n    files: [\"pipeline/write/write-sheet.ts\", \"pipeline/write/render-report.ts\", \"shared/io.ts\"],\n    focus: '写表行定位错位、并发 addSheet 竞态、部分失败处理、目标行计算',\n  },\n  {\n    key: 'promote',\n    label: '发布晋级与重启',\n    files: [\"scripts/promote.ts\", \"scripts/safe-restart.ts\"],\n    focus: '受保护分支直推、预演合并测试还原、并发锁、重启前任务检查、事务幂等',\n  },\n  {\n    key: 'scripts-fetch',\n    label: '抓取数据脚本',\n    files: [\"scripts/create-fetch-task.ts\", \"scripts/chunked-resume.ts\", \"scripts/fetch-review-top3.ts\"],\n    focus: 'fetch 无超时、查询拼接注入、cookie 过期、并发浏览器堆积、错误吞没',\n  },\n  {\n    key: 'frontend',\n    label: '前端逻辑',\n    files: [\"public/app.ts\", \"public/dashboard.ts\", \"public/board-schema.ts\"],\n    focus: 'XSS、轮询泄漏、状态不一致、错误未处理的 fetch、内存泄漏',\n  },\n]\n\nconst FINDINGS_SCHEMA = {\n  type: 'object',\n  properties: { findings: { type: 'array', items: { type: 'object' } } },\n  required: ['findings'],\n}\n\nconst VERDICT_SCHEMA = {\n  type: 'object',\n  properties: { isReal: { type: 'boolean' }, confidence: { type: 'string' }, reasoning: { type: 'string' } },\n  required: ['isReal', 'confidence', 'reasoning'],\n}\n\nfunction findPrompt(zone) {\n  return `你是资深代码审查者，正在审计「示例评估看板项目」（公开脱敏示例）。\n主链路：读取任务 → 抓取页面/接口结果 → 规则+LLM 终判 → 写回报告。\n项目根目录：${ROOT}\n\n【你负责的审查分区：${zone.label}】\n请用 Read 工具完整读取以下文件（必要时 Grep 它们调用/被调用的上下文，但审查范围聚焦这些文件）：\n${zone.files.map(f => `  - ${ROOT}/${f}`).join('\\n')}\n\n【重点关注】${zone.focus}\n\n【要求】\n- 找真实的漏洞、缺陷、需重构处。优先正确性 bug、安全漏洞、资源泄漏、并发竞态、错误处理缺口。\n- 每条发现必须引用具体代码作为 evidence（行号 + 关键片段），不能泛泛而谈、不能臆测。\n- 宁缺毋滥：没把握成立的不要报。\n\n返回结构化 findings 数组。`\n}\n\nfunction verifyPrompt(f) {\n  return `你是严格的代码审查验证者，任务是【对抗性地验证】下面这条审查发现是否真实成立。默认怀疑它是误报，除非代码证据确凿。\n项目根目录：${ROOT}\n\n【待验证的发现】\n标题：${f.title}\n文件：${f.file}\n行号：${f.line}\n严重度：${f.severity}（${f.category}）\n描述：${f.description}\n建议：${f.suggestion}\n\n【你必须做的】\n1. 用 Read 工具打开 ${ROOT}/${f.file}，定位到 ${f.line} 附近的示例代码。\n2. 核对上下文是否支持这个判断。\n3. 给出裁决：isReal=true 仅当证据确凿。`\n}\n\nconst zoneResults = await pipeline(\n  ZONES,\n  (zone) => agent(findPrompt(zone), {\n    label: `审:${zone.key}`,\n    phase: 'Find',\n    schema: FINDINGS_SCHEMA,\n    agentType: 'Explore',\n  }).then(r => ({ zone, findings: (r && r.findings) || [] })),\n  (res) => parallel(res.findings.map(f => () =>\n    agent(verifyPrompt(f), {\n      label: `验:${f.file.split('/').pop()}:${f.line}`,\n      phase: 'Verify',\n      schema: VERDICT_SCHEMA,\n      agentType: 'Explore',\n    }).then(v => ({ ...f, verdict: v }))\n  ))\n)\n",
+    "findAgent": {
+      "id": "public-find-auth",
+      "zone": "鉴权与门禁（安全关键）",
+      "steps": [
+        {
+          "k": "say",
+          "text": "我会先读取鉴权相关文件，再检查 token 比较、fail-open 和审计脱敏。"
+        },
+        {
+          "k": "tool",
+          "name": "Read",
+          "arg": "src/auth/session.ts"
+        },
+        {
+          "k": "tool",
+          "name": "Grep",
+          "arg": "token|safeEqual|authorization"
+        },
+        {
+          "k": "tool",
+          "name": "StructuredOutput",
+          "arg": "findings[]"
+        },
+        {
+          "k": "result",
+          "text": "返回 3 条候选发现。"
+        }
+      ]
+    },
+    "verifyAgent": {
+      "id": "public-verify-token",
+      "target": "Token comparison uses direct equality in write gate",
+      "steps": [
+        {
+          "k": "say",
+          "text": "我会默认怀疑该发现是误报，重新读取相关文件确认。"
+        },
+        {
+          "k": "tool",
+          "name": "Read",
+          "arg": "src/auth/session.ts"
+        },
+        {
+          "k": "tool",
+          "name": "Grep",
+          "arg": "safeEqual"
+        },
+        {
+          "k": "tool",
+          "name": "StructuredOutput",
+          "arg": "{ isReal, confidence, reasoning }"
+        },
+        {
+          "k": "result",
+          "text": "裁定为真问题，建议使用恒定时间比较。"
+        }
+      ]
+    }
+  },
+  "overview": [
+    {
+      "runId": "wf_public_demo_81",
+      "name": "audit-project-dual-review-public-demo",
+      "date": "2026-06-26",
+      "agents": 81,
+      "tokens": 3640435,
+      "sec": 660,
+      "toolCalls": 1890,
+      "phases": [
+        "Find",
+        "Verify",
+        "Synthesize"
+      ]
+    },
+    {
+      "runId": "wf_public_demo_02",
+      "name": "minimal-fanout-public-demo",
+      "date": "2026-06-26",
+      "agents": 2,
+      "tokens": 27000,
+      "sec": 90,
+      "toolCalls": 10,
+      "phases": [
+        "Discover"
+      ]
+    }
+  ]
+}

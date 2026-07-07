@@ -1,0 +1,87 @@
+{
+  "runId": "wf_public_demo_02",
+  "timestamp": "2026-06-26T12:30:00.000Z",
+  "taskId": "public-small-demo",
+  "script": "const results = await parallel([agent(taskA), agent(taskB)])",
+  "scriptPath": "/tmp/public-demo/workflows/minimal-fanout.js",
+  "result": [
+    {
+      "summary": "脱敏示例：定位代码中的耗时字段",
+      "findings": [
+        {
+          "claim": "duration is emitted",
+          "file": "src/metrics/timing.ts",
+          "line": 42,
+          "evidence": "durationMs"
+        }
+      ]
+    },
+    {
+      "summary": "脱敏示例：定位历史数据目录",
+      "findings": [
+        {
+          "claim": "sample run data exists",
+          "file": "data/example-runs/*.json",
+          "line": 1,
+          "evidence": "usage.total.durationMs"
+        }
+      ]
+    }
+  ],
+  "agentCount": 2,
+  "logs": [
+    "脱敏示例：并行启动 2 个 agent"
+  ],
+  "durationMs": 90000,
+  "summary": "脱敏最小存档：2 agent 并行检索",
+  "workflowName": "public-small-demo",
+  "status": "completed",
+  "startTime": 1782485000000,
+  "phases": [
+    {
+      "title": "Discover"
+    }
+  ],
+  "defaultModel": "example-small-agent-model",
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Discover"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "code-timing-instrumentation",
+      "phaseIndex": 1,
+      "phaseTitle": "Discover",
+      "agentId": "public-small-01",
+      "agentType": "Explore",
+      "model": "example-small-agent-model",
+      "state": "done",
+      "promptPreview": "Repo: /workspace/sample-agent-app. Find timing instrumentation.",
+      "tokens": 12000,
+      "toolCalls": 4,
+      "durationMs": 45000,
+      "resultPreview": "{\"summary\":\"public sample\"}"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "ondisk-historical-data",
+      "phaseIndex": 1,
+      "phaseTitle": "Discover",
+      "agentId": "public-small-02",
+      "agentType": "Explore",
+      "model": "example-small-agent-model",
+      "state": "done",
+      "promptPreview": "Repo: /workspace/sample-agent-app. Find sample run data.",
+      "tokens": 15000,
+      "toolCalls": 6,
+      "durationMs": 52000,
+      "resultPreview": "{\"summary\":\"public sample\"}"
+    }
+  ],
+  "totalTokens": 27000,
+  "totalToolCalls": 10
+}

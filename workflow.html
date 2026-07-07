@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>一句话,怎么变成一支 agent 团队</title>
+<style>
+  :root{
+    --bg:#faf9f6; --surface:#ffffff; --surface2:#f5f4f0; --border:#e8e5de; --border2:#dedad1;
+    --ink:#211e19; --ink2:#655f57; --ink3:#9a938a;
+    --accent:#5a51db; --accent-soft:#eeecfb; --accent-bd:#d9d4f6;
+    --find:#2563eb; --find-soft:#e9f0fe; --find-bd:#c7dbfb;
+    --val:#b3600b; --val-soft:#fbeeda; --val-bd:#f0d6a8;
+    --ok:#0b8a4b; --ok-soft:#e4f6ec; --ok-bd:#bce6cd;
+    --no:#cf443e; --no-soft:#fbe9e8; --no-bd:#f2c9c6;
+    --code:#f7f6f2;
+    --sh:0 1px 2px rgba(30,25,15,.04), 0 4px 16px rgba(30,25,15,.04);
+    --mono:"SFMono-Regular",ui-monospace,Consolas,"Liberation Mono",Menlo,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    --serif:"Georgia","Songti SC",serif;
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --bg:#16151a; --surface:#1e1d24; --surface2:#26242c; --border:#322f3a; --border2:#3b3846;
+    --ink:#ece9f2; --ink2:#a9a3b5; --ink3:#736d81;
+    --accent:#a99cff; --accent-soft:#262138; --accent-bd:#3d3560;
+    --find:#7aa7ff; --find-soft:#1b2540; --find-bd:#2e3f66;
+    --val:#e0a765; --val-soft:#2c2314; --val-bd:#4a3a1e;
+    --ok:#5cc98a; --ok-soft:#16281d; --ok-bd:#274d36;
+    --no:#e88b86; --no-soft:#2b1a19; --no-bd:#4d2b29;
+    --code:#191820;
+    --sh:0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25);
+  }}
+  :root[data-theme="dark"]{
+    --bg:#16151a; --surface:#1e1d24; --surface2:#26242c; --border:#322f3a; --border2:#3b3846;
+    --ink:#ece9f2; --ink2:#a9a3b5; --ink3:#736d81;
+    --accent:#a99cff; --accent-soft:#262138; --accent-bd:#3d3560;
+    --find:#7aa7ff; --find-soft:#1b2540; --find-bd:#2e3f66;
+    --val:#e0a765; --val-soft:#2c2314; --val-bd:#4a3a1e;
+    --ok:#5cc98a; --ok-soft:#16281d; --ok-bd:#274d36;
+    --no:#e88b86; --no-soft:#2b1a19; --no-bd:#4d2b29; --code:#191820;
+  }
+  :root[data-theme="light"]{
+    --bg:#faf9f6; --surface:#ffffff; --surface2:#f5f4f0; --border:#e8e5de;
+    --ink:#211e19; --ink2:#655f57; --ink3:#9a938a; --code:#f7f6f2;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.7;font-size:16px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:820px;margin:0 auto;padding:0 22px}
+  a{color:var(--accent)}
+  ::selection{background:var(--accent-soft)}
+
+  header.top{border-bottom:1px solid var(--border);background:var(--bg)}
+  .toprow{max-width:820px;margin:0 auto;padding:12px 22px;display:flex;justify-content:space-between;align-items:center;font-size:13px}
+  .brand{font-weight:600;letter-spacing:.02em;color:var(--ink2)}
+  .brand b{color:var(--accent)}
+  .themebtn{border:1px solid var(--border);background:var(--surface);color:var(--ink2);border-radius:20px;padding:4px 12px;cursor:pointer;font-size:12px}
+
+  .hero{padding:56px 0 30px}
+  .eyebrow{color:var(--accent);font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px}
+  h1{font-size:40px;line-height:1.18;letter-spacing:-.02em;margin:0 0 16px;font-weight:700}
+  .hsub{font-size:18px;color:var(--ink2);max-width:60ch;margin:0}
+  .metarow{display:flex;gap:20px;flex-wrap:wrap;margin-top:24px;font-size:13.5px;color:var(--ink3)}
+  .metarow b{color:var(--ink);font-variant-numeric:tabular-nums}
+
+  section{padding:26px 0}
+  .sec-h{display:flex;align-items:baseline;gap:12px;margin:20px 0 6px}
+  .sec-n{font-family:var(--mono);font-size:13px;color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-bd);border-radius:20px;padding:2px 11px;flex-shrink:0}
+  h2{font-size:26px;letter-spacing:-.01em;margin:0;font-weight:700}
+  .sec-lead{color:var(--ink2);font-size:16px;max-width:64ch;margin:8px 0 0}
+  h3{font-size:16px;margin:0 0 4px;font-weight:650}
+
+  .divider{height:1px;background:var(--border);margin:8px 0}
+
+  /* flow overview */
+  .flow{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin:22px 0}
+  @media(max-width:720px){.flow{grid-template-columns:1fr 1fr}}
+  .fstep{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:var(--sh);position:relative}
+  .fstep .fn{font-family:var(--mono);font-size:12px;color:var(--accent);margin-bottom:8px}
+  .fstep h4{margin:0 0 4px;font-size:14.5px}
+  .fstep p{margin:0;font-size:13px;color:var(--ink2);line-height:1.55}
+  .fstep .arw{position:absolute;right:-11px;top:50%;transform:translateY(-50%);color:var(--ink3);font-size:16px;z-index:2}
+  @media(max-width:720px){.fstep .arw{display:none}}
+
+  /* cards */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;box-shadow:var(--sh);margin:14px 0}
+  .card-lab{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--ink2);margin-bottom:12px;
+    background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:4px 12px}
+  .card-lab .d{width:8px;height:8px;border-radius:50%}
+  .lab-you .d{background:var(--accent)} .lab-script .d{background:var(--find)}
+  .lab-run .d{background:var(--val)} .lab-out .d{background:var(--ok)} .lab-verify .d{background:var(--no)}
+
+  .saidbox{font-size:17px;line-height:1.7;color:var(--ink);font-family:var(--serif)}
+  .saidbox::before{content:"“";color:var(--accent);font-size:26px;font-family:var(--serif);margin-right:2px}
+  .saidbox::after{content:"”";color:var(--accent);font-size:26px;font-family:var(--serif)}
+
+  pre{background:var(--code);border:1px solid var(--border);border-radius:12px;padding:15px 16px;overflow-x:auto;
+    font-family:var(--mono);font-size:12.7px;line-height:1.65;color:var(--ink);margin:0;white-space:pre-wrap;word-break:break-word}
+  pre.nowrap{white-space:pre;word-break:normal}
+  .s-cm{color:var(--ink3)} .s-kw{color:var(--accent);font-weight:600}
+  code{font-family:var(--mono);background:var(--surface2);border:1px solid var(--border);padding:.5px 5px;border-radius:5px;font-size:.88em}
+
+  /* tabs */
+  .tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+  .tab{border:1px solid var(--border);background:var(--surface);color:var(--ink2);border-radius:10px;padding:8px 16px;cursor:pointer;font-size:14px;transition:.12s;font-weight:500}
+  .tab:hover{border-color:var(--border2)}
+  .tab.on{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:var(--sh)}
+
+  /* template-fill widget */
+  .fill{display:grid;grid-template-columns:1fr;gap:12px}
+  .fillrow{border:1px solid var(--border);border-radius:12px;overflow:hidden}
+  .fillrow .h{background:var(--surface2);border-bottom:1px solid var(--border);padding:7px 13px;font-size:12px;color:var(--ink2);font-weight:600;display:flex;align-items:center;gap:7px}
+  .fillrow .b{padding:13px;font-family:var(--mono);font-size:12.8px;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+  .slot{background:var(--find-soft);border:1px solid var(--find-bd);color:var(--find);border-radius:5px;padding:.5px 6px;font-weight:600;font-family:var(--mono)}
+  .val{background:var(--val-soft);border:1px solid var(--val-bd);color:var(--val);border-radius:5px;padding:.5px 6px;font-weight:600}
+  .arrow-d{text-align:center;color:var(--ink3);font-size:15px;font-family:var(--mono)}
+  .jsonout .b{color:var(--ink)}
+  .j-key{color:var(--find)} .j-str{color:var(--ok)} .j-sev-high{color:var(--no);font-weight:700} .j-sev-medium{color:var(--val);font-weight:700} .j-sev-low{color:var(--ink2);font-weight:700}
+
+  .note{background:var(--accent-soft);border:1px solid var(--accent-bd);border-radius:12px;padding:12px 16px;font-size:14px;color:var(--ink);margin-top:14px}
+  .note b{color:var(--accent)}
+
+  /* zone selector chips */
+  .zsel{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+  .zchip{border:1px solid var(--border);background:var(--surface);color:var(--ink2);border-radius:20px;padding:5px 12px;cursor:pointer;font-size:12.5px}
+  .zchip:hover{border-color:var(--border2)}
+  .zchip.on{background:var(--find);border-color:var(--find);color:#fff}
+  .zcount{font-size:12px;color:var(--ink3);margin-left:4px}
+
+  /* finding card + verdict */
+  .finding{border:1px solid var(--no-bd);background:var(--no-soft);border-radius:12px;padding:14px}
+  .finding .t{font-weight:650;font-size:15px;margin-bottom:4px}
+  .finding .loc{font-family:var(--mono);font-size:12px;color:var(--ink2)}
+  .finding .desc{font-size:13.5px;color:var(--ink2);margin-top:8px;line-height:1.6}
+  .sevtag{display:inline-block;font-size:11px;font-family:var(--mono);padding:2px 8px;border-radius:20px;font-weight:700;vertical-align:1px;margin-left:6px}
+  .sev-high{background:var(--no-soft);border:1px solid var(--no-bd);color:var(--no)}
+  .btn{border:1px solid var(--accent-bd);background:var(--accent-soft);color:var(--accent);border-radius:10px;padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600}
+  .btn:disabled{opacity:.5;cursor:default}
+  .verdict{border:1px solid var(--ok-bd);background:var(--ok-soft);border-radius:12px;padding:14px;margin-top:12px}
+  .verdict .vh{font-weight:700;color:var(--ok);font-size:15px;margin-bottom:6px}
+  .verdict .vr{font-size:13.5px;color:var(--ink2);line-height:1.6}
+
+  /* fan-out mini */
+  .fanmini{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+  .fdot{width:12px;height:12px;border-radius:3px}
+  .fdot.ok{background:var(--ok)} .fdot.no{background:var(--no)}
+
+  details{margin-top:14px;border:1px solid var(--border);border-radius:12px;background:var(--surface);overflow:hidden}
+  summary{cursor:pointer;padding:12px 16px;font-size:14px;font-weight:600;color:var(--accent);list-style:none}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"▸ ";color:var(--ink3)}
+  details[open] summary::before{content:"▾ "}
+  details .body{padding:0 16px 16px}
+  details .body h4{margin:14px 0 4px;font-size:13.5px}
+
+  .takeaways{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:16px}
+  @media(max-width:720px){.takeaways{grid-template-columns:1fr}}
+  .tk{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:var(--sh)}
+  .tk .n{font-family:var(--mono);color:var(--accent);font-size:20px;font-weight:700}
+  .tk p{margin:6px 0 0;font-size:13.5px;color:var(--ink2)}
+  .tk b{color:var(--ink)}
+
+  footer{padding:40px 0 60px;color:var(--ink3);font-size:13px;border-top:1px solid var(--border);margin-top:30px}
+  footer a{color:var(--ink2)}
+  .loading{color:var(--ink3);padding:40px 0}
+
+  /* fan-out animation (two-level, code-equivalent) */
+  .fo-sync{background:var(--code);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-family:var(--mono);font-size:12.2px;line-height:1.85;margin-bottom:14px;white-space:pre-wrap;word-break:break-word}
+  .fo-sync .ln{border-radius:5px;padding:1px 5px;margin:0 -5px;transition:background .15s,box-shadow .15s}
+  .fo-sync .ln.af{background:var(--find-soft);box-shadow:inset 3px 0 0 var(--find)}
+  .fo-sync .ln.av{background:var(--val-soft);box-shadow:inset 3px 0 0 var(--val)}
+  .fo-sync .cmt{color:var(--ink3)}
+  .fo-ctrl{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+  .fo-count{font-size:13.5px;color:var(--ink2)} .fo-count b{color:var(--accent);font-family:var(--mono);font-size:17px}
+  .fo-prog{height:3px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:14px}
+  .fo-prog i{display:block;height:100%;background:var(--accent);width:0}
+  .lanes{display:flex;flex-direction:column;gap:6px}
+  .lane{display:flex;align-items:center;gap:10px}
+  .findblk{flex-shrink:0;width:158px;font-size:11.3px;border-radius:8px;padding:7px 10px;border:1px solid var(--border);background:var(--surface2);color:var(--ink3);transition:.2s;font-family:var(--mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .findblk.running{border-color:var(--find-bd);background:var(--find-soft);color:var(--find);animation:fpulse 1s infinite}
+  .findblk.done{border-color:var(--find);background:var(--find);color:#fff}
+  @keyframes fpulse{0%,100%{opacity:1}50%{opacity:.55}}
+  .varrow{display:flex;flex-wrap:wrap;gap:4px;flex:1;min-width:0}
+  .vblk{width:14px;height:14px;border-radius:4px;background:var(--surface2);border:1px solid var(--border);transform:scale(0);transition:transform .18s}
+  .vblk.spawned{transform:scale(1)}
+  .vblk.running{background:var(--val-soft);border-color:var(--val-bd);animation:fpulse .9s infinite}
+  .vblk.ok{background:var(--ok);border-color:var(--ok)}
+  .vblk.no{background:var(--no);border-color:var(--no)}
+  @media(max-width:560px){.findblk{width:112px;font-size:10px}}
+</style>
+</head>
+<body>
+<header class="top"><div class="toprow">
+  <span class="brand"><b>AI 助手</b> · Workflow 原理</span>
+  <button class="themebtn" onclick="toggleTheme()">◐ 主题</button>
+</div></header>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="eyebrow">从一句话到一支团队</div>
+    <h1>一句话,怎么变成一支<br>agent 团队?</h1>
+    <p class="hsub">你说一句大白话 → 我把它转换成一小段脚本 → 引擎按数据「代入」出许多具体指令 → 每个指令交给一个独立的 sub-agent 去干。下面拆解一次真实发生过的 <b>81 个 agent</b> 的项目审计。</p>
+    <div class="metarow" id="metaRow"></div>
+  </div>
+
+  <section>
+    <div class="flow" id="flow">
+      <div class="fstep"><div class="fn">STEP 1</div><h4>你说的话</h4><p>一句自然语言的需求,不含任何代码。<span class="arw">→</span></p></div>
+      <div class="fstep"><div class="fn">STEP 2</div><h4>我写的脚本</h4><p>一段小 JS:一个数组 + 一个 prompt 模板 + 一个返回格式。<span class="arw">→</span></p></div>
+      <div class="fstep"><div class="fn">STEP 3</div><h4>代入生成</h4><p>引擎拿数组每一项代入模板,生成 N 条具体 prompt。<span class="arw">→</span></p></div>
+      <div class="fstep"><div class="fn">STEP 4</div><h4>各自干活</h4><p>N 个 agent 并行执行,各返回一份结构化结果。</p></div>
+    </div>
+  </section>
+
+  <!-- ===================== 真实案例 ===================== -->
+  <section id="real">
+    <div class="sec-h"><span class="sec-n">01</span><h2>真实案例:那次 81 个 agent 的审计</h2></div>
+    <p class="sec-lead">同样 4 步,只是数组从 3 项换成 11 个"审查分区",而且多了一层"对每条发现再验一遍"。这是真发生过的一次,数据已脱敏。</p>
+
+    <div class="card">
+      <div class="card-lab lab-you"><span class="d"></span>① 我当时说的话</div>
+      <div class="saidbox" id="r_prompt"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-lab lab-script"><span class="d"></span>② 我转换成的脚本 · 结构</div>
+      <pre id="r_struct" class="nowrap"></pre>
+      <details>
+        <summary>展开:每个部件的完整源码(ZONES / findPrompt / verifyPrompt / schema,逐字)</summary>
+        <div class="body" id="r_pieces"></div>
+      </details>
+    </div>
+
+    <div class="card">
+      <div class="card-lab lab-run"><span class="d"></span>③ 每个分区代入 findPrompt · 点一个分区看那个 find agent 收到什么</div>
+      <div class="zsel" id="r_zsel"></div>
+      <div class="fill" id="r_fill"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-lab lab-run"><span class="d"></span>④ 点播放 · 看 81 个 agent 两层长出来(与代码等价)</div>
+      <p style="font-size:13.5px;color:var(--ink2);margin:0 0 14px">左边代码<b>正在执行的那行会高亮</b>。<b style="color:var(--find)">第一层</b>:11 个 find 一起开跑(蓝方块=find agent);<b style="color:var(--val)">第二层</b>:哪个分区先审完,它的 verify 子 agent 就先冒出来——<b>不等别的分区</b>(这正是 <code>pipeline</code> 无屏障)。verify 跑完变 <span style="color:var(--ok)">绿(确认)</span>/<span style="color:var(--no)">红(误报)</span>。</p>
+      <div class="fo-sync" id="foSync"></div>
+      <div class="fo-ctrl">
+        <button class="btn" id="foPlay" onclick="playFanout()">▶ 播放</button>
+        <button class="tab" onclick="resetFanout()">↺ 重置</button>
+        <div class="fo-count" id="foCount">第一层:11 个 find agent · 等待播放</div>
+      </div>
+      <div class="fo-prog"><i id="foBar"></i></div>
+      <div class="lanes" id="foLanes"></div>
+      <div class="note" style="margin-top:14px">这条播放 = 代码里 <code>pipeline(ZONES, findStage, verifyStage)</code> 的真实执行:每个分区独立走「find → verify」,互不设屏障。方块数量(11 找、70 验、36 绿 34 红)全是真值;各分区的<b>耗时是示意</b>(压缩到几秒,便于看清结构)。</div>
+    </div>
+
+    <div class="card">
+      <div class="card-lab lab-verify"><span class="d"></span>⑤ 一条发现的完整命运 · find 找到 → verify 复核</div>
+      <p style="font-size:13.5px;color:var(--ink2);margin:0 0 12px">以「鉴权分区」那个 find agent 真实找到的一条为例。它返回后,引擎<b>又派一个 verify agent</b>,把这条发现代入 <code>verifyPrompt</code> 去对抗复核。</p>
+      <div class="finding" id="r_finding"></div>
+      <div style="text-align:center;margin:14px 0"><button class="btn" id="r_verifyBtn" onclick="runVerify()">▶ 派 verify agent 复核这条</button></div>
+      <div id="r_verifyArea"></div>
+    </div>
+
+    <div class="note" id="r_tally"></div>
+  </section>
+
+  <!-- ===================== 总结 ===================== -->
+  <section id="why">
+    <div class="sec-h"><span class="sec-n">03</span><h2>三句话记住它</h2></div>
+    <div class="takeaways">
+      <div class="tk"><div class="n">1</div><h3>我写"规则",不写"数量"</h3><p>agent 有几个,是<b>数组长度</b>和<b>运行时数据</b>决定的,不是某个字段设的。</p></div>
+      <div class="tk"><div class="n">2</div><h3>模板 + 数据 = 每个 prompt</h3><p>一个 <b>prompt 模板</b>,代入数组每一项,就长出每个 agent 各自收到的具体指令。</p></div>
+      <div class="tk"><div class="n">3</div><h3>schema 让返回可直接用</h3><p>规定返回形状,agent 交回的就是<b>干净 JSON</b>,不用再解析自然语言。</p></div>
+    </div>
+  </section>
+</div>
+
+<footer class="wrap">
+  由 <b>AI 助手</b> 生成 · 全部数据取自脱敏 workflow 示例存档 <code>wf_public_demo_81</code> ·
+  <a href="how-it-works.html">▸ 看更偏机制的版本(并发/流水线/甘特图)</a> ·
+  <a href="workflow-output.html">▸ 看那次审计的完整产出数据</a>
+</footer>
+
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+function hl(code){
+  let h=esc(code);
+  h=h.replace(/(\/\/[^\n]*)/g,'<span class="s-cm">$1</span>');
+  h=h.replace(/\b(const|await|return|export|function)\b/g,'<span class="s-kw">$1</span>');
+  return h;
+}
+function toggleTheme(){
+  const r=document.documentElement;
+  const cur=r.getAttribute('data-theme')|| (matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+  r.setAttribute('data-theme', cur==='dark'?'light':'dark');
+}
+const ROOT='/workspace/sample-agent-app';
+
+fetch('./chain-data.json?t='+Date.now()).then(r=>r.json()).then(D=>{
+  // ---------- meta ----------
+  const su=D.real.summary;
+  $('#metaRow').innerHTML=
+    `<span>真实案例规模 · <b>${su.agents}</b> 个 agent</span>`+
+    `<span><b>${su.zones}</b> 分区 · <b>${su.findings}</b> 条发现 · 确认 <b>${su.confirmed}</b></span>`+
+    `<span><b>${(su.tokens/10000).toFixed(0)}万</b> token</span>`;
+
+  // ---------- 真实案例 ----------
+  const R=D.real;
+  $('#r_prompt').textContent=R.userPrompt;
+  $('#r_struct').innerHTML=hl(
+`export const meta = { name:'audit-project-dual-review', … }
+
+const ZONES = [ /* 11 个分区对象,每个 {key,label,files,focus} */ ]
+
+await pipeline(ZONES,
+  (zone) => agent(findPrompt(zone),   { schema:FINDINGS_SCHEMA, agentType:'Explore' }),  // → 11 个 find
+  (res)  => parallel(res.findings.map(f =>
+             agent(verifyPrompt(f),    { schema:VERDICT_SCHEMA,  agentType:'Explore' })))) // → 每条发现 1 个 verify`);
+  // pieces
+  const P=R.pieces;
+  $('#r_pieces').innerHTML=
+    `<h4>① ZONES(11 项,我手写)</h4><pre class="nowrap">${hl(P.zones)}</pre>`+
+    `<h4>② findPrompt(zone)</h4><pre>${hl(P.findPrompt)}</pre>`+
+    `<h4>③ verifyPrompt(f)</h4><pre>${hl(P.verifyPrompt)}</pre>`+
+    `<h4>④ 真实 pipeline 调用</h4><pre>${hl(P.pipeline)}</pre>`+
+    `<h4>⑤ 两个 schema</h4><pre class="nowrap">${hl(P.fschema+'\n\n'+P.vschema)}</pre>`;
+
+  // findPrompt 模板分段(与真实源码一致),用于高亮代入
+  function buildFindPrompt(zone){
+    const pre=`你是资深代码审查者，正在审计「示例评估看板项目」项目（生产中的公开脱敏示例）。\n主链路：读取任务 → 抓取页面/接口结果 → 规则+LLM 终判 → 写回报告。\n项目根目录：${ROOT}\n\n【你负责的审查分区：`;
+    const mid1=`】\n请用 Read 工具完整读取以下文件（必要时 Grep 上下文，但审查范围聚焦这些文件）：\n`;
+    const mid2=`\n\n【重点关注】`;
+    const post=`\n\n【要求】\n- 找真实的漏洞、缺陷、需重构处。优先正确性 bug、安全漏洞、资源泄漏、并发竞态、错误处理缺口。\n- 每条发现必须引用具体代码作为 evidence（行号 + 关键片段）。\n- 宁缺毋滥：没把握成立的不要报。\n- 这是生产工具，已过多轮人工 + CodeX review，你要找被遗漏的、深层的、边界的问题。\n返回结构化 findings 数组。`;
+    const files=zone.files.map(f=>`  - ${ROOT}/${f}`).join('\n');
+    return {pre,mid1,mid2,post,files};
+  }
+  const zsel=$('#r_zsel');
+  R.zonesFull.forEach((z,i)=>{
+    const c=document.createElement('div');c.className='zchip'+(z.key==='auth-gate'?' on':'');
+    c.innerHTML=esc(z.label)+`<span class="zcount">${z.confirmed+z.rejected}条</span>`;
+    c.onclick=()=>{document.querySelectorAll('#r_zsel .zchip').forEach(x=>x.classList.remove('on'));c.classList.add('on');renderZone(i);};
+    zsel.appendChild(c);
+  });
+  function renderZone(i){
+    const z=R.zonesFull[i];
+    const t=buildFindPrompt(z);
+    const tplHtml=esc(t.pre)+'<span class="slot">${zone.label}</span>'+esc(t.mid1)+'<span class="slot">${zone.files…}</span>'+esc(t.mid2)+'<span class="slot">${zone.focus}</span>'+esc(t.post);
+    const filledHtml=esc(t.pre)+`<span class="val">${esc(z.label)}</span>`+esc(t.mid1)+`<span class="val">${esc(t.files)}</span>`+esc(t.mid2)+`<span class="val">${esc(z.focus)}</span>`+esc(t.post);
+    let dots='';for(let k=0;k<z.confirmed;k++)dots+='<div class="fdot ok"></div>';for(let k=0;k<z.rejected;k++)dots+='<div class="fdot no"></div>';
+    $('#r_fill').innerHTML=
+      `<div class="fillrow"><div class="h">🧩 findPrompt 模板(3 个槽:分区名 / 文件清单 / 关注点)</div><div class="b">${tplHtml}</div></div>`+
+      `<div class="arrow-d">▼ 代入「${esc(z.label)}」这一行数据</div>`+
+      `<div class="fillrow"><div class="h">📨 这个 find agent 真实收到的 prompt</div><div class="b">${filledHtml}</div></div>`+
+      `<div class="arrow-d">▼ 它读文件、审查后返回 findings</div>`+
+      `<div class="fillrow"><div class="h">📋 本分区返回 ${z.confirmed+z.rejected} 条(后续验证:<span style="color:var(--ok)">${z.confirmed} 确认</span> / <span style="color:var(--no)">${z.rejected} 误报</span>)</div><div class="b"><div class="fanmini">${dots}</div></div></div>`;
+  }
+  renderZone(R.zonesFull.findIndex(z=>z.key==='auth-gate'));
+
+  // ---------- worked example: finding → verify → verdict ----------
+  const W=R.worked;
+  const f=W.finding;
+  $('#r_finding').innerHTML=
+    `<div class="t">${esc(f.title)}<span class="sevtag sev-high">${esc(f.severity)}</span></div>`+
+    `<div class="loc">${esc(f.file)} · ${esc(f.category)}</div>`+
+    `<div class="desc">${esc(f.description)}</div>`;
+  window.runVerify=function(){
+    $('#r_verifyBtn').disabled=true;
+    const vp=W.verifyPromptReal;
+    const conf=(f.verify_confidence||'high');
+    $('#r_verifyArea').innerHTML=
+      `<div class="arrow-d">▼ 代入这条发现,生成 verifyPrompt</div>`+
+      `<div class="fillrow"><div class="h">📨 verify agent 真实收到的 prompt(默认怀疑,除非证据确凿)</div><div class="b">${esc(vp)}</div></div>`+
+      `<div class="arrow-d">▼ 它独立重读代码后裁决</div>`+
+      `<div class="verdict"><div class="vh">✓ 裁定:真漏洞(isReal = true · 信心 ${esc(conf)})</div>`+
+      `<div class="vr">${esc(f.verify_reasoning||'')}</div></div>`;
+  };
+
+  $('#r_tally').innerHTML=`<b>合起来:</b> 11 个 find(我写的 ZONES)+ 70 个 verify(11 个 agent 跑出来的 findings 各一个)= <b>${su.agents} 个 agent</b>。我只写了「11 个分区」和「对每条都验一下」这两条规则。`;
+
+  // ---------- ④ 两层扇出动画(与 pipeline 代码等价) ----------
+  const FO=(()=>{
+    const lanes=R.zonesFull.map((z)=>{
+      const total=z.confirmed+z.rejected;
+      const findDur=1.4+total*0.22;              // 示意:发现多的分区审得久
+      const findEnd=findDur;
+      const seq=[]; let c=z.confirmed,n=z.rejected;
+      while(c||n){ if(c){seq.push('ok');c--;} if(n){seq.push('no');n--;} }  // 交错,数量为真值
+      const verifies=seq.map((res,k)=>{ const s=findEnd+0.06*k; return {res,start:s,end:s+1.0}; });
+      return {z,findEnd,verifies};
+    });
+    const maxT=Math.max(...lanes.map(l=>l.verifies.length?Math.max(...l.verifies.map(v=>v.end)):l.findEnd));
+    return {lanes,maxT};
+  })();
+  const FO_MS=6200;
+  function foBuild(){
+    document.getElementById('foLanes').innerHTML=FO.lanes.map((l,i)=>{
+      const vb=l.verifies.map((v,k)=>`<span class="vblk" id="v_${i}_${k}"></span>`).join('');
+      return `<div class="lane"><div class="findblk" id="f_${i}" title="${esc(l.z.label)}">find · ${esc(l.z.label)}</div><div class="varrow">${vb}</div></div>`;
+    }).join('');
+    document.getElementById('foSync').innerHTML=
+      `<span class="ln" id="lnPipe">await pipeline(ZONES,</span>\n`+
+      `  <span class="ln" id="lnFind">(zone) => agent(findPrompt(zone), {…}),  <span class="cmt">// 第一层:11 个 find</span></span>\n`+
+      `  <span class="ln" id="lnVerify">(res)  => parallel(res.findings.map(f =>\n           agent(verifyPrompt(f), {…})))  <span class="cmt">// 第二层:每条发现 1 个 verify</span></span>\n)`;
+  }
+  let foRAF=null;
+  function foRender(t){
+    let rf=false, rv=false, spawned=11;
+    FO.lanes.forEach((l,i)=>{
+      const fb=document.getElementById('f_'+i);
+      if(t<l.findEnd){ fb.className='findblk running'; rf=true; } else { fb.className='findblk done'; }
+      l.verifies.forEach((v,k)=>{
+        const el=document.getElementById(`v_${i}_${k}`);
+        if(t<v.start){ el.className='vblk'; }
+        else if(t<v.end){ el.className='vblk spawned running'; spawned++; rv=true; }
+        else { el.className='vblk spawned '+v.res; spawned++; }
+      });
+    });
+    document.getElementById('foCount').innerHTML=
+      `当前 <b>${spawned}</b> 个 agent`+
+      (rf?' · <span style="color:var(--find)">find 执行中</span>':'')+
+      (rf&&rv?' + ':(rv?' · ':''))+
+      (rv?'<span style="color:var(--val)">verify 执行中</span>':'')+
+      (!rf&&!rv&&t>0?' · <span style="color:var(--ok)">全部完成 (11 find + 70 verify)</span>':'');
+    document.getElementById('lnFind').className='ln'+(rf?' af':'');
+    document.getElementById('lnVerify').className='ln'+(rv?' av':'');
+    document.getElementById('foBar').style.width=Math.min(100,t/FO.maxT*100)+'%';
+  }
+  window.resetFanout=function(){
+    if(foRAF)cancelAnimationFrame(foRAF); foRAF=null;
+    foBuild();
+    document.getElementById('foCount').innerHTML='第一层:11 个 find agent · 等待播放';
+    document.getElementById('foBar').style.width='0';
+    document.getElementById('foPlay').disabled=false;
+  };
+  window.playFanout=function(){
+    window.resetFanout(); document.getElementById('foPlay').disabled=true;
+    const t0=performance.now();
+    (function step(now){
+      const t=(now-t0)/FO_MS*FO.maxT;
+      foRender(Math.min(t,FO.maxT));
+      if(t<FO.maxT) foRAF=requestAnimationFrame(step);
+      else document.getElementById('foPlay').disabled=false;
+    })(t0);
+  };
+  foBuild();
+}).catch(e=>{
+  $('.wrap').insertAdjacentHTML('beforeend',`<p style="color:#cf443e">数据加载失败:${e}</p>`);
+});
+</script>
+</body>
+</html>
