@@ -113,6 +113,33 @@
   .cb p{font-size:13px;margin:0;color:var(--ink2);line-height:1.5}
   .cb .cs{font-size:12px;color:var(--ink2);margin-top:6px}
   .cb .cs b{color:var(--accent2)}
+  .viz{height:100px;margin:8px 0 9px;border:1px solid var(--line);border-radius:12px;background:var(--bg);display:flex;align-items:center;justify-content:center;gap:10px;overflow:hidden;padding:12px 14px}
+  .viz-arrow{font-family:var(--mono);font-size:17px;color:var(--ink3)}
+  .dotgrid{display:grid;grid-template-columns:repeat(3,12px);gap:5px}
+  .dotgrid i,.vote i{width:12px;height:12px;border-radius:4px;background:var(--accent-bg);border:1px solid var(--accent);display:block}
+  .dotgrid i:nth-child(2n){background:var(--a2-bg);border-color:var(--accent2)}
+  .funnel{width:58px;height:46px;border:2px solid var(--accent2);border-top-width:12px;border-radius:8px 8px 16px 16px;background:var(--a2-bg);display:grid;place-items:center;font-family:var(--mono);font-size:11px;color:var(--accent2);font-weight:700}
+  .okbox{min-width:54px;height:38px;border:2px solid var(--ok);background:var(--ok-bg);border-radius:10px;display:grid;place-items:center;font-family:var(--mono);font-size:12px;color:var(--ok);font-weight:800}
+  .tree{display:grid;grid-template-columns:auto auto auto;gap:9px;align-items:center}
+  .root,.tiny-node{font-family:var(--mono);border:1px solid var(--line);background:var(--soft);border-radius:8px;padding:5px 9px;font-size:11px;white-space:nowrap}
+  .branch{height:56px;border-left:2px solid var(--ink3);border-top:2px solid var(--ink3);border-bottom:2px solid var(--ink3);border-radius:10px 0 0 10px;width:28px}
+  .tree-stack{display:flex;flex-direction:column;gap:6px}
+  .tiny-node.f{border-color:var(--accent);background:var(--accent-bg);color:var(--accent)}
+  .tiny-node.v{border-color:var(--accent2);background:var(--a2-bg);color:var(--accent2)}
+  .tiny-node.g{border-color:var(--ok);background:var(--ok-bg);color:var(--ok)}
+  .judge{display:flex;gap:12px;align-items:center;justify-content:center;width:100%}
+  .cards{display:flex;gap:6px}.card-mini{width:34px;height:44px;border:1px solid var(--line);border-radius:8px;background:var(--bg);display:grid;place-items:center;font-family:var(--mono);font-weight:700;color:var(--accent)}
+  .bars{display:flex;flex-direction:column;gap:5px}.bars i{height:8px;border-radius:8px;background:var(--accent-bg);border:1px solid var(--accent)}.bars i:nth-child(1){width:44px}.bars i:nth-child(2){width:62px}.bars i:nth-child(3){width:34px}
+  .loopviz{position:relative;width:250px;height:62px;display:flex;align-items:center;justify-content:center;gap:12px}
+  .loopviz::before{content:"";position:absolute;inset:8px 12px;border:2px dashed var(--accent2);border-radius:999px;z-index:0}
+  .loopviz::after{content:"↻";position:absolute;right:3px;top:5px;color:var(--accent2);font-size:20px;font-family:var(--mono);background:var(--bg);line-height:1;padding:0 2px;z-index:2}
+  .loopviz .tiny-node{position:relative;z-index:1;background:var(--bg)}
+  .sweep{display:grid;grid-template-columns:auto 40px auto;gap:12px;align-items:center;max-width:360px;width:100%}
+  .query-stack{display:flex;flex-direction:column;gap:5px}.query{border:1px solid var(--line);background:var(--soft);border-radius:8px;padding:3px 9px;font-size:11px;white-space:nowrap}
+  .beams{width:40px;height:46px;position:relative}.beams i{position:absolute;left:0;right:0;top:50%;height:2px;background:var(--accent);transform-origin:right center}.beams i:nth-child(1){transform:rotate(-24deg)}.beams i:nth-child(2){transform:rotate(0)}.beams i:nth-child(3){transform:rotate(24deg)}
+  .union{border:2px solid var(--ok);background:var(--ok-bg);color:var(--ok);border-radius:14px;padding:10px 14px;font-family:var(--mono);font-size:12px;font-weight:800;white-space:nowrap}
+  .vote{display:flex;gap:5px;align-items:center}.vote span{width:22px;height:22px;border-radius:7px;border:1px solid var(--line);display:grid;place-items:center;font-family:var(--mono);font-size:12px;font-weight:800}.vote .yes{background:var(--ok-bg);border-color:var(--ok);color:var(--ok)}.vote .nope{background:var(--no-bg);border-color:var(--no);color:var(--no)}
+  .vote-result{border:2px solid var(--ok);background:var(--ok-bg);color:var(--ok);border-radius:11px;padding:9px 13px;font-family:var(--mono);font-size:12px;font-weight:800;white-space:nowrap}
 
   /* 本次流程图 */
   .flowd{display:flex;flex-direction:column;align-items:center;gap:5px;margin-top:14px}
@@ -134,25 +161,6 @@
   .stat .n{font-size:min(9vw,46px);font-weight:800;letter-spacing:-.03em;font-family:var(--mono);line-height:1}
   .stat .l{font-size:13.5px;color:var(--ink2);margin-top:6px}
   .stat.a .n{color:var(--accent)} .stat.g .n{color:var(--ok)} .stat.r .n{color:var(--no)} .stat.o .n{color:var(--accent2)}
-
-  /* 81-agent 分批动画 */
-  .agctrl{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:16px 0 12px}
-  .pbtn{border:1px solid var(--accent);background:var(--accent-bg);color:var(--accent);border-radius:9px;padding:9px 17px;cursor:pointer;font-size:14px;font-weight:600}
-  .pbtn:disabled{opacity:.5;cursor:default}
-  .agcount{font-family:var(--mono);font-size:13.5px;color:var(--ink2)} .agcount b{color:var(--accent);font-size:16px}
-  .agrid{display:flex;flex-wrap:wrap;gap:4px;max-width:660px}
-  .ag{width:15px;height:15px;border-radius:4px;background:var(--soft);border:1px solid var(--line);transition:.12s}
-  .ag.run{background:var(--a2-bg);border-color:var(--accent2);animation:apulse .8s infinite}
-  .ag.find{background:var(--accent);border-color:var(--accent)}
-  .ag.ok{background:var(--ok);border-color:var(--ok)}
-  .ag.no{background:var(--no);border-color:var(--no)}
-  @keyframes apulse{0%,100%{opacity:1}50%{opacity:.45}}
-  .agcap{font-size:13px;color:var(--ink2);margin-top:12px;line-height:1.6}
-  .phaselab{font-size:13.5px;color:var(--ink2);font-weight:600;margin:14px 0 6px}
-  .phaselab .c{font-family:var(--mono);color:var(--accent)}
-  .barlab{font-size:12.5px;color:var(--ink3);font-family:var(--mono);margin:8px 0 6px}
-  .finalnode{display:inline-block;border:1px solid var(--line);background:var(--soft);border-radius:10px;padding:9px 15px;font-size:13.5px;font-family:var(--mono);opacity:.38;transition:.35s}
-  .finalnode.on{opacity:1;border-color:var(--ok);background:var(--ok-bg);color:var(--ok);font-weight:600}
 
   /* 工具降级阶梯 */
   .ladder{display:flex;flex-direction:column;gap:8px;margin:16px 0;max-width:740px}
@@ -276,38 +284,77 @@
       <div class="combos">
         <div class="cb">
           <div class="cnm"><span class="x">①</span>find → verify(对抗验证)</div>
-          <div class="mini"><span class="mn f">找·广撒网</span><span class="ar">→</span><span class="mn v">验·证伪</span><span class="ar">→</span><span class="mn g">留真的</span></div>
+          <div class="viz">
+            <div class="dotgrid"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <span class="viz-arrow">→</span>
+            <div class="funnel">verify</div>
+            <span class="viz-arrow">→</span>
+            <div class="okbox">true</div>
+          </div>
           <p>一层尽量多找,一层默认怀疑逐条驳。</p>
           <div class="cs">case:<b>代码审查 / 找 bug / 核查</b></div>
         </div>
         <div class="cb">
           <div class="cnm"><span class="x">②</span>两层扇出(map→再 fan out)</div>
-          <div class="mini"><span class="mn">11 分区</span><span class="ar">→</span><span class="mn f">11 find</span><span class="ar">→</span><span class="mn v">70 verify</span></div>
+          <div class="viz">
+            <div class="tree">
+              <span class="root">11 zones</span><div class="branch"></div>
+              <div class="tree-stack"><span class="tiny-node f">find</span><span class="tiny-node f">find</span><span class="tiny-node f">find</span></div>
+            </div>
+            <span class="viz-arrow">→</span>
+            <div class="tree-stack"><span class="tiny-node v">verify ×70</span></div>
+          </div>
           <p>你写数组,第二层运行时长出,数量自己涨。</p>
           <div class="cs">case:<b>本项目审计 → 81 个 agent</b></div>
         </div>
         <div class="cb">
           <div class="cnm"><span class="x">③</span>评审团(judge panel)</div>
-          <div class="mini"><span class="mn">A</span><span class="mn">B</span><span class="mn">C</span><span class="ar">→</span><span class="mn">打分</span><span class="ar">→</span><span class="mn g">合成</span></div>
+          <div class="viz">
+            <div class="judge">
+              <div class="cards"><span class="card-mini">A</span><span class="card-mini">B</span><span class="card-mini">C</span></div>
+              <span class="viz-arrow">→</span>
+              <div class="bars"><i></i><i></i><i></i></div>
+              <span class="viz-arrow">→</span>
+              <div class="okbox">merge</div>
+            </div>
+          </div>
           <p>N 版方案不同角度出 → 打分 → 取优嫁接。</p>
           <div class="cs">case:<b>方案设计 / 选型 / 多稿</b></div>
         </div>
         <div class="cb">
           <div class="cnm"><span class="x">④</span>循环直到(loop-until)</div>
-          <div class="mini"><span class="mn">派一批</span><span class="ar">↻</span><span class="mn g">够 / 挖干为止</span></div>
-          <p>数量事先不知,一直派到凑够或挖不出新的。</p>
+          <div class="viz">
+            <div class="loopviz">
+              <span class="tiny-node f">batch</span>
+              <span class="tiny-node">check</span>
+              <span class="tiny-node g">stop</span>
+            </div>
+          </div>
+          <p>一轮不够就再派一轮,直到达标或没有新东西。</p>
           <div class="cs">case:<b>穷尽找问题 / 按预算铺深度</b></div>
         </div>
         <div class="cb">
-          <div class="cnm"><span class="x">⑤</span>多路扫(multi-modal sweep)</div>
-          <div class="mini"><span class="mn">按名</span><span class="mn">按内容</span><span class="mn">按时间</span><span class="ar">→</span><span class="mn g">并集去重</span></div>
-          <p>每个 agent 换一种搜法,盲搜后合并补漏。</p>
+          <div class="cnm"><span class="x">⑤</span>多策略并搜(search ensemble)</div>
+          <div class="viz">
+            <div class="sweep">
+              <div class="query-stack"><span class="query">文件名</span><span class="query">正文</span><span class="query">历史</span></div>
+              <div class="beams"><i></i><i></i><i></i></div>
+              <div class="union">并集去重</div>
+            </div>
+          </div>
+          <p>同一目标,换几种线索并行搜,最后合并补漏。</p>
           <div class="cs">case:<b>检索 / 研究 / 大范围排查</b></div>
         </div>
         <div class="cb">
-          <div class="cnm"><span class="x">⑥</span>单票 → 多票(质量旋钮)</div>
-          <div class="mini"><span class="mn">1 票判</span><span class="ar">→</span><span class="mn v">3~5 票投</span><span class="ar">→</span><span class="mn g">多数说真</span></div>
-          <p>每条派几个 verify 投票,误报大降。</p>
+          <div class="cnm"><span class="x">⑥</span>多 verifier 投票(质量旋钮)</div>
+          <div class="viz">
+            <span class="tiny-node">finding</span>
+            <span class="viz-arrow">→</span>
+            <div class="vote"><span class="yes">✓</span><span class="yes">✓</span><span class="yes">✓</span><span class="nope">×</span><span class="nope">×</span></div>
+            <span class="viz-arrow">→</span>
+            <div class="vote-result">3/5 true</div>
+          </div>
+          <p>同一条发现交给 3~5 个 verifier,按多数票采信。</p>
           <div class="cs">case:<b>要更高验证质量时</b></div>
         </div>
       </div>
@@ -316,7 +363,7 @@
 
   <!-- ===== 组三 ===== -->
   <section class="slide divider">
-    <div class="inner"><div class="grp">组 三</div><h1>仅用简单的 prompt,<br>共花费 364 万 Token</h1>
+    <div class="inner"><div class="grp">组 三</div><h1>提供简单 prompt 驱动的 workflow,<br>共花费 364 万 Token</h1>
       <p class="sub">最后从 70 条发现里筛出 <b>36 个确认 case</b>,34 条被 verify 打回。</p></div>
   </section>
 
@@ -343,48 +390,6 @@
       <span class="peek">🔍 点这块代码 → 看当时真实、完整的值:ZONES 全 11 项 / findPrompt / verifyPrompt / schema 逐字,以及代入后每个 agent 收到的 prompt →</span>
       </a>
       <p>我手写的只有 <b>ZONES(11 项)</b> 和"对每条都验一下"这条规则。<span style="color:var(--ink3)">上面 <code>{…}</code>、<code>findPrompt(zone)</code> 里到底是什么,点代码看真实值。</span></p>
-    </div>
-  </section>
-
-  <section class="slide">
-    <div class="inner">
-      <div class="eyebrow">真实例子 · 这次属于哪种套路</div>
-      <h2>② 两层扇出 × ① find→verify,用 pipeline 跑</h2>
-      <div class="flowd">
-        <span class="fd-pill acc">你一句话:「找项目里要修的漏洞,修一下」</span>
-        <span class="fd-ar">↓</span>
-        <span class="fd-pill">我写脚本:ZONES × 11 &nbsp;+&nbsp; pipeline(find, verify)</span>
-        <span class="fd-ar">↓ &nbsp;<span class="fd-lab">pipeline · 无屏障 · 每个分区独立走 find→verify,互不等</span></span>
-        <div class="fd-lanes">
-          <div class="fd-lane"><span class="mn">分区①鉴权</span><span class="ar">→</span><span class="mn f">find</span><span class="ar">→</span><span class="mn">3 发现</span><span class="ar">→</span><span class="mn v">verify ×3</span><span class="fd-dots"><i class="ok"></i><i class="ok"></i><i class="no"></i></span></div>
-          <div class="fd-lane"><span class="mn">分区②评估核心</span><span class="ar">→</span><span class="mn f">find</span><span class="ar">→</span><span class="mn">11 发现</span><span class="ar">→</span><span class="mn v">verify ×11</span></div>
-          <div class="fd-lane mut">⋮ &nbsp;共 11 条泳道,各分区并行推进</div>
-          <div class="fd-lane"><span class="mn">分区⑪前端</span><span class="ar">→</span><span class="mn f">find</span><span class="ar">→</span><span class="mn">8 发现</span><span class="ar">→</span><span class="mn v">verify ×8</span></div>
-        </div>
-        <span class="fd-ar">↓ &nbsp;<span class="fd-lab">70 个 verify 各自返回 isReal(单票:每条发现只 1 个 verify)</span></span>
-        <span class="fd-pill">纯 JS:<code style="border:none;background:none;padding:0">filter(isReal)</code> → <b class="ok">36 确认</b> / <b class="no">34 误报</b></span>
-        <span class="fd-ar">↓</span>
-        <span class="fd-pill acc">return 给我 → 我决定修哪些</span>
-      </div>
-    </div>
-  </section>
-
-  <section class="slide">
-    <div class="inner">
-      <div class="eyebrow">真实例子 · 展开成 81(点播放)</div>
-      <h2>先 find → 再并发 verify → 屏障 → 通知主 Agent</h2>
-      <div class="agctrl">
-        <button class="pbtn" id="pbtn" onclick="playBatch()">▶ 播放</button>
-        <span class="agcount" id="agcount">等待播放</span>
-      </div>
-      <div class="phaselab"><span class="c">①</span> FIND · 11 个先跑,产出 findings</div>
-      <div class="agrid" id="findGrid"></div>
-      <div class="barlab">↓ 每个 find 的 findings 各派一个 verify</div>
-      <div class="phaselab"><span class="c">②</span> VERIFY · 70 个并发(一波 7 个,其余排队)</div>
-      <div class="agrid" id="verGrid"></div>
-      <div class="barlab">↓ 屏障:必须等 70 个 verify <b>全部</b>完成</div>
-      <div class="finalnode" id="finalNode"><span class="c">③</span> 汇总 filter(isReal) → 通知主 Agent　(<span class="ok">36 确认</span> / <span class="no">34 误报</span>)</div>
-      <div class="agcap"><span class="ac">■ find</span> 11 · <span class="ok">■ 确认</span> 36 · <span class="no">■ 误报</span> 34　|　并发上限约 16,此处示意 7 个一波。严格说 pipeline 下某分区 find 一完它的 verify 就开(可与别的分区 find 重叠);此处简化为「先 find 后 verify」,以看清依赖与最后的屏障。</div>
     </div>
   </section>
 
@@ -460,6 +465,28 @@
     </div>
   </section>
 
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow">延伸思考 · 再往后一层</div>
+      <h2>Workflow 可能会变成<br>跨 agent 的调度层</h2>
+      <p>现在 Claude Code 的 workflow 主要还是在 <b>Claude Code 自己的 harness</b> 里跑:extra 提高推理预算,workflow 负责拆分、并发、合并、验证。</p>
+      <div class="two">
+        <div class="box"><h4>今天:单厂内调度</h4>
+          <div class="diag"><span class="node a">Claude Code workflow</span><span class="arrow">→</span><span class="node a">Claude sub-agent</span></div>
+          <p>能编排,但调度对象主要还是自家的 agent / tool。</p></div>
+        <div class="box"><h4 class="ac">以后:通用调度平面</h4>
+          <div class="diag"><span class="node v">workflow router</span><span class="arrow">→</span><span class="node a">Claude</span><span class="node a">Codex</span><span class="node a">自研 agent</span><span class="node v">规则代码</span></div>
+          <p>按节点选择最合适的执行者:谁会读、谁会改、谁便宜、谁更稳。</p></div>
+      </div>
+      <p style="margin-top:12px;font-size:15.5px;color:var(--ink3)">那时问题会从<b style="color:var(--ink2)">“哪个 agent 更强?”</b>变成<b style="color:var(--ink2)">“这个节点该派哪个 agent?”</b> 统一 I/O schema、权限、状态、成本和验证,会比单个 agent 的聪明更重要。</p>
+      <p style="margin-top:18px;font-size:15px;color:var(--muted)">组内已有探索:
+        <a href="https://bytedance.larkoffice.com/docx/KLt4d9bMgo3YQ4xiVEGcQyiFnme" target="_blank" rel="noreferrer">Workflow 调度实践</a>
+        ·
+        <a href="https://github.com/kelvinschen/acpus/blob/main/README.zh.md" target="_blank" rel="noreferrer">ACPU(S) README.zh</a>
+      </p>
+    </div>
+  </section>
+
   <section class="slide divider">
     <div class="inner"><div class="grp">END</div><h1>就这么回事。</h1>
       <p class="sub">配套可交互版:/workflow.html(转换链) · /how-it-works.html(机制) · /index.html(那次审计数据)</p></div>
@@ -504,50 +531,6 @@
     const n=hashIndex();
     if(n!==null)show(n,false);
   });
-  // ---- 81-agent 分阶段动画:先 find → 再并发 verify → 屏障 → 通知主 Agent ----
-  const CONC=7, DUR=340; let batchTimer=null;
-  const VSEQ=(()=>{let ok=36,no=34,s=[];while(ok||no){if(ok){s.push('ok');ok--;}if(no){s.push('no');no--;}}return s;})(); // 70
-  function buildGrids(){
-    const g=id=>document.getElementById(id);
-    if(!g('findGrid'))return;
-    g('findGrid').innerHTML=Array.from({length:11},()=>'<span class="ag pend" data-c="find"></span>').join('');
-    g('verGrid').innerHTML=VSEQ.map(c=>`<span class="ag pend" data-c="${c}"></span>`).join('');
-    g('finalNode').classList.remove('on');
-    g('agcount').textContent='等待播放';
-    if(g('pbtn'))g('pbtn').disabled=false;
-  }
-  function playBatch(){
-    if(batchTimer)clearTimeout(batchTimer);
-    buildGrids();
-    const cnt=document.getElementById('agcount');
-    document.getElementById('pbtn').disabled=true;
-    function waves(grid,label,onDone){
-      let done=0, running=[];
-      (function w(){
-        running.forEach(el=>el.className='ag '+el.dataset.c);
-        done+=running.length; running=[];
-        const pend=[...grid.querySelectorAll('.pend')].slice(0,CONC);
-        if(!pend.length){ onDone(done); return; }
-        pend.forEach(el=>{el.classList.remove('pend');el.classList.add('run');});
-        running=pend;
-        cnt.innerHTML=`${label} · 完成 <b>${done}</b> · 运行中 ${running.length}`;
-        batchTimer=setTimeout(w,DUR);
-      })();
-    }
-    waves(document.getElementById('findGrid'),'① FIND',()=>{
-      cnt.innerHTML='① FIND 完成 <b>11</b> → 派 verify…';
-      batchTimer=setTimeout(()=>waves(document.getElementById('verGrid'),'② VERIFY',()=>{
-        cnt.innerHTML='② VERIFY 完成 <b>70</b> → 屏障:等全部…';
-        batchTimer=setTimeout(()=>{
-          document.getElementById('finalNode').classList.add('on');
-          cnt.innerHTML='③ 全部完成 → <span style="color:var(--ok)">已通知主 Agent</span>';
-          document.getElementById('pbtn').disabled=false;
-        },550);
-      }),450);
-    });
-  }
-  window.playBatch=playBatch;
-  buildGrids();
   show(i);
 </script>
 </body>

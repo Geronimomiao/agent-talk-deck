@@ -328,31 +328,31 @@ li::before{content:"";position:absolute;left:0;top:12px;width:9px;height:9px;bor
   </div>
 </section>
 
-<!-- S18 Goal / Workflow 属于 harness -->
-<section class="slide" data-sect="组2 · 拆整车" data-notes="<b>新增页:</b>承接“控制流”快闪,把 UltraCode / workflow、Codex goal 这类新模式放回七层框架里。台词:“这不是模型突然长出了项目经理,而是 harness 开始持有目标、拆步骤、调工具、做验证。模型仍然只负责每一轮推理,真正把任务串起来的是外面的控制流。”">
-  <div class="kick">控制流层 · 新模式归位</div>
-  <h2><a href="goal.html" target="_blank" rel="noopener">Goal</a> / <a href="deck.html" target="_blank" rel="noopener">Workflow</a>，<br>也是 harness 的一部分</h2>
+<!-- S18 Codex Goal 属于 harness -->
+<section class="slide" data-sect="组2 · 拆整车" data-notes="<b>新增页:</b>承接“控制流”快闪,先只讲 Codex Goal。台词:“Goal 不是 workflow,也不是模型突然会项目管理。它是 harness 持有一个目标状态,在空闲时继续推进,每一轮仍然交给模型判断下一步,但‘还要不要继续、怎么验证、何时停’是外层控制流在管。”">
+  <div class="kick">控制流层 · Codex Goal</div>
+  <h2><a href="goal.html" target="_blank" rel="noopener">Codex Goal</a>：<br>把“继续做”变成 harness 状态</h2>
   <div class="cols">
     <div class="col"><h3>模型负责什么</h3><p>读当前上下文,做一轮推理,产出下一步文本或工具调用</p></div>
-    <div class="col"><h3>harness 负责什么</h3><p>持有目标、拆步骤、调工具 / subagent、保存状态、验证结果</p></div>
+    <div class="col"><h3>Goal harness 负责什么</h3><p>保存目标、空闲续跑、检查是否完成,卡住时把控制权交还人</p></div>
   </div>
-  <div class="bigline">它把“模型回答问题”，升级成“系统推进任务”。</div>
-  <div class="src">细讲 goal：<a href="goal.html" target="_blank" rel="noopener">Codex Goal 怎么实现</a> · 细讲 workflow：<a href="deck.html" target="_blank" rel="noopener">用确定的代码，编排不确定的智能</a></div>
+  <div class="bigline">它解决的是：没人继续追问时，任务还能按目标推进。</div>
+  <div class="src">细讲 goal：<a href="goal.html" target="_blank" rel="noopener">Codex Goal 怎么实现</a></div>
 </section>
 
-<!-- S19 Goal / Workflow 的任务循环 -->
-<section class="slide" data-sect="组2 · 拆整车" data-notes="<b>新增页:</b>这页讲清楚普通 chat、普通 agent、goal/workflow agent 的差异。不要展开产品细节,只强调结构差异:目标状态、循环推进、证据验证、卡住时交还人类。收句:“所以 workflow / goal 不是第八种魔法,是控制流层变厚了。”">
-  <div class="kick">从一轮回答,到持续推进</div>
-  <h2><a href="deck.html" target="_blank" rel="noopener">Workflow</a> / <a href="goal.html" target="_blank" rel="noopener">Goal</a> 多出来的，<br>是一个任务循环</h2>
+<!-- S19 Claude Code Workflow 属于 harness -->
+<section class="slide" data-sect="组2 · 拆整车" data-notes="<b>新增页:</b>解释 Claude Code 里的 Ultracode 标签。台词:“你们可能见过这个模式名:Ultracode - xhigh + workflows。它不是说模型换了,而是这轮被放进了更重的控制流:xhigh 给更多推理预算,workflow 让 harness 按编排脚本调度一组 agent。也就是说,同一个模型被不同的壳组织起来,体感就会完全不同。”">
+  <div class="kick">控制流层 · Claude Code Workflow</div>
+  <h2><a href="deck.html" target="_blank" rel="noopener">Workflow</a>：<br>Claude Code 里的“Ultracode”</h2>
   <div class="chain">
-    <div class="row"><b>普通聊天:</b>&nbsp;用户一句话 → 模型回答</div>
-    <div class="so">进化成 ↓</div>
-    <div class="row"><b>普通 agent:</b>&nbsp;拼上下文 → 模型选工具 → 执行 → 回填结果</div>
-    <div class="so">再进化成 ↓</div>
-    <div class="row"><b>Goal / Workflow agent:</b>&nbsp;保存目标 → 拆任务 → 并行/串行执行 → 验证 → 修正 → 继续</div>
+    <div class="row"><b>屏幕上看到的标签:</b>&nbsp;<code>(Ultracode - xhigh + workflows)</code></div>
+    <div class="so">拆开看 ↓</div>
+    <div class="row"><b>xhigh:</b>&nbsp;更高推理预算,让模型先规划、拆解,再决定怎么行动</div>
+    <div class="so">再加上 ↓</div>
+    <div class="row"><b>workflows:</b>&nbsp;把拆分、并发、合并、验证交给 harness 的编排脚本</div>
   </div>
-  <span class="chip">④ workflow 不是新模型，是更厚的控制流</span>
-  <div class="src">展开看：<a href="goal.html" target="_blank" rel="noopener">Goal 独立课件</a> · <a href="deck.html" target="_blank" rel="noopener">Workflow 独立课件</a></div>
+  <div class="bigline">所以 Ultracode 更像“高推理档位 + workflow 调度”,不是单纯换了一个更聪明的模型。</div>
+  <div class="src">细讲 workflow：<a href="deck.html" target="_blank" rel="noopener">用确定的代码，编排不确定的智能</a> · <a href="workflow-anatomy.html" target="_blank" rel="noopener">Claude Code workflow 怎么实现</a></div>
 </section>
 
 <!-- S20 七层总表 -->

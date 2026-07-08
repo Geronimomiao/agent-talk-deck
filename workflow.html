@@ -264,7 +264,7 @@
               <div class="card-lab lab-script"><span class="d"></span>② 我转换成的脚本 · 结构</div>
               <pre id="r_struct" class="nowrap"></pre>
               <details>
-                <summary>展开:每个部件的完整源码(ZONES / findPrompt / verifyPrompt / schema,逐字)</summary>
+                <summary>展开:每个部件的完整源码(ZONES / schema / findPrompt / verifyPrompt / pipeline,逐字)</summary>
                 <div class="body" id="r_pieces"></div>
               </details>
             </div>
@@ -422,10 +422,10 @@ await pipeline(ZONES,
     `<details open class="piece-detail"><summary>${title}</summary><div class="body"><pre class="${cls}">${hl(code)}</pre></div></details>`;
   $('#r_pieces').innerHTML=
     piece('① ZONES(11 项,我手写)',P.zones,'nowrap')+
-    piece('② findPrompt(zone)',P.findPrompt)+
-    piece('③ verifyPrompt(f)',P.verifyPrompt)+
-    piece('④ 真实 pipeline 调用',P.pipeline)+
-    piece('⑤ 两个 schema',P.fschema+'\n\n'+P.vschema,'nowrap');
+    piece('② 两个 schema',P.fschema+'\n\n'+P.vschema,'nowrap')+
+    piece('③ findPrompt(zone)',P.findPrompt)+
+    piece('④ verifyPrompt(f)',P.verifyPrompt)+
+    piece('⑤ 真实 pipeline 调用',P.pipeline);
 
   // findPrompt 模板分段(与真实源码一致),用于高亮代入
   function buildFindPrompt(zone){
