@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>课件 v2 · 同一个模型,为什么不同 agent 差这么多</title>
+<title>Agent 探索</title>
 <style>
 :root{
   --bg:#faf9f7;--surface:#fff;--surface2:#f1efe8;--text:#26241f;--text2:#5f5e5a;--text3:#8a8980;
@@ -29,6 +29,8 @@ body{background:var(--bg);color:var(--text);
 .kick{font-size:15px;color:var(--text3);letter-spacing:.06em;margin-bottom:18px}
 h1{font-size:48px;font-weight:600;line-height:1.25;margin:0 0 14px;text-wrap:balance}
 h2{font-size:34px;font-weight:600;line-height:1.32;margin:0 0 20px;text-wrap:balance}
+h2 a{color:inherit;text-decoration:none;border-bottom:3px solid rgba(24,95,165,.28)}
+h2 a:hover{color:var(--blue);border-bottom-color:var(--blue-bd)}
 .sub{font-size:22px;color:var(--text2);line-height:1.55;text-wrap:balance}
 .big{font-size:40px;font-weight:600;line-height:1.42;text-wrap:balance}
 .huge{font-size:150px;font-weight:600;line-height:1;color:var(--blue-bd)}
@@ -50,6 +52,26 @@ li::before{content:"";position:absolute;left:0;top:12px;width:9px;height:9px;bor
   display:flex;align-items:center;justify-content:center;font-size:16px;color:transparent;margin-top:2px}
 .case.done .st{background:var(--ok-bg);border-color:var(--ok);color:var(--ok)}
 .case .lay{display:block;margin-top:6px;font-size:14px;color:var(--blue)}
+.ground-layout{display:grid;grid-template-columns:minmax(360px,.9fr) minmax(440px,1.1fr);gap:56px;align-items:center;width:100%}
+.ground-copy{min-width:0}
+.ground-reveal{opacity:0;transform:translateX(26px);pointer-events:none;transition:opacity .28s ease,transform .28s ease}
+.slide.fragment-on .ground-reveal{opacity:1;transform:none;pointer-events:auto}
+.ground-reveal .mini-title{font-size:18px;color:var(--text3);letter-spacing:.08em;margin-bottom:14px}
+.ground-reveal .step{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 18px;margin:10px 0}
+.ground-reveal .step b{display:block;font-size:20px;line-height:1.45;margin-bottom:4px}
+.ground-reveal .step span{display:block;font-size:18px;line-height:1.55;color:var(--text2)}
+.ground-reveal .so{margin:5px 0 5px 22px;font-size:15px;color:var(--text3)}
+.slide-fragment{opacity:0;transform:translateY(20px);pointer-events:none;max-height:0;overflow:hidden;
+  transition:opacity .28s ease,transform .28s ease,max-height .28s ease}
+.slide.fragment-on .slide-fragment{opacity:1;transform:none;pointer-events:auto;max-height:560px}
+.hi-reveal{margin-top:26px;border-top:1px solid var(--border);padding-top:22px}
+.hi-reveal-head{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-bottom:14px}
+.hi-reveal-title{font-size:25px;font-weight:600;line-height:1.35}
+.hi-reveal-title span{color:var(--blue)}
+.hi-reveal .slide-actions{margin-top:0}
+.hi-reveal .cols{gap:14px}
+.hi-reveal .col{padding:14px 16px}
+.hi-reveal .col p{font-size:16.5px}
 .chain{margin-top:4px}
 .chain .row{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 18px;font-size:21px;line-height:1.5}
 .chain .row b{font-weight:600}
@@ -61,6 +83,8 @@ li::before{content:"";position:absolute;left:0;top:12px;width:9px;height:9px;bor
 .cols{display:flex;gap:18px;flex-wrap:wrap;margin-top:8px}
 .col{flex:1;min-width:230px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 18px}
 .col h3{margin:0 0 8px;font-size:18px;font-weight:600;color:var(--blue)}
+.col h3 a{color:inherit;text-decoration:none;border-bottom:1px solid rgba(24,95,165,.28)}
+.col h3 a:hover{border-bottom-color:var(--blue-bd)}
 .col p{margin:0;font-size:17.5px;line-height:1.55;color:var(--text2)}
 .col.warn h3{color:var(--red)}
 .nums{display:flex;gap:40px;margin:18px 0 4px;flex-wrap:wrap}
@@ -86,6 +110,15 @@ li::before{content:"";position:absolute;left:0;top:12px;width:9px;height:9px;bor
 .stop .ar{display:none}
 .flow{font-size:22px;line-height:2;color:var(--text2)}
 .flow b{color:var(--text);font-weight:600}
+.slide-actions{display:flex;gap:14px;flex-wrap:wrap;margin-top:28px}
+.deck-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 17px;border-radius:12px;
+  background:var(--surface);border:1px solid var(--border);color:var(--blue);text-decoration:none;
+  font-size:17px;font-weight:600;line-height:1.2}
+.deck-btn:hover{border-color:var(--blue-bd);background:var(--blue-bg)}
+.deck-btn.secondary{color:var(--text2)}
+.deck-btn.secondary:hover{color:var(--blue)}
+.deck-btn.neutral{color:var(--text2)}
+.deck-btn.neutral:hover{color:var(--text);border-color:var(--border);background:var(--surface2)}
 .tbl{width:100%;border-collapse:collapse;margin-top:6px;font-size:18px}
 .tbl th{text-align:left;font-size:15px;color:var(--text3);font-weight:600;padding:8px 12px;border-bottom:2px solid var(--border)}
 .tbl td{padding:11px 12px;border-bottom:1px solid var(--border);line-height:1.5;vertical-align:top}
@@ -98,6 +131,10 @@ li::before{content:"";position:absolute;left:0;top:12px;width:9px;height:9px;bor
   padding:16px 26px;font-size:17px;line-height:1.6;color:var(--text2);display:none;z-index:60;max-height:44vh;overflow:auto}
 .notes.show{display:block}
 .notes b{color:var(--text)}
+@media(max-width:960px){
+  .ground-layout{grid-template-columns:1fr;gap:28px}
+  .ground-reveal{transform:translateY(18px)}
+}
 </style>
 </head>
 <body>
@@ -106,16 +143,16 @@ li::before{content:"";position:absolute;left:0;top:12px;width:9px;height:9px;bor
 
 <!-- S1 封面 -->
 <section class="slide" data-sect="开场" data-notes="开场前检查:勿扰模式、终端字号 ≥20pt、录屏备份放在紧邻下一页、抓包回放 flow 文件就位。自我介绍一句:深度用 Claude Code / Codex 几个月,今天不测评、不复述文档,只讲我抓下来的真实报文。<br><b>止损协议(排练过,不现场即兴):</b>开场结束 ≤3′;组 1 结束 ≤17′;组 2+桥结束 ≤32′。若第 32 分钟落后→组 3 切短版:总对比图 + 旋钮映射页 + 1 条最狠策略,3 分钟收线进结尾。">
-  <div class="kick">内部技术分享 · 45′ 主讲 + 15′ Q&amp;A</div>
+  <div class="kick">技术分享 · 30′ 主讲 + 5′ Q&amp;A</div>
   <h1>同一个模型，<br>为什么不同 agent 差这么多</h1>
-  <div class="sub">抓包七层解剖 × 前端工作流 AI 改造</div>
-  <div class="src">simiao · 不猜、不复述文档，看报文说话</div>
+  <div class="sub">从报文拆 Agent：Prompt / Tools / Workflow / Harness</div>
+  <div class="src">不做体感评测，直接看请求、响应和工具链</div>
 </section>
 
 <!-- S2 开场 B · 举手站队 -->
-<section class="slide" data-sect="开场" data-notes="<b>开场 B 定稿台词:</b>“先举个手:平时觉得 Claude Code 更聪明的?……觉得 Codex 或者 Cursor 更顺手的?好,两边都有人,而且我知道你们手里都有证据。但尴尬的是——它们底下很可能是同一个模型。同一个模型,凭什么让一屋子干了十年的工程师举不同的手?过去几个月我干了一件事:给这些 agent 抓包,把它们喂给模型的每一个字节摊开来看。看完我只有一个结论:我们从来就不是在比模型,是在比另一样东西。今天,我把那样东西当场拆给你们看。”<br>⚠ 不剧透任何数字——“几万 token”留给 Hi demo,“1.6%”留给投票。开场 30 秒完成第一次全场互动,压低后面讲授段的走神率。">
+<section class="slide" data-sect="开场" data-notes="<b>开场 B 定稿台词:</b>“先投个票:平时觉得 Claude Code 更聪明的?……觉得 Codex 或者 Cursor 更顺手的?好,两边都有人,而且我知道你们手里都有证据。但尴尬的是——它们底下很可能是同一个模型。同一个模型,凭什么让一屋子干了十年的工程师举不同的手?过去几个月我干了一件事:给这些 agent 抓包,把它们喂给模型的每一个字节摊开来看。看完我只有一个结论:我们从来就不是在比模型,是在比另一样东西。今天,我把那样东西当场拆给你们看。”<br>⚠ 不剧透任何数字——“几万 token”留给 Hi demo,“1.6%”留给投票。开场 30 秒完成第一次全场互动,压低后面讲授段的走神率。">
   <div class="kick">开场 · 黄金 30 秒</div>
-  <div class="big">先举个手——<br><br>觉得 Claude Code 更聪明的？<br>觉得 Codex / Cursor 更顺手的？</div>
+  <div class="big">先投个票——<br><br>觉得 Claude Code 更聪明的？<br>觉得 Codex / Cursor 更顺手的？</div>
 </section>
 
 <!-- S3 hook -->
@@ -125,37 +162,46 @@ li::before{content:"";position:absolute;left:0;top:12px;width:9px;height:9px;bor
 </section>
 
 <!-- S4 四悬案挂起 -->
-<section class="slide" data-sect="开场" data-notes="明说:“45 分钟后,这四个每一个都有报文级答案。”(curiosity gap:挂起的缺口必须在第 39 分钟集中闭合,一个都不能悬空,否则变挫败。)语气:这四个你们全遇到过,但没人给过系统答案——今天给。">
+<section class="slide" data-sect="开场" data-notes="明说:“30 分钟后,这四个每一个都有报文级答案。”(curiosity gap:挂起的缺口必须在第 27 分钟集中闭合,一个都不能悬空,否则变挫败。)语气:这四个你们全遇到过,但没人给过系统答案——今天给。">
   <h2>四个悬案，先挂在这儿</h2>
   <div class="grid2">
-    <div class="case"><span class="st">✓</span><span>① 同模型同任务，<br>A 家一把过，B 家反复编辑失败</span></div>
+    <div class="case"><span class="st">✓</span><span>① 同样模型、同任务，不同 agent 的执行表现不同</span></div>
     <div class="case"><span class="st">✓</span><span>② 会话越长越笨，重开一个立刻恢复智商</span></div>
     <div class="case"><span class="st">✓</span><span>③ IDE 里随口一句就懂，CLI 里同一句话装傻</span></div>
     <div class="case"><span class="st">✓</span><span>④ 有的 agent 事事请示，有的闷头就干</span></div>
   </div>
-  <div class="src">45 分钟后，每一个都有报文级答案。</div>
+  <div class="src">30 分钟后，每一个都有报文级答案。</div>
 </section>
 
-<!-- S5 组1 divider -->
-<section class="slide" data-sect="组1 · 地基与方法" data-notes="引子:“要回答这四个悬案,得先统一一个地基。60 秒讲完——但它的第三层推论,多数人没往下推过。”<br>⚠ 严禁科普腔(专家反转效应 Kalyuga 2003:对老手,教科书式定义是在烧耐心)。判据:听众自己读文档 5 分钟能获得的,删。">
-  <div class="kick">组 1 · 地基与方法 · 3′–14′</div>
-  <h2>先统一一个 60 秒的地基</h2>
-  <div class="sub">它的第三层推论，多数人没往下推过。</div>
-</section>
-
-<!-- S6 K1-K3 推论链 -->
-<section class="slide" data-sect="组1 · 地基与方法" data-notes="<b>台词(推论链口吻,3 分钟封顶):</b>“模型是无状态的 token 预测器,这个你们都知道——但它的推论是:agent 的记忆、工具、联网、subagent,没有一样是模型干的,全是壳在干:把信息拼成文字塞进去,把吐出来的文字解析成动作。工具调用没有魔法。而既然模型的全部世界就是这一次请求里的那串字,那抓包看到的就不是边角料,是全景。”这一步给全场方法论发“合法性执照”。">
-  <h2>三步推论,60 秒</h2>
-  <div class="chain">
-    <div class="row"><b>模型 = 无状态的“接话茬机器”。</b>&nbsp;它天生没有记忆、工具、网络,世界就是这次请求里的那串字</div>
-    <div class="so">所以 ↓</div>
-    <div class="row"><b>agent 的一切“本事”,全是壳(harness)干的。</b>&nbsp;工具调用没有魔法:约定格式的文字,壳负责解析、执行、再拼回去</div>
-    <div class="so">所以 ↓</div>
-    <div class="row"><b>抓包 = 看到 agent 喂给模型的全部。</b>&nbsp;不是窥探边角料,是看全景</div>
+<!-- S5 组1 divider + reveal -->
+<section class="slide" data-sect="组1 · 地基与方法" data-fragments="1" data-notes="引子:“要回答这四个悬案,得先统一一个地基。60 秒讲完——但它的第三层推论,多数人没往下推过。”按右箭头展开右侧三步推论。<br><b>展开后台词:</b>“模型不是 agent,模型只处理这次请求里的文本。所以 agent 的差异,主要长在模型外:上下文怎么塞、工具怎么给、权限怎么放、失败怎么重试。再所以,抓包不是看边角料,是在看 agent 怎么把任务翻译成请求,再把动作回填成上下文。”<br>⚠ 严禁科普腔(专家反转效应 Kalyuga 2003:对老手,教科书式定义是在烧耐心)。判据:听众自己读文档 5 分钟能获得的,删。">
+  <div class="ground-layout">
+    <div class="ground-copy">
+      <div class="kick">组 1 · 地基与方法 · 3′–14′</div>
+      <h2>先统一一个 60 秒的地基</h2>
+      <div class="sub">它的第三层推论，多数人没往下推过。</div>
+    </div>
+    <div class="ground-reveal" aria-hidden="true">
+      <div class="mini-title">三步推论 · 60 秒</div>
+      <div class="step">
+        <b>模型不是 agent</b>
+        <span>模型只处理这次请求里的文本。</span>
+      </div>
+      <div class="so">所以 ↓</div>
+      <div class="step">
+        <b>Agent 的差异，主要长在模型外</b>
+        <span>上下文怎么塞、工具怎么给、权限怎么放、失败怎么重试。</span>
+      </div>
+      <div class="so">所以 ↓</div>
+      <div class="step">
+        <b>抓包不是看边角料</b>
+        <span>是在看 agent 如何把任务翻译成请求，再把动作回填成上下文。</span>
+      </div>
+    </div>
   </div>
 </section>
 
-<!-- S7 投票 1.6% -->
+<!-- S6 投票 1.6% -->
 <section class="slide" data-sect="组1 · 地基与方法" data-notes="逐项举手,统计个大概。Pretesting(Richland, Kornell &amp; Kao 2009):揭示前先让全场预测,猜错的落差就是记忆点。资深听众大多往高了猜——正中下怀。这是约第 7 分钟的注意力重启点①。">
   <div class="kick">全场投票 · 先猜,再揭</div>
   <h2>Claude Code 的代码里，<br>“模型决策逻辑”占多少？</h2>
@@ -173,24 +219,40 @@ li::before{content:"";position:absolute;left:0;top:12px;width:9px;height:9px;bor
   <div class="src">来源：<a href="https://arxiv.org/pdf/2604.14228" target="_blank" rel="noopener">arXiv 2604.14228《Dive into Claude Code》</a></div>
 </section>
 
-<!-- S9 Hi demo -->
-<section class="slide" data-sect="组1 · 地基与方法" data-notes="<b>Demo 铁律:live 只做“证真”——30-60 秒,当场对两家各发一句 Hi,让抓包工具里跳出请求,证明这是真的、刚发生的;然后立刻切到提前抓好、逐段标注高亮的报文截图讲 4 分钟。千万不要现场滚动生报文找重点——那是 demo 坟场。</b><br>三级降级:live 失败,20 秒内切预录视频→视频也出问题,切静态标注截图(内容零损失,只损失仪式感)。翻车台词提前背好:“公司代理今天不配合——这就是为什么我提前抓好了,看这份。”最稳形态:回放提前保存的 flow 文件,“重放昨晚的真实报文”,证据力相同、风险归零。">
+<!-- S9 Hi demo question -->
+<section class="slide" data-sect="组1 · 地基与方法" data-notes="<b>先提问:</b>“如果我只在 agent 里发一句 Hi,你觉得这一包会烧多少 token?”让大家心里先猜一个数,停 2 秒。下一页再揭示真实抓包入口和关键字段。<br><b>Demo 铁律:</b>live 只做“证真”——30-60 秒,当场对两家各发一句 Hi,让抓包工具里跳出请求,证明这是真的、刚发生的;然后立刻切到提前抓好、逐段标注高亮的报文截图讲 4 分钟。千万不要现场滚动生报文找重点。三个看点每个都反直觉:固定开销、注入内容、两家首包 diff。">
   <div class="kick">Demo · 一句 “Hi” 抓包 · 5′</div>
-  <h2>你还没干活，<br>几万 token 已经花出去了</h2>
-  <div class="flow"><b>30–60″ live 证真</b>(两家各发一句 Hi)→ <b>4′ 预标注报文走读</b>(高亮 diff)</div>
+  <h2>你在 agent 里发一条消息，<br>会烧多少 token？</h2>
+  <div class="sub">先猜一句 “Hi” 的首包开销。</div>
 </section>
 
-<!-- S10 Hi 三看点 -->
-<section class="slide" data-sect="组1 · 地基与方法" data-notes="这是设计好的<b>峰值时刻</b>(峰终定律,第 9-14 分钟):让全场第一次看到“官方文档没写的东西”。三个看点每个都反直觉,配并排报文截图、颜色高亮 diff——眼睛先看到差异,嘴再解释(双编码)。后排可读性:截图里 JSON 提前折叠到只剩关键字段。">
-  <h2>一句 Hi 的报文里,有什么</h2>
+<!-- S10 Hi demo answer -->
+<section class="slide" data-sect="组1 · 地基与方法" data-notes="先报大数:“这次 Claude Code 新开 session,只发一句 Hi,首包创建缓存就有 3.3 万 token。”然后补一句边界:input_tokens 是 3154,cache_creation_input_tokens 是 33131,两者不要混。接着打开抓包页,只讲三件事:固定开销、注入内容、两家首包 diff。">
+  <div class="kick">Demo · 真实抓包 · 5′</div>
+  <div class="huge">3.3 万</div>
+  <div class="sub" style="margin-top:26px">Claude Code 新开 Session，只发一句 “Hi”：首包创建缓存约 33,131 tokens。<br>请求输入本身是 3,154 tokens，“Hi” 只是报文里很小的一角。</div>
   <div class="cols">
-    <div class="col"><h3>固定开销</h3><p>System Prompt + 工具定义,以万计 token——你还没说正事,这笔钱每次请求都在付</p></div>
-    <div class="col"><h3>注入内容</h3><p>环境信息(OS / 目录 / git 状态)、system-reminder——你的 “Hi” 只是报文里很小的一角</p></div>
-    <div class="col"><h3>两家首包</h3><p>同一句 Hi,结构、字段、注入内容完全不同——并排一放,diff 一目了然</p></div>
+    <div class="col">
+      <h3>Claude Code</h3>
+      <p>POST /v1/messages<br>3,154 input / 13 output<br>约 98KB 请求体，37 个工具 schema</p>
+    </div>
+    <div class="col">
+      <h3>Codex</h3>
+      <p>WEBSOCKET /v1/responses<br>10,032 input 预热包<br>17,792 input / 14 output 回答包</p>
+    </div>
+    <div class="col">
+      <h3>看点</h3>
+      <p>不是 “Hi” 贵，是 agent 把系统提示、工具、环境和会话策略一起发过去。</p>
+    </div>
   </div>
+  <div class="slide-actions">
+    <a class="deck-btn neutral" href="trace_viewer.html?lab=hi&amp;v=claude" target="_blank" rel="noopener">打开 Claude 抓包 →</a>
+    <a class="deck-btn neutral" href="trace_viewer.html?lab=hi&amp;v=codex" target="_blank" rel="noopener">打开 Codex 抓包 →</a>
+  </div>
+  <div class="src">数据源：本仓库抓包样本 trace_hi_claude.json / trace_hi_codex.json。</div>
 </section>
 
-<!-- S11 立轴 -->
+<!-- S10 立轴 -->
 <section class="slide" data-sect="组1 · 地基与方法" data-notes="立轴,放慢:“模型是引擎,agent 是整车。你日常感知到的好用不好用,大部分 diff 来自整车厂,不是引擎。”<br><b>承上启下:</b>“整车和引擎的差距,具体差在哪几个零件?咱们把这台车拆开——顺便,把开头那四个悬案一个一个解了。”">
   <div class="big">模型是引擎，<br>agent 是整车。</div>
   <div class="sub" style="margin-top:26px">你感知的“好用 / 不好用”，大部分 diff 来自整车厂，不是引擎。</div>
@@ -199,24 +261,25 @@ li::before{content:"";position:absolute;left:0;top:12px;width:9px;height:9px;bor
 <!-- S12 组2 divider + SP 改动史 -->
 <section class="slide" data-sect="组2 · 拆整车" data-notes="开胃段 2 分钟,挑 2-3 个最戏剧性的版本 diff 讲(数据源:phistory 历史版本)。收一句:“这部踩坑史,就是我们拆车的说明书。”<br><b>免疫台词(预埋,防现场 challenge):</b>“你们今晚回去抓,报文很可能跟我的不一样——版本一直在改,而这个改动史本身,就是今天讲的官方踩坑史。”所有硬数字标:来源 + 抓包日期 + agent 版本号。">
   <div class="kick">组 2 · 拆整车 · 14′–27′</div>
-  <h2>System Prompt 的改动史，<br>就是官方踩坑史</h2>
+  <h2><a href="prompt-history.html" target="_blank" rel="noopener">System Prompt</a> 的改动史，<br>就是官方踩坑史</h2>
   <ul>
     <li>跟“话痨”搏斗：曾写死“回答必须少于 4 行”，此后措辞反复调整</li>
     <li>跟“废话注释”搏斗：全大写强调“不要添加任何注释,除非被要求”</li>
     <li>把“爱列计划”从性格变成制度：TODO / 计划工具入场,配大段使用规范</li>
   </ul>
-  <div class="src">数据源：phistory 历史版本 · 这部踩坑史，就是拆车的说明书。</div>
+  <div class="src">数据源：<a href="https://phistory.cc/" target="_blank" rel="noopener">Phistory · Agent CLI System Prompt Diff History</a> · 这部踩坑史，就是拆车的说明书。</div>
 </section>
 
 <!-- S13 悬案① 工具与编辑格式层 -->
-<section class="slide" data-sect="组2 · 拆整车" data-notes="回收悬案①,角落打勾。讲一条真实重试链:缩进差一个空格→“未找到匹配”→重试选段太短、命中两处→第三次整文件重写——500 token 的小改动烧掉几千 token、三轮往返,你的体感就是“它今天好笨”。<br><b>punchline 放慢:</b>“模型和自家的壳,是一起 RL 训练出来的。apply_patch 之于 GPT 系、专用工具格式之于 Claude 系,都是主场作战;把模型 A 塞进 agent B 的壳,天然是客场。所以「哪个 agent 最好」可能是伪问题,「哪对 模型×壳 组合最好」才是真问题。”">
+<section class="slide" data-sect="组2 · 拆整车" data-notes="回收悬案①,角落打勾。讲一条真实重试链:缩进差一个空格→“未找到匹配”→重试选段太短、命中两处→第三次整文件重写——500 token 的小改动烧掉几千 token、三轮往返,你的体感就是“它今天好笨”。<br><b>punchline 放慢:</b>“模型不是直接改文件,而是在生成工具调用。apply_patch、Edit、Bash 这些都是 agent 壳给模型的动作语言。换了壳,工具名、参数格式、失败反馈、重试路径都变了。所以「哪个模型最好」可能是伪问题,「哪对 模型×壳 组合最好」才是真问题。”">
   <div class="kick">悬案① 破案 · 工具与编辑格式层 · 3′</div>
-  <h2>不是模型笨，<br>是编辑格式“八字不合”</h2>
+  <h2>不是裸模型在比赛，<br>是<a href="edit-formats.html" target="_blank" rel="noopener">模型 × 工具接口</a>在比赛</h2>
   <div class="cols">
-    <div class="col"><h3>Codex</h3><p>apply_patch 自定义 diff 格式——GPT 系模型被专门训练过这个格式</p></div>
-    <div class="col"><h3>Claude Code</h3><p>Edit 精确字符串替换——old_string 必须唯一命中,差一个空格就失败</p></div>
+    <div class="col"><h3><a href="edit-formats.html" target="_blank" rel="noopener">Codex</a></h3><p>apply_patch / diff 风格——模型描述“删什么、加什么、上下文在哪”</p></div>
+    <div class="col"><h3><a href="edit-formats.html" target="_blank" rel="noopener">Claude Code</a></h3><p>Edit / 精确替换风格——old_string 要能在原文里准确定位</p></div>
   </div>
-  <div class="bigline">模型和自家的壳是一起训练的——<br>“同一个模型”，其实从没在同等条件下比过赛。</div>
+  <div class="bigline">“同一个模型”一旦换了壳，<br>看到的动作语言就变了。</div>
+  <div class="src">参考：<a href="https://arxiv.org/abs/2405.15793" target="_blank" rel="noopener">SWE-agent ACI</a> · <a href="https://arxiv.org/abs/2604.27296" target="_blank" rel="noopener">To Diff or Not to Diff?</a> · <a href="https://arxiv.org/abs/2606.15508" target="_blank" rel="noopener">ToolMenuBench</a></div>
 </section>
 
 <!-- S14 悬案② 上下文工程层 -->
@@ -404,7 +467,7 @@ li::before{content:"";position:absolute;left:0;top:12px;width:9px;height:9px;bor
 <section class="slide" data-sect="收尾" data-notes="30 秒,逐个点勾:“编辑格式层、上下文层、输入组装层、人设加权限层——四个悬案,一个都没悬空。”完成感就是 Q&amp;A 前的“终”(峰终定律:未闭合的缺口会变成挫败,闭合的缺口就是满足感)。">
   <h2>四个悬案，验收</h2>
   <div class="grid2">
-    <div class="case done"><span class="st">✓</span><span>① A 家一把过,B 家反复失败<span class="lay">② 工具与编辑格式层</span></span></div>
+    <div class="case done"><span class="st">✓</span><span>① 同样模型、同任务，不同 agent 的执行表现不同<span class="lay">② 工具与编辑格式层</span></span></div>
     <div class="case done"><span class="st">✓</span><span>② 会话越长越笨<span class="lay">③ 上下文工程层</span></span></div>
     <div class="case done"><span class="st">✓</span><span>③ IDE 秒懂,CLI 装傻<span class="lay">⑦ 输入组装层</span></span></div>
     <div class="case done"><span class="st">✓</span><span>④ 事事请示 vs 闷头就干<span class="lay">① 人设 + ⑤ 权限沙箱层</span></span></div>
@@ -444,62 +507,65 @@ li::before{content:"";position:absolute;left:0;top:12px;width:9px;height:9px;bor
   <div class="src">Stewart Brand，《Whole Earth Catalog》创刊词，1968</div>
 </section>
 
-<!-- S33 Q&A -->
+<!-- Q&A -->
 <section class="slide" data-sect="Q&A" data-notes="预留 15 分钟。<b>暗牌:</b>有人问“100 行 agent 怎么写的”→现场展开完整 6 分钟版,repo 会后发群。<b>弹药:</b>“四分法在协议层不存在吧”和“有五金铺为何还要斧子”两发应答,在第 25 页口播里,背熟。<b>冷场种子问题:</b>它会不会乱改我代码?/ 和内部平台怎么互补?/ 小团队怎么起步?<br>和主持人提前约好:Q&amp;A 后给我 30 秒收口——别把结尾交给最后一个随机质量的提问。">
   <h1>谢谢 · Q&amp;A</h1>
-  <div class="src" style="font-size:18px">冷场备用：它会不会乱改我代码？/ 和内部平台怎么互补？/ 小团队怎么起步？</div>
-</section>
-
-<!-- S34 Q&A 后收口 -->
-<section class="slide" data-sect="Q&A 后收口" data-notes="Q&amp;A 后 30 秒,定格这一页结束(峰终的“终”)。这一页就是隔级领导带走的东西——四条原则全部可以直接迁移进公司 AI 平台的设计。逐条念,不解释,鞠躬下台。">
-  <div class="kick">收口 · 30″ · 四条可迁移的设计原则</div>
-  <div class="layers" style="margin-top:10px">
-    <div class="lr"><span class="no">1</span>上下文是稀缺资源，要预算化管理</div>
-    <div class="lr"><span class="no">2</span>权限设计的目标是减少打断，而非增加确认</div>
-    <div class="lr"><span class="no">3</span>能力长在 harness，不长在 prompt</div>
-    <div class="lr"><span class="no">4</span>评测锚定真实报文，不锚定官方文档</div>
-  </div>
-  <div class="src">这一页,给要做 AI 基建的同学。</div>
 </section>
 
 </div>
-<div class="counter" id="counter">1 / 34</div>
-<div class="hint">← → 翻页 · 按 S 看口播</div>
+<div class="counter" id="counter">1 / 32</div>
+<div class="hint">← → 翻页/展开 · 按 S 看口播</div>
 <div class="sect" id="sect"></div>
 <div class="notes" id="notes"></div>
 <script>
 const slides=[...document.querySelectorAll('.slide')];
 const prog=document.getElementById('prog'),counter=document.getElementById('counter'),
       notesEl=document.getElementById('notes'),sectEl=document.getElementById('sect');
-let i=0,showNotes=false;
+let i=0,fragment=0,showNotes=false;
 function hashIndex(){
   const m=location.hash.match(/^#(?:p|slide-)?(\d+)$/i);
   if(!m)return null;
   return Math.max(0,Math.min(slides.length-1,Number(m[1])-1));
+}
+function maxFragment(){
+  return Number(slides[i]?.dataset.fragments||0);
 }
 function syncHash(){
   const h='#'+(i+1);
   if(location.hash!==h)history.replaceState(null,'',h);
 }
 function render(updateHash=true){
-  slides.forEach((s,k)=>s.classList.toggle('active',k===i));
+  slides.forEach((s,k)=>{
+    const active=k===i;
+    s.classList.toggle('active',active);
+    s.classList.toggle('fragment-on',active&&fragment>0);
+    s.querySelectorAll('.ground-reveal,.slide-fragment').forEach(el=>el.setAttribute('aria-hidden',active&&fragment>0?'false':'true'));
+  });
   prog.style.width=((i+1)/slides.length*100)+'%';
   counter.textContent=(i+1)+' / '+slides.length;
   sectEl.textContent=slides[i].dataset.sect||'';
   notesEl.innerHTML='<b>口播 · '+(i+1)+'</b> &nbsp; '+(slides[i].dataset.notes||'');
   if(updateHash)syncHash();
 }
-function go(n){i=Math.max(0,Math.min(slides.length-1,n));render()}
+function go(n){i=Math.max(0,Math.min(slides.length-1,n));fragment=0;render()}
+function next(){
+  if(fragment<maxFragment()){fragment+=1;render(false);return}
+  go(i+1);
+}
+function prev(){
+  if(fragment>0){fragment-=1;render(false);return}
+  go(i-1);
+}
 document.addEventListener('keydown',e=>{
-  if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();go(i+1)}
-  else if(e.key==='ArrowLeft'){go(i-1)}
+  if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();next()}
+  else if(e.key==='ArrowLeft'){prev()}
   else if(e.key==='Home'){go(0)}
   else if(e.key==='End'){go(slides.length-1)}
   else if(e.key==='s'||e.key==='S'){showNotes=!showNotes;notesEl.classList.toggle('show',showNotes)}
 });
 window.addEventListener('hashchange',()=>{
   const n=hashIndex();
-  if(n!==null){i=n;render(false)}
+  if(n!==null){i=n;fragment=0;render(false)}
 });
 const initialHash=hashIndex();
 if(initialHash!==null)i=initialHash;

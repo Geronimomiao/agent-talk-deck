@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>System Prompt 改动史</title>
+<style>
+:root{
+  --bg:#faf9f7;--surface:#fff;--surface2:#f1efe8;--text:#26241f;--text2:#5f5e5a;--text3:#8a8980;
+  --border:rgba(0,0,0,.12);--blue:#0c447c;--blue-bd:#185fa5;--blue-bg:#e6f1fb;
+  --green:#0b5a49;--green-bg:#e1f5ee;--amber:#854f0b;--amber-bg:#faeeda;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  -webkit-font-smoothing:antialiased}
+a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(24,95,165,.28)}
+a:hover{border-bottom-color:var(--blue-bd)}
+.wrap{max-width:1180px;margin:0 auto;padding:56px clamp(24px,5vw,64px) 72px}
+.top{display:flex;justify-content:space-between;gap:28px;align-items:flex-start;margin-bottom:44px}
+.kicker{font-size:14px;letter-spacing:.18em;color:var(--text3);font-weight:700;text-transform:uppercase;margin-bottom:18px}
+h1{font-size:52px;line-height:1.15;margin:0 0 20px;font-weight:700;letter-spacing:0;text-wrap:balance}
+.lead{font-size:22px;line-height:1.65;color:var(--text2);max-width:840px;margin:0}
+.nav{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;margin-top:8px}
+.pill{display:inline-flex;align-items:center;padding:9px 13px;border:1px solid var(--border);border-radius:999px;background:var(--surface);color:var(--text2);font-size:14px;font-weight:650;white-space:nowrap}
+.pill:hover{background:var(--surface2);color:var(--text);border-color:var(--border)}
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:42px}
+.metric{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px}
+.metric .label{font-size:13px;letter-spacing:.12em;color:var(--text3);font-weight:700;text-transform:uppercase;margin-bottom:8px}
+.metric .value{font-size:32px;font-weight:720;line-height:1.2}
+.metric .hint{font-size:15px;color:var(--text2);line-height:1.45;margin-top:7px}
+.takeaway{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:48px}
+.take{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px 20px}
+.take b{display:block;color:var(--blue);font-size:18px;margin-bottom:8px}
+.take span{display:block;color:var(--text2);font-size:16px;line-height:1.55}
+.section-head{display:flex;align-items:end;justify-content:space-between;gap:20px;margin:34px 0 18px}
+h2{font-size:30px;line-height:1.25;margin:0;font-weight:720}
+.section-note{font-size:15px;color:var(--text3);line-height:1.5;max-width:560px}
+.tracks{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.track{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 22px 8px}
+.track h3{margin:0 0 6px;font-size:22px;display:flex;align-items:center;gap:9px}
+.badge{font-size:12px;letter-spacing:.08em;color:var(--text3);font-weight:700}
+.range{font-size:15px;color:var(--text2);line-height:1.5;margin-bottom:20px}
+.rail{position:relative;padding-left:26px}
+.rail::before{content:"";position:absolute;left:7px;top:5px;bottom:22px;width:2px;background:var(--border)}
+.event{position:relative;margin:0 0 22px;padding-bottom:2px}
+.event::before{content:"";position:absolute;left:-24px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--surface);border:3px solid var(--blue-bd)}
+.event.green::before{border-color:var(--green)}
+.when{font-size:14px;color:var(--text3);font-weight:700;margin-bottom:5px}
+.event h4{font-size:19px;line-height:1.35;margin:0 0 8px;font-weight:720}
+.event p{margin:0;color:var(--text2);font-size:16px;line-height:1.58}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.chip{display:inline-flex;padding:5px 8px;border-radius:8px;background:var(--blue-bg);color:var(--blue);font-size:12px;font-weight:700}
+.chip.muted{background:var(--surface2);color:var(--text3)}
+.chip.green{background:var(--green-bg);color:var(--green)}
+.mini-link{font-size:13px;color:var(--text3);margin-top:10px}
+.mini-link a{color:var(--text2);border-bottom-color:rgba(0,0,0,.18)}
+.curve{margin-top:44px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px}
+.bars{display:grid;gap:16px;margin-top:18px}
+.barrow{display:grid;grid-template-columns:120px 1fr 100px;gap:14px;align-items:center}
+.barlabel{font-size:15px;color:var(--text2);font-weight:650}
+.bartrack{height:14px;background:var(--surface2);border-radius:999px;overflow:hidden;border:1px solid var(--border)}
+.barfill{height:100%;background:var(--blue-bd);border-radius:999px}
+.barfill.green{background:var(--green)}
+.barvalue{font-size:14px;color:var(--text3);text-align:right}
+.foot{margin-top:42px;padding-top:20px;border-top:1px solid var(--border);font-size:14px;color:var(--text3);line-height:1.7}
+@media(max-width:900px){
+  .top{display:block}
+  .nav{justify-content:flex-start;margin-top:24px}
+  h1{font-size:40px}
+  .summary,.takeaway,.tracks{grid-template-columns:1fr}
+  .barrow{grid-template-columns:92px 1fr 74px}
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="top">
+    <div>
+      <div class="kicker">Agent Prompt History</div>
+      <h1>System Prompt 的改动史，<br>就是 agent 的产品迭代史</h1>
+      <p class="lead">基于 Phistory 对 Claude Code 与 Codex CLI 的系统提示词快照，抽出几次大改动。重点不是逐字复述 prompt，而是看这些改动在把什么能力从“模型性格”推进到 harness、工具、权限和工作流。</p>
+    </div>
+    <nav class="nav">
+      <a class="pill" href="index.html">回到主 Deck</a>
+      <a class="pill" href="https://phistory.cc/?agent=claude-code&range=latest" target="_blank" rel="noopener">Claude Code 原始 diff</a>
+      <a class="pill" href="https://phistory.cc/?agent=codex&range=latest" target="_blank" rel="noopener">Codex 原始 diff</a>
+    </nav>
+  </header>
+
+  <section class="summary" aria-label="数据摘要">
+    <div class="metric">
+      <div class="label">Claude Code</div>
+      <div class="value">361</div>
+      <div class="hint">快照，1.0.0 到 2.1.204</div>
+    </div>
+    <div class="metric">
+      <div class="label">Claude Prompt</div>
+      <div class="value">1104 → 1867</div>
+      <div class="hint">行，最大单次变更 1414 行</div>
+    </div>
+    <div class="metric">
+      <div class="label">Codex CLI</div>
+      <div class="value">63</div>
+      <div class="hint">快照，0.80.0 到 0.143.0</div>
+    </div>
+    <div class="metric">
+      <div class="label">Codex Prompt</div>
+      <div class="value">347 → 656</div>
+      <div class="hint">行，最大单次变更 247 行</div>
+    </div>
+  </section>
+
+  <section class="takeaway" aria-label="一句话结论">
+    <div class="take"><b>不是越写越会聊天</b><span>大改动集中在工具、权限、记忆、计划、上下文管理，而不是“请你更聪明”。</span></div>
+    <div class="take"><b>Prompt 变成接口文档</b><span>它告诉模型如何理解 harness 注入、工具 schema、沙箱、hooks、子代理和用户可见输出。</span></div>
+    <div class="take"><b>两家节奏不同</b><span>Claude Code 更频繁大幅重构；Codex 更像把能力模块逐步接入，再压缩成稳定规则。</span></div>
+  </section>
+
+  <div class="section-head">
+    <h2>两条时间轴</h2>
+    <div class="section-note">节点选自 Phistory manifest 里 changed_lines 较大的版本，再结合少量快照文本归纳。数字表示该版本相对上一快照的 prompt 行级变更。</div>
+  </div>
+
+  <section class="tracks">
+    <article class="track" id="claude">
+      <h3>Claude Code <span class="badge">2025.05 - 2026.07</span></h3>
+      <div class="range">从 1104 行初版一路膨胀、拆分、再压缩；大动作集中在 subagent、工具路由、memory、harness 和权限边界。</div>
+      <div class="rail">
+        <div class="event">
+          <div class="when">2025.05 · 1.0.0</div>
+          <h4>工程 agent 的基线 prompt</h4>
+          <p>1.0.0 已经不是简单人设，而是带有软件工程任务、工具使用、权限与输出约束的工作说明。</p>
+          <div class="chips"><span class="chip muted">1104 行</span><span class="chip">baseline</span></div>
+        </div>
+        <div class="event">
+          <div class="when">2026.02 · 2.1.53 / 2.1.63</div>
+          <h4>“壳”开始显性化：System、Agent、Skill</h4>
+          <p>2 月底的两次大改动把系统环境、工具结果、prompt injection、subagent 和 skill 调用写进规则，模型开始被明确告知哪些内容来自 harness。</p>
+          <div class="chips"><span class="chip">+255 行级变更</span><span class="chip">+289 行级变更</span></div>
+          <div class="mini-link"><a href="https://phistory.cc/?agent=claude-code&from=2.1.52&to=2.1.53" target="_blank" rel="noopener">看 2.1.53 diff</a></div>
+        </div>
+        <div class="event">
+          <div class="when">2026.03 · 2.1.69 / 2.1.70</div>
+          <h4>一次“拆掉重装”：deferred tools 与专业子代理</h4>
+          <p>连续两次千行级变化：先大幅压缩，再快速补回 Agent、ToolSearch、Plan、Explore 等工具/子代理说明。这里能看到产品在试探“哪些能力写进 prompt，哪些延迟加载”。</p>
+          <div class="chips"><span class="chip">1414 行级变更</span><span class="chip">1389 行级变更</span></div>
+          <div class="mini-link"><a href="https://phistory.cc/?agent=claude-code&from=2.1.68&to=2.1.69" target="_blank" rel="noopener">看 2.1.69 diff</a> · <a href="https://phistory.cc/?agent=claude-code&from=2.1.69&to=2.1.70" target="_blank" rel="noopener">看 2.1.70 diff</a></div>
+        </div>
+        <div class="event">
+          <div class="when">2026.04 · 2.1.111 - 2.1.122</div>
+          <h4>从“能干活”到“按工程规范干活”</h4>
+          <p>输出节奏、代码风格、注释密度、TodoWrite、用户可见更新等规则被加强，prompt 开始管理协作方式，而不只是工具怎么调。</p>
+          <div class="chips"><span class="chip">251 / 189 / 185 行级变更</span><span class="chip">collaboration</span></div>
+        </div>
+        <div class="event">
+          <div class="when">2026.05 · 2.1.142 / 2.1.154</div>
+          <h4>Task 与 Memory 进入制度层</h4>
+          <p>TaskCreate/计划跟踪、文件型 memory、hooks、permission mode、harness 注入被系统化。这里很像从“提醒模型记住”升级成“给模型一套外部记忆和任务账本协议”。</p>
+          <div class="chips"><span class="chip">457 行级变更</span><span class="chip">737 行级变更</span></div>
+          <div class="mini-link"><a href="https://phistory.cc/?agent=claude-code&from=2.1.153&to=2.1.154" target="_blank" rel="noopener">看 2.1.154 diff</a></div>
+        </div>
+        <div class="event">
+          <div class="when">2026.06 - 2026.07 · 2.1.175 - 2.1.204</div>
+          <h4>能力扩展后开始收束</h4>
+          <p>6 月加入 DesignSync 这类外部能力；随后 2.1.187 和 7 月初几次版本大幅删减/重排。最新 2.1.204 仍保留 Harness、Memory、Environment、Context management 等清晰章节。</p>
+          <div class="chips"><span class="chip">+250</span><span class="chip muted">-295 / -166</span><span class="chip">1867 行</span></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="track" id="codex">
+      <h3>Codex CLI <span class="badge">2026.01 - 2026.07</span></h3>
+      <div class="range">从较短的 coding agent 规则开始，逐步把工具、skills、subagent、MCP、Goal、frontend guidance 放进 harness 协作协议。</div>
+      <div class="rail">
+        <div class="event green">
+          <div class="when">2026.01 · 0.80.0 / 0.81.0</div>
+          <h4>较短的工程协作基线</h4>
+          <p>0.80.0 只有 347 行；0.81.0 还短到 311 行。早期 Codex 更像“少量规则 + 工具环境”的工作代理。</p>
+          <div class="chips"><span class="chip green">347 → 311 行</span><span class="chip muted">baseline</span></div>
+        </div>
+        <div class="event green">
+          <div class="when">2026.02 · 0.94.0 - 0.106.0</div>
+          <h4>从性格到工作协议</h4>
+          <p>request_user_input、exec/write_stdin、final answer、review stance、autonomy/persistence、commentary updates 等规则陆续加入。它开始规定“怎么协作”，不是只规定“怎么说话”。</p>
+          <div class="chips"><span class="chip green">73 / 139 / 106 行级变更</span></div>
+        </div>
+        <div class="event green">
+          <div class="when">2026.03 · 0.115.0 / 0.117.0</div>
+          <h4>多 agent、skills、MCP 进入提示词</h4>
+          <p>spawn/resume/send_input、skills、MCP resources/templates 等能力出现。prompt 变成“如何选择和调度外部能力”的路由说明。</p>
+          <div class="chips"><span class="chip green">238 行级变更</span><span class="chip green">91 行级变更</span></div>
+          <div class="mini-link"><a href="https://phistory.cc/?agent=codex&from=0.114.0&to=0.115.0" target="_blank" rel="noopener">看 0.115.0 diff</a></div>
+        </div>
+        <div class="event green">
+          <div class="when">2026.04 · 0.123.0 / 0.125.0</div>
+          <h4>工程判断与前端体验被写入制度</h4>
+          <p>同一 workspace、apply_patch、并行读文件、脏工作区保护、工程判断、frontend guidance 等大段规则成型。Codex prompt 从“CLI 助手”走向“完整 coding agent 运行手册”。</p>
+          <div class="chips"><span class="chip green">91 行级变更</span><span class="chip green">168 行级变更</span></div>
+          <div class="mini-link"><a href="https://phistory.cc/?agent=codex&from=0.124.0&to=0.125.0" target="_blank" rel="noopener">看 0.125.0 diff</a></div>
+        </div>
+        <div class="event green">
+          <div class="when">2026.05 · 0.133.0</div>
+          <h4>Goal 与工具发现进入控制流层</h4>
+          <p>create_goal/get_goal/update_goal、tool_search、plugin/skill 相关说明加入，同时整体行数从 773 收到 640。新能力出现，但 prompt 本身开始更强调“接口与约束”。</p>
+          <div class="chips"><span class="chip green">247 行级变更</span><span class="chip green">goal</span><span class="chip muted">640 行</span></div>
+          <div class="mini-link"><a href="https://phistory.cc/?agent=codex&from=0.132.0&to=0.133.0" target="_blank" rel="noopener">看 0.133.0 diff</a></div>
+        </div>
+        <div class="event green">
+          <div class="when">2026.06 - 2026.07 · 0.136.0 - 0.143.0</div>
+          <h4>进入稳定打磨期</h4>
+          <p>6 月以后变更幅度明显变小，最新 0.143.0 相对 0.142.5 没有 prompt 行级变化；核心结构稳定在 Personality、General、Frontend、Editing、Autonomy、Formatting 等板块。</p>
+          <div class="chips"><span class="chip green">656 行</span><span class="chip muted">latest no prompt delta</span></div>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="curve" aria-label="行数曲线">
+    <h2>行数不是能力，但能看出策略</h2>
+    <div class="section-note">Claude Code 的 prompt 先扩张再几次压缩；Codex 的 prompt 从 300 多行增长到 600 多行后稳定。两者都在把“agent 经验”写成可执行约束。</div>
+    <div class="bars">
+      <div class="barrow"><div class="barlabel">Claude 1.0</div><div class="bartrack"><div class="barfill" style="width:54%"></div></div><div class="barvalue">1104 行</div></div>
+      <div class="barrow"><div class="barlabel">Claude 高点</div><div class="bartrack"><div class="barfill" style="width:100%"></div></div><div class="barvalue">2040 行</div></div>
+      <div class="barrow"><div class="barlabel">Claude 最新</div><div class="bartrack"><div class="barfill" style="width:92%"></div></div><div class="barvalue">1867 行</div></div>
+      <div class="barrow"><div class="barlabel">Codex 0.80</div><div class="bartrack"><div class="barfill green" style="width:45%"></div></div><div class="barvalue">347 行</div></div>
+      <div class="barrow"><div class="barlabel">Codex 高点</div><div class="bartrack"><div class="barfill green" style="width:100%"></div></div><div class="barvalue">773 行</div></div>
+      <div class="barrow"><div class="barlabel">Codex 最新</div><div class="bartrack"><div class="barfill green" style="width:85%"></div></div><div class="barvalue">656 行</div></div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    数据来源：<a href="https://phistory.cc/" target="_blank" rel="noopener">Phistory · Agent CLI System Prompt Diff History</a>。页面基于 Phistory manifest 与少量 prompt 快照归纳，数据更新时间为 2026-07-08 03:49 UTC。这里的“迭代意义”是对 diff 和新增章节的解释，不等同于官方发布说明。
+  </footer>
+</main>
+</body>
+</html>

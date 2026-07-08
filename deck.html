@@ -198,7 +198,7 @@
     <div class="inner wide">
       <div class="eyebrow">AI 助手 · 内部分享</div>
       <h1>Workflow<br>用确定的代码,<br>编排不确定的智能</h1>
-      <p class="sub">一句话需求 → 一段脚本 → 一群 sub-agent 各司其职。<br>三块积木 → 常见组合 → 两个真实例子。</p>
+      <p class="sub">一句话需求 → 一段脚本 → 一群 sub-agent 各司其职。<br>三块积木 → 常见组合 → 一个 81-agent 真实案例。</p>
     </div>
   </section>
 
@@ -316,40 +316,14 @@
 
   <!-- ===== 组三 ===== -->
   <section class="slide divider">
-    <div class="inner"><div class="grp">组 三</div><h1>两个例子</h1>
-      <p class="sub">先一个玩具,再拆本项目真发生过的一次。</p></div>
-  </section>
-
-  <section class="slide">
-    <div class="inner">
-      <div class="eyebrow">简单例子 · 需求 → 脚本</div>
-      <h2>"查登录/支付/搜索三个模块的安全隐患"</h2>
-      <pre><span class="kw">const</span> MODULES = [<span class="st">'登录'</span>, <span class="st">'支付'</span>, <span class="st">'搜索'</span>]        <span class="cm">// 3 项 = 3 个 agent</span>
-<span class="kw">const</span> SCHEMA  = { risk: string, severity: <span class="st">'high|medium|low'</span> }
-<span class="kw">await</span> <span class="fn">parallel</span>(MODULES.map(m => () =>
-  <span class="fn">agent</span>(<span class="st">`分析「${m}」模块最大的安全隐患`</span>, { schema: SCHEMA })))</pre>
-      <p>没写"3 个 agent"。<b>数组有 3 项,才有 3 个。</b>改 5 项就 5 个。</p>
-    </div>
-  </section>
-
-  <section class="slide">
-    <div class="inner">
-      <div class="eyebrow">简单例子 · 代入 → 返回</div>
-      <h2>一个模板 × 3 个值 = 3 份结构化结果</h2>
-      <div class="two">
-        <div class="box"><h4 class="a2">支付 那个 agent 收到</h4>
-          <p style="font-family:var(--mono);font-size:13px">分析「<span class="a2">支付</span>」模块最大的安全隐患</p></div>
-        <div class="box"><h4 class="ok">它返回(按 schema)</h4>
-          <p style="font-family:var(--mono);font-size:13px">{ risk: "金额客户端算、服务端没复核…", severity: <span class="no">"high"</span> }</p></div>
-      </div>
-      <p style="margin-top:14px">登录 → 账号枚举(medium);搜索 → 注入(high)。<b>各判各的,一次并行拿回三份。</b></p>
-    </div>
+    <div class="inner"><div class="grp">组 三</div><h1>仅用简单的 prompt,<br>共花费 364 万 Token</h1>
+      <p class="sub">最后从 70 条发现里筛出 <b>36 个确认 case</b>,34 条被 verify 打回。</p></div>
   </section>
 
   <section class="slide">
     <div class="inner">
       <div class="eyebrow">真实例子 · 需求</div>
-      <h2>我当时收到的原话</h2>
+      <h2>我当时发送的 prompt</h2>
       <div class="quote" style="margin:18px 0">读一下这个项目,找出要修的漏洞、缺陷、重构点,发现问题就修一下</div>
       <p>一句大白话,没有任何代码。下一步:我把它转换成脚本。</p>
     </div>

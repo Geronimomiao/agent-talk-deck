@@ -56,15 +56,17 @@
   .brand b{color:var(--accent)}
   .themebtn{border:1px solid var(--border);background:var(--surface);color:var(--ink2);border-radius:20px;padding:4px 12px;cursor:pointer;font-size:12px}
 
-  .hero{padding:56px 0 30px}
+  .hero{padding:56px 0 18px}
   .eyebrow{color:var(--accent);font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px}
   h1{font-size:40px;line-height:1.18;letter-spacing:-.02em;margin:0 0 16px;font-weight:700}
   .hsub{font-size:18px;color:var(--ink2);max-width:60ch;margin:0}
   .metarow{display:flex;gap:20px;flex-wrap:wrap;margin-top:24px;font-size:13.5px;color:var(--ink3)}
   .metarow b{color:var(--ink);font-variant-numeric:tabular-nums}
 
-  section{padding:26px 0}
-  .sec-h{display:flex;align-items:baseline;gap:12px;margin:20px 0 6px}
+  section{padding:18px 0}
+  .flow-section{padding:8px 0 10px}
+  .flow-section + section{padding-top:12px}
+  .sec-h{display:flex;align-items:baseline;gap:12px;margin:12px 0 6px}
   .sec-n{font-family:var(--mono);font-size:13px;color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-bd);border-radius:20px;padding:2px 11px;flex-shrink:0}
   h2{font-size:26px;letter-spacing:-.01em;margin:0;font-weight:700}
   .sec-lead{color:var(--ink2);font-size:16px;max-width:64ch;margin:8px 0 0}
@@ -72,8 +74,35 @@
 
   .divider{height:1px;background:var(--border);margin:8px 0}
 
+  /* page deck */
+  html,body{height:100%;overflow:hidden}
+  header.top{position:fixed;top:0;left:0;right:0;z-index:20}
+  .deck{height:100vh;overflow:hidden}
+  .deck-track{height:100%;display:flex;transition:transform .36s ease;will-change:transform}
+  .deck-slide{flex:0 0 100vw;height:100vh;overflow-y:auto;padding:68px 0 72px;scrollbar-width:thin}
+  .wrap.wide{max-width:1160px}
+  .deck-ui{position:fixed;right:24px;bottom:20px;z-index:30;display:flex;align-items:center;gap:10px;
+    background:color-mix(in srgb,var(--bg) 88%,transparent);border:1px solid var(--border);border-radius:999px;padding:8px 10px;box-shadow:var(--sh);backdrop-filter:blur(12px)}
+  .deck-btn{border:1px solid var(--border);background:var(--surface);color:var(--ink2);border-radius:999px;padding:7px 12px;
+    cursor:pointer;font-size:13px;font-weight:650}
+  .deck-btn:hover{border-color:var(--border2);color:var(--ink)}
+  .deck-btn:disabled{opacity:.35;cursor:default}
+  .deck-count{font-family:var(--mono);font-size:12px;color:var(--ink3);min-width:38px;text-align:center}
+  .deck-dots{display:flex;gap:6px}
+  .deck-dot{width:7px;height:7px;border-radius:999px;border:0;background:var(--border2);padding:0;cursor:pointer}
+  .deck-dot.on{width:20px;background:var(--accent)}
+  .detail-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:14px;align-items:start}
+  .detail-grid .card{margin:0 0 14px}
+  .footnote{color:var(--ink3);font-size:13px;margin-top:24px}
+  .footnote a{color:var(--ink2)}
+  @media(max-width:720px){
+    .deck-slide{padding-bottom:92px}
+    .deck-ui{left:18px;right:18px;justify-content:center}
+    .detail-grid{grid-template-columns:1fr}
+  }
+
   /* flow overview */
-  .flow{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin:22px 0}
+  .flow{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin:12px 0 4px}
   @media(max-width:720px){.flow{grid-template-columns:1fr 1fr}}
   .fstep{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:var(--sh);position:relative}
   .fstep .fn{font-family:var(--mono);font-size:12px;color:var(--accent);margin-bottom:8px}
@@ -152,6 +181,10 @@
   details[open] summary::before{content:"▾ "}
   details .body{padding:0 16px 16px}
   details .body h4{margin:14px 0 4px;font-size:13.5px}
+  .piece-detail{margin:12px 0 0;background:var(--bg)}
+  .piece-detail summary{padding:10px 14px;color:var(--ink);font-size:13.5px}
+  .piece-detail .body{padding:0 12px 12px}
+  .piece-detail pre{margin:0}
 
   .takeaways{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:16px}
   @media(max-width:720px){.takeaways{grid-template-columns:1fr}}
@@ -195,89 +228,99 @@
   <button class="themebtn" onclick="toggleTheme()">◐ 主题</button>
 </div></header>
 
-<div class="wrap">
-  <div class="hero">
-    <div class="eyebrow">从一句话到一支团队</div>
-    <h1>一句话,怎么变成一支<br>agent 团队?</h1>
-    <p class="hsub">你说一句大白话 → 我把它转换成一小段脚本 → 引擎按数据「代入」出许多具体指令 → 每个指令交给一个独立的 sub-agent 去干。下面拆解一次真实发生过的 <b>81 个 agent</b> 的项目审计。</p>
-    <div class="metarow" id="metaRow"></div>
-  </div>
+<main class="deck" id="wfDeck">
+  <div class="deck-track" id="wfTrack">
+    <section class="deck-slide" id="real" data-title="整体概览">
+      <div class="wrap">
+        <div class="hero">
+          <div class="eyebrow">从一句话到一支团队</div>
+          <h1>一句话,怎么变成一支<br>agent 团队?</h1>
+          <p class="hsub">你说一句大白话 → 我把它转换成一小段脚本 → 引擎按数据「代入」出许多具体指令 → 每个指令交给一个独立的 sub-agent 去干。下面拆解一次真实发生过的 <b>81 个 agent</b> 的项目审计。</p>
+          <div class="metarow" id="metaRow"></div>
+        </div>
 
-  <section>
-    <div class="flow" id="flow">
-      <div class="fstep"><div class="fn">STEP 1</div><h4>你说的话</h4><p>一句自然语言的需求,不含任何代码。<span class="arw">→</span></p></div>
-      <div class="fstep"><div class="fn">STEP 2</div><h4>我写的脚本</h4><p>一段小 JS:一个数组 + 一个 prompt 模板 + 一个返回格式。<span class="arw">→</span></p></div>
-      <div class="fstep"><div class="fn">STEP 3</div><h4>代入生成</h4><p>引擎拿数组每一项代入模板,生成 N 条具体 prompt。<span class="arw">→</span></p></div>
-      <div class="fstep"><div class="fn">STEP 4</div><h4>各自干活</h4><p>N 个 agent 并行执行,各返回一份结构化结果。</p></div>
-    </div>
-  </section>
-
-  <!-- ===================== 真实案例 ===================== -->
-  <section id="real">
-    <div class="sec-h"><span class="sec-n">01</span><h2>真实案例:那次 81 个 agent 的审计</h2></div>
-    <p class="sec-lead">同样 4 步,只是数组从 3 项换成 11 个"审查分区",而且多了一层"对每条发现再验一遍"。这是真发生过的一次,数据已脱敏。</p>
-
-    <div class="card">
-      <div class="card-lab lab-you"><span class="d"></span>① 我当时说的话</div>
-      <div class="saidbox" id="r_prompt"></div>
-    </div>
-
-    <div class="card">
-      <div class="card-lab lab-script"><span class="d"></span>② 我转换成的脚本 · 结构</div>
-      <pre id="r_struct" class="nowrap"></pre>
-      <details>
-        <summary>展开:每个部件的完整源码(ZONES / findPrompt / verifyPrompt / schema,逐字)</summary>
-        <div class="body" id="r_pieces"></div>
-      </details>
-    </div>
-
-    <div class="card">
-      <div class="card-lab lab-run"><span class="d"></span>③ 每个分区代入 findPrompt · 点一个分区看那个 find agent 收到什么</div>
-      <div class="zsel" id="r_zsel"></div>
-      <div class="fill" id="r_fill"></div>
-    </div>
-
-    <div class="card">
-      <div class="card-lab lab-run"><span class="d"></span>④ 点播放 · 看 81 个 agent 两层长出来(与代码等价)</div>
-      <p style="font-size:13.5px;color:var(--ink2);margin:0 0 14px">左边代码<b>正在执行的那行会高亮</b>。<b style="color:var(--find)">第一层</b>:11 个 find 一起开跑(蓝方块=find agent);<b style="color:var(--val)">第二层</b>:哪个分区先审完,它的 verify 子 agent 就先冒出来——<b>不等别的分区</b>(这正是 <code>pipeline</code> 无屏障)。verify 跑完变 <span style="color:var(--ok)">绿(确认)</span>/<span style="color:var(--no)">红(误报)</span>。</p>
-      <div class="fo-sync" id="foSync"></div>
-      <div class="fo-ctrl">
-        <button class="btn" id="foPlay" onclick="playFanout()">▶ 播放</button>
-        <button class="tab" onclick="resetFanout()">↺ 重置</button>
-        <div class="fo-count" id="foCount">第一层:11 个 find agent · 等待播放</div>
+        <section class="flow-section">
+          <div class="flow" id="flow">
+            <div class="fstep"><div class="fn">STEP 1</div><h4>你说的话</h4><p>一句自然语言的需求,不含任何代码。<span class="arw">→</span></p></div>
+            <div class="fstep"><div class="fn">STEP 2</div><h4>我写的脚本</h4><p>一段小 JS:一个数组 + 一个 prompt 模板 + 一个返回格式。<span class="arw">→</span></p></div>
+            <div class="fstep"><div class="fn">STEP 3</div><h4>代入生成</h4><p>引擎拿数组每一项代入模板,生成 N 条具体 prompt。<span class="arw">→</span></p></div>
+            <div class="fstep"><div class="fn">STEP 4</div><h4>各自干活</h4><p>N 个 agent 并行执行,各返回一份结构化结果。</p></div>
+          </div>
+        </section>
       </div>
-      <div class="fo-prog"><i id="foBar"></i></div>
-      <div class="lanes" id="foLanes"></div>
-      <div class="note" style="margin-top:14px">这条播放 = 代码里 <code>pipeline(ZONES, findStage, verifyStage)</code> 的真实执行:每个分区独立走「find → verify」,互不设屏障。方块数量(11 找、70 验、36 绿 34 红)全是真值;各分区的<b>耗时是示意</b>(压缩到几秒,便于看清结构)。</div>
-    </div>
+    </section>
 
-    <div class="card">
-      <div class="card-lab lab-verify"><span class="d"></span>⑤ 一条发现的完整命运 · find 找到 → verify 复核</div>
-      <p style="font-size:13.5px;color:var(--ink2);margin:0 0 12px">以「鉴权分区」那个 find agent 真实找到的一条为例。它返回后,引擎<b>又派一个 verify agent</b>,把这条发现代入 <code>verifyPrompt</code> 去对抗复核。</p>
-      <div class="finding" id="r_finding"></div>
-      <div style="text-align:center;margin:14px 0"><button class="btn" id="r_verifyBtn" onclick="runVerify()">▶ 派 verify agent 复核这条</button></div>
-      <div id="r_verifyArea"></div>
-    </div>
+    <section class="deck-slide" id="code" data-title="代码讲解">
+      <div class="wrap wide">
+        <div class="sec-h"><span class="sec-n">02</span><h2>详细代码讲解:脚本怎么长出 81 个 agent</h2></div>
+        <p class="sec-lead">关键不是“写 81 条 prompt”,而是写一套规则:分区数组、find 模板、verify 模板、返回 schema,再用 pipeline 把它们编排起来。</p>
+        <div class="detail-grid">
+          <div>
+            <div class="card">
+              <div class="card-lab lab-you"><span class="d"></span>① 我当时发送的 prompt</div>
+              <div class="saidbox" id="r_prompt"></div>
+            </div>
+            <div class="card">
+              <div class="card-lab lab-script"><span class="d"></span>② 我转换成的脚本 · 结构</div>
+              <pre id="r_struct" class="nowrap"></pre>
+              <details>
+                <summary>展开:每个部件的完整源码(ZONES / findPrompt / verifyPrompt / schema,逐字)</summary>
+                <div class="body" id="r_pieces"></div>
+              </details>
+            </div>
+          </div>
+          <div>
+            <div class="card">
+              <div class="card-lab lab-run"><span class="d"></span>③ 每个分区代入 findPrompt</div>
+              <div class="zsel" id="r_zsel"></div>
+              <div class="fill" id="r_fill"></div>
+            </div>
+            <div class="card">
+              <div class="card-lab lab-run"><span class="d"></span>④ 点播放 · 看 81 个 agent 两层长出来</div>
+              <div class="fo-sync" id="foSync"></div>
+              <div class="fo-ctrl">
+                <button class="btn" id="foPlay" onclick="playFanout()">▶ 播放</button>
+                <button class="tab" onclick="resetFanout()">↺ 重置</button>
+                <div class="fo-count" id="foCount">第一层:11 个 find agent · 等待播放</div>
+              </div>
+              <div class="fo-prog"><i id="foBar"></i></div>
+              <div class="lanes" id="foLanes"></div>
+            </div>
+            <div class="card">
+              <div class="card-lab lab-verify"><span class="d"></span>⑤ 一条发现的完整命运 · find 找到 → verify 复核</div>
+              <div class="finding" id="r_finding"></div>
+              <div style="text-align:center;margin:14px 0"><button class="btn" id="r_verifyBtn" onclick="runVerify()">▶ 派 verify agent 复核这条</button></div>
+              <div id="r_verifyArea"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    <div class="note" id="r_tally"></div>
-  </section>
-
-  <!-- ===================== 总结 ===================== -->
-  <section id="why">
-    <div class="sec-h"><span class="sec-n">03</span><h2>三句话记住它</h2></div>
-    <div class="takeaways">
-      <div class="tk"><div class="n">1</div><h3>我写"规则",不写"数量"</h3><p>agent 有几个,是<b>数组长度</b>和<b>运行时数据</b>决定的,不是某个字段设的。</p></div>
-      <div class="tk"><div class="n">2</div><h3>模板 + 数据 = 每个 prompt</h3><p>一个 <b>prompt 模板</b>,代入数组每一项,就长出每个 agent 各自收到的具体指令。</p></div>
-      <div class="tk"><div class="n">3</div><h3>schema 让返回可直接用</h3><p>规定返回形状,agent 交回的就是<b>干净 JSON</b>,不用再解析自然语言。</p></div>
-    </div>
-  </section>
+    <section class="deck-slide" id="end" data-title="收尾">
+      <div class="wrap">
+        <div class="sec-h"><span class="sec-n">03</span><h2>最后合账</h2></div>
+        <div class="note" id="r_tally"></div>
+        <div class="takeaways">
+          <div class="tk"><div class="n">1</div><h3>我写"规则",不写"数量"</h3><p>agent 有几个,是<b>数组长度</b>和<b>运行时数据</b>决定的,不是某个字段设的。</p></div>
+          <div class="tk"><div class="n">2</div><h3>模板 + 数据 = 每个 prompt</h3><p>一个 <b>prompt 模板</b>,代入数组每一项,就长出每个 agent 各自收到的具体指令。</p></div>
+          <div class="tk"><div class="n">3</div><h3>schema 让返回可直接用</h3><p>规定返回形状,agent 交回的就是<b>干净 JSON</b>,不用再解析自然语言。</p></div>
+        </div>
+        <div class="footnote">
+          由 <b>AI 助手</b> 生成 · 全部数据取自脱敏 workflow 示例存档 <code>wf_public_demo_81</code> ·
+          <a href="how-it-works.html">▸ 看更偏机制的版本(并发/流水线/甘特图)</a> ·
+          <a href="workflow-output.html">▸ 看那次审计的完整产出数据</a>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+<div class="deck-ui" aria-label="页面导航">
+  <button class="deck-btn" id="deckPrev" type="button">←</button>
+  <span class="deck-count" id="deckCount">1 / 3</span>
+  <button class="deck-btn" id="deckNext" type="button">→</button>
+  <div class="deck-dots" id="deckDots"></div>
 </div>
-
-<footer class="wrap">
-  由 <b>AI 助手</b> 生成 · 全部数据取自脱敏 workflow 示例存档 <code>wf_public_demo_81</code> ·
-  <a href="how-it-works.html">▸ 看更偏机制的版本(并发/流水线/甘特图)</a> ·
-  <a href="workflow-output.html">▸ 看那次审计的完整产出数据</a>
-</footer>
 
 <script>
 const $=s=>document.querySelector(s);
@@ -292,8 +335,66 @@ function toggleTheme(){
   const r=document.documentElement;
   const cur=r.getAttribute('data-theme')|| (matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
   r.setAttribute('data-theme', cur==='dark'?'light':'dark');
-}
+  }
 const ROOT='/workspace/sample-agent-app';
+
+function initWorkflowDeck(){
+  const track=$('#wfTrack'), slides=[...document.querySelectorAll('.deck-slide')];
+  const prev=$('#deckPrev'), next=$('#deckNext'), count=$('#deckCount'), dots=$('#deckDots');
+  if(!track||!slides.length)return;
+  const ids=slides.map(s=>s.id);
+  let cur=0;
+  const clamp=n=>Math.max(0,Math.min(slides.length-1,n));
+  const parseHash=()=>{
+    const raw=location.hash.replace('#','');
+    const byId=ids.indexOf(raw);
+    if(byId>=0)return byId;
+    const m=raw.match(/^p(\d+)$/);
+    return m?clamp(Number(m[1])-1):null;
+  };
+  dots.innerHTML=slides.map((s,i)=>`<button class="deck-dot" type="button" aria-label="${esc(s.dataset.title||`第 ${i+1} 页`)}"></button>`).join('');
+  const dotBtns=[...dots.querySelectorAll('.deck-dot')];
+  function setSlide(n,{hash=false}={}){
+    cur=clamp(n);
+    track.style.transform=`translateX(${-cur*100}vw)`;
+    slides.forEach((s,i)=>{
+      s.setAttribute('aria-hidden',i===cur?'false':'true');
+      if(i!==cur)s.scrollTop=0;
+    });
+    prev.disabled=cur===0;
+    next.disabled=cur===slides.length-1;
+    count.textContent=`${cur+1} / ${slides.length}`;
+    dotBtns.forEach((d,i)=>d.classList.toggle('on',i===cur));
+    if(hash){
+      const h='#'+ids[cur];
+      if(location.hash!==h)history.replaceState(null,'',h);
+    }
+  }
+  prev.onclick=()=>setSlide(cur-1,{hash:true});
+  next.onclick=()=>setSlide(cur+1,{hash:true});
+  dotBtns.forEach((d,i)=>d.onclick=()=>setSlide(i,{hash:true}));
+  document.addEventListener('keydown',e=>{
+    if(e.target.closest('button,summary,a'))return;
+    if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();setSlide(cur+1,{hash:true});}
+    else if(e.key==='ArrowLeft'){e.preventDefault();setSlide(cur-1,{hash:true});}
+  });
+  let sx=0,sy=0;
+  document.addEventListener('touchstart',e=>{
+    const t=e.changedTouches[0]; sx=t.clientX; sy=t.clientY;
+  },{passive:true});
+  document.addEventListener('touchend',e=>{
+    const t=e.changedTouches[0], dx=t.clientX-sx, dy=t.clientY-sy;
+    if(Math.abs(dx)>56&&Math.abs(dx)>Math.abs(dy)*1.45)setSlide(cur+(dx<0?1:-1),{hash:true});
+  },{passive:true});
+  window.addEventListener('hashchange',()=>{
+    const n=parseHash();
+    if(n!==null)setSlide(n);
+  });
+  const initial=parseHash();
+  setSlide(initial===null?0:initial);
+  if(!location.hash)history.replaceState(null,'','#real');
+}
+initWorkflowDeck();
 
 fetch('./chain-data.json?t='+Date.now()).then(r=>r.json()).then(D=>{
   // ---------- meta ----------
@@ -317,12 +418,14 @@ await pipeline(ZONES,
              agent(verifyPrompt(f),    { schema:VERDICT_SCHEMA,  agentType:'Explore' })))) // → 每条发现 1 个 verify`);
   // pieces
   const P=R.pieces;
+  const piece=(title,code,cls='')=>
+    `<details open class="piece-detail"><summary>${title}</summary><div class="body"><pre class="${cls}">${hl(code)}</pre></div></details>`;
   $('#r_pieces').innerHTML=
-    `<h4>① ZONES(11 项,我手写)</h4><pre class="nowrap">${hl(P.zones)}</pre>`+
-    `<h4>② findPrompt(zone)</h4><pre>${hl(P.findPrompt)}</pre>`+
-    `<h4>③ verifyPrompt(f)</h4><pre>${hl(P.verifyPrompt)}</pre>`+
-    `<h4>④ 真实 pipeline 调用</h4><pre>${hl(P.pipeline)}</pre>`+
-    `<h4>⑤ 两个 schema</h4><pre class="nowrap">${hl(P.fschema+'\n\n'+P.vschema)}</pre>`;
+    piece('① ZONES(11 项,我手写)',P.zones,'nowrap')+
+    piece('② findPrompt(zone)',P.findPrompt)+
+    piece('③ verifyPrompt(f)',P.verifyPrompt)+
+    piece('④ 真实 pipeline 调用',P.pipeline)+
+    piece('⑤ 两个 schema',P.fschema+'\n\n'+P.vschema,'nowrap');
 
   // findPrompt 模板分段(与真实源码一致),用于高亮代入
   function buildFindPrompt(zone){
