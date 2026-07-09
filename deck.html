@@ -395,22 +395,6 @@
 
   <section class="slide">
     <div class="inner">
-      <div class="eyebrow">真实例子 · 一条发现的命运</div>
-      <h2>find 读真代码 → 生成发现 → verify 独立复核</h2>
-      <div class="diag">
-        <span class="node f">find 读 64KB 真代码</span><span class="arrow">→</span>
-        <span class="node">发现:token 用 === 比较(timing attack)</span>
-      </div>
-      <div class="diag">
-        <span class="node v">verify 重读 auth.mjs</span><span class="arrow">→</span>
-        <span class="node" style="border-color:var(--ok);background:var(--ok-bg);color:var(--ok)">✓ 真漏洞(绿)</span>
-      </div>
-      <p>红绿是<b>每个 verify agent 自己</b>返回的 <code>isReal</code>;最后汇总只是一行 <code>.filter()</code>,<b>没有中央裁判</b>。</p>
-    </div>
-  </section>
-
-  <section class="slide">
-    <div class="inner">
       <div class="eyebrow">真实例子 · 模型真相</div>
       <h2>Opus 只指挥,干活的全是 Haiku</h2>
       <div class="stats">

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Agent 探索</title>
+<title>聊聊 Harness</title>
 <style>
 :root{
   --bg:#faf9f7;--surface:#fff;--surface2:#f1efe8;--text:#26241f;--text2:#5f5e5a;--text3:#8a8980;
@@ -31,6 +31,8 @@ h1{font-size:48px;font-weight:600;line-height:1.25;margin:0 0 14px;text-wrap:bal
 h2{font-size:34px;font-weight:600;line-height:1.32;margin:0 0 20px;text-wrap:balance}
 h2 a{color:inherit;text-decoration:none;border-bottom:3px solid rgba(24,95,165,.28)}
 h2 a:hover{color:var(--blue);border-bottom-color:var(--blue-bd)}
+.history-links a{color:var(--blue);text-decoration:none;border-bottom:3px solid rgba(24,95,165,.28)}
+.history-links a:hover{border-bottom-color:var(--blue-bd)}
 .sub{font-size:22px;color:var(--text2);line-height:1.55;text-wrap:balance}
 .big{font-size:40px;font-weight:600;line-height:1.42;text-wrap:balance}
 .huge{font-size:150px;font-weight:600;line-height:1;color:var(--blue-bd)}
@@ -87,10 +89,22 @@ li::before{content:"";position:absolute;left:0;top:12px;width:9px;height:9px;bor
 .col h3 a:hover{border-bottom-color:var(--blue-bd)}
 .col p{margin:0;font-size:17.5px;line-height:1.55;color:var(--text2)}
 .col.warn h3{color:var(--red)}
+.triad{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:8px 0 14px}
+.triad .piece{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px 17px;min-height:132px}
+.triad .label{font-size:15px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:9px}
+.triad b{display:block;font-size:21px;line-height:1.35;margin-bottom:7px}
+.triad p{margin:0;font-size:16.5px;line-height:1.55;color:var(--text2)}
+.triad .piece.harness-piece{border-color:rgba(24,95,165,.3);box-shadow:none;background:rgba(24,95,165,.035)}
+.triad .piece.harness-piece .label{color:var(--blue)}
+.harness-wrap{position:relative;margin-top:18px;padding:24px 18px 14px;border:2px solid rgba(24,95,165,.3);
+  border-radius:18px;background:rgba(24,95,165,.035)}
+.harness-wrap::before{content:"Harness";position:absolute;top:-14px;left:22px;padding:0 12px;
+  background:var(--bg);color:var(--blue);font-size:16px;font-weight:600;letter-spacing:.03em}
 .nums{display:flex;gap:40px;margin:18px 0 4px;flex-wrap:wrap}
 .nums .n{font-size:64px;font-weight:600;color:var(--blue-bd)}
 .nums .cap{font-size:16px;color:var(--text2);margin-top:2px;max-width:330px;line-height:1.5}
 .layers{margin-top:4px}
+.harness-wrap .layers{margin-top:0}
 .layers .lr{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--border);
   border-radius:10px;padding:9px 16px;margin:7px 0;font-size:19.5px}
 .layers .no{flex:0 0 30px;font-weight:600;color:var(--blue)}
@@ -103,11 +117,58 @@ li::before{content:"";position:absolute;left:0;top:12px;width:9px;height:9px;bor
 .map .act{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 16px}
 .map .ar{color:var(--text3)}
 .map .ly{flex:0 0 250px;background:var(--blue-bg);color:var(--blue);border-radius:10px;padding:10px 16px}
-.axis{display:flex;gap:10px;align-items:stretch;margin-top:14px;flex-wrap:wrap}
-.stop{flex:1;min-width:170px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 15px}
-.stop b{display:block;font-size:18.5px;margin-bottom:6px}
-.stop p{margin:0;font-size:15px;color:var(--text2);line-height:1.5}
-.stop .ar{display:none}
+.mode-map{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:16px}
+.mode-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 18px;min-height:132px}
+.mode-card .scope{display:inline-block;font-size:14px;color:var(--blue);background:var(--blue-bg);border-radius:999px;padding:4px 10px;margin-bottom:10px}
+.mode-card b{display:block;font-size:22px;line-height:1.25;margin-bottom:8px}
+.mode-card p{margin:0;font-size:16.5px;color:var(--text2);line-height:1.55}
+.mode-note{font-size:18px;color:var(--text2);line-height:1.55;margin-top:16px}
+.multiplier-groups{display:grid;gap:14px;margin-top:22px;max-width:930px}
+.multiplier-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 20px}
+.multiplier-box h3{margin:0 0 10px;font-size:18px;line-height:1.35;color:var(--blue);font-weight:600}
+.multiplier-box ul{margin:0}
+.multiplier-box li{font-size:20px;line-height:1.42;margin:8px 0}
+.multiplier-box li::before{top:10px}
+.trace-mini{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px}
+.trace-pane{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;min-height:318px}
+.trace-pane h3{margin:0 0 7px;font-size:18px;font-weight:600;color:var(--blue)}
+.trace-endpoint{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;color:var(--text3);line-height:1.45;margin-bottom:10px}
+.trace-lines{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:15px;line-height:1.65;color:var(--text2)}
+.trace-lines b{color:var(--text);font-weight:600}
+.trace-struct{display:grid;gap:8px}
+.trace-node{border:1px solid var(--border);border-radius:10px;padding:8px 10px;background:rgba(241,239,232,.48);
+  font-size:15px;line-height:1.45;color:var(--text2)}
+.trace-node b{color:var(--text);font-weight:600}
+.trace-node .key{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--blue);font-weight:600}
+.trace-node .subline{display:block;margin-top:3px;color:var(--text3);font-size:13px;line-height:1.4}
+.trace-node.hot{border-color:rgba(24,95,165,.34);background:var(--blue-bg)}
+.trace-flow{display:grid;grid-template-columns:1fr;gap:8px}
+.trace-event{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:10px;padding:8px 10px;
+  background:rgba(241,239,232,.48);font-size:15px;color:var(--text2)}
+.trace-event .event{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--blue);font-weight:600;min-width:148px}
+.trace-event .payload{flex:1}
+.usage-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}
+.usage-cell{border:1px solid var(--border);border-radius:10px;padding:8px 10px;background:var(--surface);
+  font-size:14px;color:var(--text2)}
+.usage-cell b{display:block;font-size:19px;line-height:1.1;color:var(--text)}
+.usage-cell.hot{background:var(--amber-bg);color:var(--amber)}
+.mark{display:inline-block;background:var(--blue-bg);color:var(--blue);border-radius:6px;padding:0 5px;font-weight:600}
+.trace-total{margin-top:14px;padding:12px 16px;border-radius:12px;background:var(--amber-bg);color:var(--amber);
+  font-size:18px;font-weight:600;line-height:1.45}
+.workflow-origin{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px}
+.workflow-shot{margin:0;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px;cursor:zoom-in}
+.workflow-shot img{display:block;width:100%;height:250px;object-fit:contain;border-radius:10px;background:#fff}
+.workflow-origin-note{margin-top:14px;font-size:20px;line-height:1.55;color:var(--text2)}
+.workflow-origin-note b{color:var(--text)}
+.image-lightbox{position:fixed;inset:0;z-index:120;display:none;align-items:center;justify-content:center;
+  padding:5vh 5vw;background:rgba(0,0,0,.72)}
+.image-lightbox.show{display:flex}
+.image-lightbox img{display:block;max-width:92vw;max-height:88vh;object-fit:contain;border-radius:14px;background:#fff;
+  box-shadow:0 24px 80px rgba(0,0,0,.42)}
+.image-lightbox button{position:absolute;top:22px;right:26px;width:44px;height:44px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.12);color:#fff;font-size:28px;line-height:1;
+  cursor:pointer}
+.image-lightbox button:hover{background:rgba(255,255,255,.22)}
 .flow{font-size:22px;line-height:2;color:var(--text2)}
 .flow b{color:var(--text);font-weight:600}
 .slide-actions{display:flex;gap:14px;flex-wrap:wrap;margin-top:28px}
@@ -134,6 +195,9 @@ li::before{content:"";position:absolute;left:0;top:12px;width:9px;height:9px;bor
 @media(max-width:960px){
   .ground-layout{grid-template-columns:1fr;gap:28px}
   .ground-reveal{transform:translateY(18px)}
+  .triad{grid-template-columns:1fr}
+  .trace-mini{grid-template-columns:1fr}
+  .workflow-origin{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -142,93 +206,86 @@ li::before{content:"";position:absolute;left:0;top:12px;width:9px;height:9px;bor
 <div class="deck" id="deck">
 
 <!-- S1 封面 -->
-<section class="slide" data-sect="开场" data-notes="开场前检查:勿扰模式、终端字号 ≥20pt、录屏备份放在紧邻下一页、抓包回放 flow 文件就位。自我介绍一句:深度用 Claude Code / Codex 几个月,今天不测评、不复述文档,只讲我抓下来的真实报文。<br><b>止损协议(排练过,不现场即兴):</b>开场结束 ≤3′;组 1 结束 ≤17′;组 2+桥结束 ≤32′。若第 32 分钟落后→组 3 切短版:总对比图 + 旋钮映射页 + 1 条最狠策略,3 分钟收线进结尾。">
+<section class="slide" data-sect="开场" data-notes="开场前检查:勿扰模式、终端字号 ≥20pt、录屏备份放在紧邻下一页、抓包回放 flow 文件就位。自我介绍一句:深度用 Claude Code / Codex 几个月,今天不测评、不复述文档,只讲我抓下来的真实报文。<br><b>止损协议(排练过,不现场即兴):</b>开场结束 ≤3′;抓包证据结束 ≤17′;拆 Harness 结束 ≤32′。若第 32 分钟落后→实践映射切短版:总对比图 + 旋钮映射页 + 1 条最狠策略,3 分钟收线进结尾。">
   <div class="kick">技术分享 · 30′ 主讲 + 5′ Q&amp;A</div>
   <h1>同一个模型，<br>为什么不同 agent 差这么多</h1>
-  <div class="sub">从报文拆 Agent：Prompt / Tools / Workflow / Harness</div>
+  <div class="sub">从报文拆 agent 运行 [system prompt / tools / workflow / goal...]</div>
   <div class="src">不做体感评测，直接看请求、响应和工具链</div>
 </section>
 
 <!-- S2 开场 B · 举手站队 -->
 <section class="slide" data-sect="开场" data-notes="<b>开场 B 定稿台词:</b>“先投个票:平时觉得 Claude Code 更聪明的?……觉得 Codex 或者 Cursor 更顺手的?好,两边都有人,而且我知道你们手里都有证据。但尴尬的是——它们底下很可能是同一个模型。同一个模型,凭什么让一屋子干了十年的工程师举不同的手?过去几个月我干了一件事:给这些 agent 抓包,把它们喂给模型的每一个字节摊开来看。看完我只有一个结论:我们从来就不是在比模型,是在比另一样东西。今天,我把那样东西当场拆给你们看。”<br>⚠ 不剧透任何数字——“几万 token”留给 Hi demo,“1.6%”留给投票。开场 30 秒完成第一次全场互动,压低后面讲授段的走神率。">
-  <div class="kick">开场 · 黄金 30 秒</div>
   <div class="big">先投个票——<br><br>觉得 Claude Code 更聪明的？<br>觉得 Codex / Cursor 更顺手的？</div>
 </section>
 
 <!-- S3 hook -->
 <section class="slide" data-sect="开场" data-notes="停一拍,让这句话扎进去,再翻页。这句是全场的轴,后面所有内容都在回答“另一样东西是什么”。">
   <div class="big">我们从来不是在比模型，<br>是在比另一样东西。</div>
-  <div class="sub" style="margin-top:26px">今天,当场拆给你们看。</div>
+  <div class="sub" style="margin-top:26px">Harness = Agent - Model</div>
+  <div class="src">参考：<a href="https://www.langchain.com/blog/the-anatomy-of-an-agent-harness" target="_blank" rel="noopener">LangChain · The Anatomy of an Agent Harness</a></div>
 </section>
 
-<!-- S4 四悬案挂起 -->
-<section class="slide" data-sect="开场" data-notes="明说:“30 分钟后,这四个每一个都有报文级答案。”(curiosity gap:挂起的缺口必须在第 27 分钟集中闭合,一个都不能悬空,否则变挫败。)语气:这四个你们全遇到过,但没人给过系统答案——今天给。">
-  <h2>四个悬案，先挂在这儿</h2>
-  <div class="grid2">
-    <div class="case"><span class="st">✓</span><span>① 同样模型、同任务，不同 agent 的执行表现不同</span></div>
-    <div class="case"><span class="st">✓</span><span>② 会话越长越笨，重开一个立刻恢复智商</span></div>
-    <div class="case"><span class="st">✓</span><span>③ IDE 里随口一句就懂，CLI 里同一句话装傻</span></div>
-    <div class="case"><span class="st">✓</span><span>④ 有的 agent 事事请示，有的闷头就干</span></div>
-  </div>
-  <div class="src">30 分钟后，每一个都有报文级答案。</div>
-</section>
-
-<!-- S5 组1 divider + reveal -->
-<section class="slide" data-sect="组1 · 地基与方法" data-fragments="1" data-notes="引子:“要回答这四个悬案,得先统一一个地基。60 秒讲完——但它的第三层推论,多数人没往下推过。”按右箭头展开右侧三步推论。<br><b>展开后台词:</b>“模型不是 agent,模型只处理这次请求里的文本。所以 agent 的差异,主要长在模型外:上下文怎么塞、工具怎么给、权限怎么放、失败怎么重试。再所以,抓包不是看边角料,是在看 agent 怎么把任务翻译成请求,再把动作回填成上下文。”<br>⚠ 严禁科普腔(专家反转效应 Kalyuga 2003:对老手,教科书式定义是在烧耐心)。判据:听众自己读文档 5 分钟能获得的,删。">
-  <div class="ground-layout">
-    <div class="ground-copy">
-      <div class="kick">组 1 · 地基与方法 · 3′–14′</div>
-      <h2>先统一一个 60 秒的地基</h2>
-      <div class="sub">它的第三层推论，多数人没往下推过。</div>
+<!-- S4 拆车目录 -->
+<section class="slide" data-sect="开场" data-notes="新增目录页,30 秒。不要展开解释,只建立地图:“这页先把三个词拆开:Model 是这次请求里的推理;Agent 是把模型放进一轮轮工具调用循环;Harness 是套在 Agent 外面的工程约束。下面 6 项不是另一份目录,而是 Harness 包住的工程决策:喂什么、给什么工具、怎么塞上下文、放什么权限、怎么编排、每轮想多深。”">
+  <h2>先把三个词拆开</h2>
+  <div class="triad">
+    <div class="piece">
+      <div class="label">Model</div>
+      <b>只算这一轮</b>
+      <p>读当前上下文,生成下一段文本或一次工具调用。</p>
     </div>
-    <div class="ground-reveal" aria-hidden="true">
-      <div class="mini-title">三步推论 · 60 秒</div>
-      <div class="step">
-        <b>模型不是 agent</b>
-        <span>模型只处理这次请求里的文本。</span>
-      </div>
-      <div class="so">所以 ↓</div>
-      <div class="step">
-        <b>Agent 的差异，主要长在模型外</b>
-        <span>上下文怎么塞、工具怎么给、权限怎么放、失败怎么重试。</span>
-      </div>
-      <div class="so">所以 ↓</div>
-      <div class="step">
-        <b>抓包不是看边角料</b>
-        <span>是在看 agent 如何把任务翻译成请求，再把动作回填成上下文。</span>
-      </div>
+    <div class="piece">
+      <div class="label">Agent</div>
+      <b>把模型放进循环</b>
+      <p>模型要工具 → 执行工具 → 结果回填 → 继续下一轮。</p>
+    </div>
+    <div class="piece harness-piece">
+      <div class="label">Harness</div>
+      <b>把循环工程化</b>
+      <p>决定它能看什么、能调什么、怎么验证、何时停。</p>
     </div>
   </div>
+  <div class="harness-wrap">
+    <div class="layers">
+      <div class="lr"><span class="no">①</span>出厂人设与 Prompt<span class="re">System Prompt 改动史</span></div>
+      <div class="lr"><span class="no">②</span>工具接口与编辑格式<span class="re">tools schema / apply_patch / Edit</span></div>
+      <div class="lr"><span class="no">③</span>输入与上下文<span class="re">Hi 首包 / IDE 注入 / 长会话压缩</span></div>
+      <div class="lr"><span class="no">④</span>权限与运行环境<span class="re">允许弹窗 / OS 沙箱 / CLI 边界</span></div>
+      <div class="lr"><span class="no">⑤</span>控制流与编排<span class="re">subagent / Goal / Workflow</span></div>
+      <div class="lr"><span class="no">⑥</span>推理档位<span class="re">thinking / xhigh</span></div>
+    </div>
+  </div>
+  <div class="src">后面每页都落回这个框: 不是散点案例,而是在拆同一套 harness。</div>
 </section>
 
 <!-- S6 投票 1.6% -->
-<section class="slide" data-sect="组1 · 地基与方法" data-notes="逐项举手,统计个大概。Pretesting(Richland, Kornell &amp; Kao 2009):揭示前先让全场预测,猜错的落差就是记忆点。资深听众大多往高了猜——正中下怀。这是约第 7 分钟的注意力重启点①。">
+<section class="slide" data-sect="抓包证据" data-notes="逐项举手,统计个大概。Pretesting(Richland, Kornell &amp; Kao 2009):揭示前先让全场预测,猜错的落差就是记忆点。资深听众大多往高了猜——正中下怀。这是约第 7 分钟的注意力重启点①。">
   <div class="kick">全场投票 · 先猜,再揭</div>
-  <h2>Claude Code 的代码里，<br>“模型决策逻辑”占多少？</h2>
+  <h2>Claude Code 的代码里，<br>真正“问模型下一步干啥”的核心 loop 占多少？</h2>
   <div class="opts">
-    <div class="opt">超过 50%<small>模型为主,壳是辅助</small></div>
-    <div class="opt">30% 左右<small>五五开偏工程</small></div>
-    <div class="opt">不到 10%<small>几乎全是工程</small></div>
+    <div class="opt">超过 50%<small>主要代码都在调模型</small></div>
+    <div class="opt">30% 左右<small>模型 loop 和工程各一半</small></div>
+    <div class="opt">不到 10%<small>核心 loop 很小,大头是 harness</small></div>
   </div>
 </section>
 
 <!-- S8 揭示 1.6% -->
-<section class="slide" data-sect="组1 · 地基与方法" data-notes="大声念出数字,停两秒再往下说。“其余约 98% 是普通的工程代码:权限、上下文压缩、工具、会话管理——核心,就是一个简单的 while 循环。”这个数字后面还会回来两次(桥、结尾备选),它是全场最该被记住的数字。">
+<section class="slide" data-sect="抓包证据" data-notes="大声念出数字,停两秒再往下说。“其余约 98% 是普通的工程代码:权限、上下文压缩、工具、会话管理——核心,就是一个简单的 while 循环。”这个数字后面还会回来两次(桥、结尾备选),它是全场最该被记住的数字。">
   <div class="huge">1.6%</div>
   <div class="sub" style="margin-top:26px">其余 ~98% 是工程基建：权限、上下文压缩、工具、会话管理。<br>核心，只是一个简单的 while 循环。</div>
   <div class="src">来源：<a href="https://arxiv.org/pdf/2604.14228" target="_blank" rel="noopener">arXiv 2604.14228《Dive into Claude Code》</a></div>
 </section>
 
 <!-- S9 Hi demo question -->
-<section class="slide" data-sect="组1 · 地基与方法" data-notes="<b>先提问:</b>“如果我只在 agent 里发一句 Hi,你觉得这一包会烧多少 token?”让大家心里先猜一个数,停 2 秒。下一页再揭示真实抓包入口和关键字段。<br><b>Demo 铁律:</b>live 只做“证真”——30-60 秒,当场对两家各发一句 Hi,让抓包工具里跳出请求,证明这是真的、刚发生的;然后立刻切到提前抓好、逐段标注高亮的报文截图讲 4 分钟。千万不要现场滚动生报文找重点。三个看点每个都反直觉:固定开销、注入内容、两家首包 diff。">
-  <div class="kick">Demo · 一句 “Hi” 抓包 · 5′</div>
+<section class="slide" data-sect="抓包证据" data-notes="<b>先提问:</b>“如果我只在 agent 里发一句 Hi,你觉得这一包会烧多少 token?”让大家心里先猜一个数,停 2 秒。下一页再揭示真实抓包入口和关键字段。<br><b>Demo 铁律:</b>live 只做“证真”——30-60 秒,当场对两家各发一句 Hi,让抓包工具里跳出请求,证明这是真的、刚发生的;然后立刻切到提前抓好、逐段标注高亮的报文截图讲 4 分钟。千万不要现场滚动生报文找重点。三个看点每个都反直觉:固定开销、注入内容、两家首包 diff。">
+  <div class="kick">一句 “Hi” 抓包 · 5′</div>
   <h2>你在 agent 里发一条消息，<br>会烧多少 token？</h2>
   <div class="sub">先猜一句 “Hi” 的首包开销。</div>
 </section>
 
 <!-- S10 Hi demo answer -->
-<section class="slide" data-sect="组1 · 地基与方法" data-notes="先报大数:“这次 Claude Code 新开 session,只发一句 Hi,首包创建缓存就有 3.3 万 token。”然后补一句边界:input_tokens 是 3154,cache_creation_input_tokens 是 33131,两者不要混。接着打开抓包页,只讲三件事:固定开销、注入内容、两家首包 diff。">
-  <div class="kick">Demo · 真实抓包 · 5′</div>
+<section class="slide" data-sect="抓包证据" data-notes="先报大数:“这次 Claude Code 新开 session,只发一句 Hi,首包创建缓存就有 3.3 万 token。”然后补一句边界:input_tokens 是 3154,cache_creation_input_tokens 是 33131,两者不要混。下一页拆核心字段,再点抓包详情看完整 JSON。">
+  <div class="kick">真实抓包 · 5′</div>
   <div class="huge">3.3 万</div>
   <div class="sub" style="margin-top:26px">Claude Code 新开 Session，只发一句 “Hi”：首包创建缓存约 33,131 tokens。<br>请求输入本身是 3,154 tokens，“Hi” 只是报文里很小的一角。</div>
   <div class="cols">
@@ -245,34 +302,75 @@ li::before{content:"";position:absolute;left:0;top:12px;width:9px;height:9px;bor
       <p>不是 “Hi” 贵，是 agent 把系统提示、工具、环境和会话策略一起发过去。</p>
     </div>
   </div>
+  <div class="src">数据源：<a href="https://github.com/Geronimomiao/agent-talk-deck" target="_blank" rel="noopener">本仓库</a>抓包样本 trace_hi_claude.json / trace_hi_codex.json。</div>
+</section>
+
+<!-- S11 Claude Hi packet detail -->
+<section class="slide" data-sect="抓包证据" data-notes="这一页讲 Claude Code 的真实首包。左边按 Request Body 结构读: model、messages、system、tools、运行旋钮。重点是 Hi 只是 user.content 里的第二个 block,messages 里还混着一条注入的 system 消息;tools 只有数量级,37 个 schema 不在这里展开。右边按 Response 读:这是 text/event-stream,SSE 事件一路回来,真正内容只有一句,但 usage 里显示创建了 33,131 cache token。最后落到公式:3,154 + 33,131 + 0 = 36,285。">
+  <div class="kick">Claude 首包拆开 · 2′</div>
+  <h2>一句 “hi”，报文里到底塞了什么？</h2>
+  <div class="trace-mini">
+    <div class="trace-pane">
+      <h3>→ Request Body</h3>
+      <div class="trace-endpoint">POST /v1/messages?beta=true · Content-Length 98,368</div>
+      <div class="trace-struct">
+        <div class="trace-node"><span class="key">model</span> · <b>claude-opus-4-8</b></div>
+        <div class="trace-node hot">
+          <span class="key">messages[2]</span> · user + 注入 system
+          <span class="subline">user.content: ① system-reminder / 项目上下文 · ② text: <span class="mark">"hi"</span> + cache_control ttl=1h</span>
+          <span class="subline">system message: 可用 subagent / 背景能力清单</span>
+        </div>
+        <div class="trace-node">
+          <span class="key">system[3]</span> · 出厂提示 + harness / environment 规则
+          <span class="subline">其中主系统段约 5,853 chars,并带 1h cache_control</span>
+        </div>
+        <div class="trace-node">
+          <span class="key">tools[37]</span> · 只放 schema 清单,不展开工具正文
+          <span class="subline">模型靠这些 schema 知道能调用什么、参数怎么填</span>
+        </div>
+        <div class="trace-node"><span class="key">runtime</span> · max_tokens <b>64,000</b> · thinking adaptive · stream true</div>
+      </div>
+    </div>
+    <div class="trace-pane">
+      <h3>← Response SSE / Usage</h3>
+      <div class="trace-endpoint">200 · text/event-stream · stop_reason=end_turn</div>
+      <div class="trace-flow">
+        <div class="trace-event"><span class="event">message_start</span><span class="payload">返回 model / role / usage 壳</span></div>
+        <div class="trace-event"><span class="event">content_delta</span><span class="payload">“Hi! How can I help you today?”</span></div>
+        <div class="trace-event"><span class="event">message_delta</span><span class="payload">本轮结束,无 tool call</span></div>
+        <div class="trace-event"><span class="event">message_stop</span><span class="payload">SSE 流关闭</span></div>
+      </div>
+      <div class="usage-grid">
+        <div class="usage-cell"><b>3,154</b>input</div>
+        <div class="usage-cell hot"><b>33,131</b>cache create · 1h</div>
+        <div class="usage-cell"><b>0</b>cache read</div>
+        <div class="usage-cell"><b>13</b>output</div>
+      </div>
+    </div>
+  </div>
+  <div class="trace-total">实际上下文 = 3,154 + 33,131 + 0 = 36,285 tokens</div>
   <div class="slide-actions">
     <a class="deck-btn neutral" href="trace_viewer.html?lab=hi&amp;v=claude" target="_blank" rel="noopener">打开 Claude 抓包 →</a>
     <a class="deck-btn neutral" href="trace_viewer.html?lab=hi&amp;v=codex" target="_blank" rel="noopener">打开 Codex 抓包 →</a>
   </div>
-  <div class="src">数据源：本仓库抓包样本 trace_hi_claude.json / trace_hi_codex.json。</div>
+  <div class="src">数据源：<a href="https://github.com/Geronimomiao/agent-talk-deck" target="_blank" rel="noopener">本仓库</a>抓包样本 trace_hi_claude.json。Powered by <a href="https://github.com/liaohch3/claude-tap" target="_blank" rel="noopener">claude-tap</a>。</div>
 </section>
 
-<!-- S10 立轴 -->
-<section class="slide" data-sect="组1 · 地基与方法" data-notes="立轴,放慢:“模型是引擎,agent 是整车。你日常感知到的好用不好用,大部分 diff 来自整车厂,不是引擎。”<br><b>承上启下:</b>“整车和引擎的差距,具体差在哪几个零件?咱们把这台车拆开——顺便,把开头那四个悬案一个一个解了。”">
-  <div class="big">模型是引擎，<br>agent 是整车。</div>
-  <div class="sub" style="margin-top:26px">你感知的“好用 / 不好用”，大部分 diff 来自整车厂，不是引擎。</div>
-</section>
-
-<!-- S12 组2 divider + SP 改动史 -->
-<section class="slide" data-sect="组2 · 拆整车" data-notes="开胃段 2 分钟,挑 2-3 个最戏剧性的版本 diff 讲(数据源:phistory 历史版本)。收一句:“这部踩坑史,就是我们拆车的说明书。”<br><b>免疫台词(预埋,防现场 challenge):</b>“你们今晚回去抓,报文很可能跟我的不一样——版本一直在改,而这个改动史本身,就是今天讲的官方踩坑史。”所有硬数字标:来源 + 抓包日期 + agent 版本号。">
-  <div class="kick">组 2 · 拆整车 · 14′–27′</div>
-  <h2><a href="prompt-history.html" target="_blank" rel="noopener">System Prompt</a> 的改动史，<br>就是官方踩坑史</h2>
-  <ul>
-    <li>跟“话痨”搏斗：曾写死“回答必须少于 4 行”，此后措辞反复调整</li>
-    <li>跟“废话注释”搏斗：全大写强调“不要添加任何注释,除非被要求”</li>
-    <li>把“爱列计划”从性格变成制度：TODO / 计划工具入场,配大段使用规范</li>
+<!-- S12 拆 Harness + SP 改动史 -->
+<section class="slide" data-sect="拆 Harness" data-notes="开胃段 2 分钟,挑 2-3 个最戏剧性的版本 diff 讲(数据源:phistory 历史版本)。收一句:“这部踩坑史,就是我们拆车的说明书。”<br><b>免疫台词(预埋,防现场 challenge):</b>“你们今晚回去抓,报文很可能跟我的不一样——版本一直在改,而这个改动史本身,就是今天讲的官方踩坑史。”所有硬数字标:来源 + 抓包日期 + agent 版本号。">
+  <div class="kick">拆 Harness · 14′–27′</div>
+  <h2>System Prompt 的改动史，<br>就是官方踩坑史</h2>
+  <ul class="history-links">
+    <li><a href="https://phistory.cc/?agent=claude-code&from=1.0.43&to=1.0.44" target="_blank" rel="noopener">Claude Code 1.0.44</a>：写死 “fewer than 4 lines”，把“少说话”直接塞进 prompt</li>
+    <li><a href="https://phistory.cc/?agent=claude-code&from=2.1.142&to=2.1.143" target="_blank" rel="noopener">Claude Code 2.1.143</a>：代码注释规则收紧，默认不写注释，只在 WHY 不明显时补</li>
+    <li><a href="https://phistory.cc/?agent=claude-code&from=2.0.20&to=2.0.21" target="_blank" rel="noopener">Claude Code 2.0.21</a>：TodoWrite / 计划跟踪进入系统提示，计划从性格变成工具协议</li>
   </ul>
-  <div class="src">数据源：<a href="https://phistory.cc/" target="_blank" rel="noopener">Phistory · Agent CLI System Prompt Diff History</a> · 这部踩坑史，就是拆车的说明书。</div>
+  <div class="src">数据源：<a href="https://phistory.cc/" target="_blank" rel="noopener">Phistory · Agent CLI System Prompt Diff History</a> 抓取官方 CLI 包的 prompt 快照；不是官方 release note。</div>
 </section>
 
-<!-- S13 悬案① 工具与编辑格式层 -->
-<section class="slide" data-sect="组2 · 拆整车" data-notes="回收悬案①,角落打勾。讲一条真实重试链:缩进差一个空格→“未找到匹配”→重试选段太短、命中两处→第三次整文件重写——500 token 的小改动烧掉几千 token、三轮往返,你的体感就是“它今天好笨”。<br><b>punchline 放慢:</b>“模型不是直接改文件,而是在生成工具调用。apply_patch、Edit、Bash 这些都是 agent 壳给模型的动作语言。换了壳,工具名、参数格式、失败反馈、重试路径都变了。所以「哪个模型最好」可能是伪问题,「哪对 模型×壳 组合最好」才是真问题。”">
-  <div class="kick">悬案① 破案 · 工具与编辑格式层 · 3′</div>
+<!-- S13 工具与编辑格式层 -->
+<section class="slide" data-sect="拆 Harness" data-notes="对应现象①。讲一条真实重试链:缩进差一个空格→“未找到匹配”→重试选段太短、命中两处→第三次整文件重写——500 token 的小改动烧掉几千 token、三轮往返,你的体感就是“它今天好笨”。<br><b>punchline 放慢:</b>“模型不是直接改文件,而是在生成工具调用。apply_patch、Edit、Bash 这些都是 agent 壳给模型的动作语言。换了壳,工具名、参数格式、失败反馈、重试路径都变了。所以「哪个模型最好」可能是伪问题,「哪对 模型×壳 组合最好」才是真问题。”">
+  <div class="kick">工具与编辑格式层 · 3′</div>
   <h2>不是裸模型在比赛，<br>是<a href="edit-formats.html" target="_blank" rel="noopener">模型 × 工具接口</a>在比赛</h2>
   <div class="cols">
     <div class="col"><h3><a href="edit-formats.html" target="_blank" rel="noopener">Codex</a></h3><p>apply_patch / diff 风格——模型描述“删什么、加什么、上下文在哪”</p></div>
@@ -282,22 +380,22 @@ li::before{content:"";position:absolute;left:0;top:12px;width:9px;height:9px;bor
   <div class="src">参考：<a href="https://arxiv.org/abs/2405.15793" target="_blank" rel="noopener">SWE-agent ACI</a> · <a href="https://arxiv.org/abs/2604.27296" target="_blank" rel="noopener">To Diff or Not to Diff?</a> · <a href="https://arxiv.org/abs/2606.15508" target="_blank" rel="noopener">ToolMenuBench</a></div>
 </section>
 
-<!-- S14 悬案② 上下文工程层 -->
-<section class="slide" data-sect="组2 · 拆整车" data-notes="回收悬案②,打勾。“变笨”不是它累了,是接近窗口上限触发了压缩——保留什么、丢什么,各家策略不同。Anthropic《Effective Context Engineering》的 attention budget / context rot 一句带过,不展开论文。三症状讲完落原则牌 1。">
-  <div class="kick">悬案② 破案 · 上下文工程层 · 2.5′</div>
+<!-- S14 输入与上下文 · 长会话压缩 -->
+<section class="slide" data-sect="拆 Harness" data-notes="对应现象②。“变笨”不是它累了,是接近窗口上限触发了压缩——保留什么、丢什么,各家策略不同。Anthropic《Effective Context Engineering》的 attention budget / context rot 一句带过,不展开论文。三症状讲完落原则牌。">
+  <div class="kick">输入与上下文 · 长会话压缩 · 2.5′</div>
   <h2>越聊越笨,不是它累了——<br>是压缩把记忆吃了</h2>
   <ul>
     <li>忘了半小时前定好的约定,用回默认做法</li>
     <li>重复问已经回答过的问题,把否决过的方案再提一遍</li>
     <li>引用“我们之前讨论过 X”——X 其实已被压缩掉,记忆变成幻觉</li>
   </ul>
-  <span class="chip">① 上下文是稀缺资源，要预算化管理</span>
+  <span class="chip">上下文是稀缺资源，要预算化管理</span>
   <div class="src">来源：<a href="https://code.claude.com/docs/en/memory" target="_blank" rel="noopener">Claude Code Memory</a> · <a href="https://arxiv.org/abs/2602.07962" target="_blank" rel="noopener">LOCA-bench: long-context agents</a></div>
 </section>
 
-<!-- S15 悬案③ 输入组装层 -->
-<section class="slide" data-sect="组2 · 拆整车" data-notes="回收悬案③,打勾。最短的一层,1.5 分钟别恋战。IDE 系(Trae / Cursor)自动携带打开的文件、光标位置、选中代码;CLI 你不说就没有。它不是装傻,是真没看见。顺带一句:你的消息也从来不是裸发的——模板包装、@引用展开、reminder 注入,各家都不同。">
-  <div class="kick">悬案③ 破案 · 输入组装层 · 1.5′</div>
+<!-- S15 输入与上下文 · 输入组装 -->
+<section class="slide" data-sect="拆 Harness" data-notes="对应现象③。最短的一层,1.5 分钟别恋战。IDE 系(Trae / Cursor)自动携带打开的文件、光标位置、选中代码;CLI 你不说就没有。它不是装傻,是真没看见。顺带一句:你的消息也从来不是裸发的——模板包装、@引用展开、reminder 注入,各家都不同。">
+  <div class="kick">输入与上下文 · 输入组装 · 1.5′</div>
   <h2>“同样的 prompt”，<br>根本不是同样的输入</h2>
   <ul>
     <li>IDE 自动携带：打开的文件、光标位置、选中的代码</li>
@@ -306,31 +404,45 @@ li::before{content:"";position:absolute;left:0;top:12px;width:9px;height:9px;bor
   </ul>
 </section>
 
-<!-- S16 悬案④ 人设+权限沙箱层 -->
-<section class="slide" data-sect="组2 · 拆整车" data-notes="回收悬案④(它横跨两层:出厂人设 + 权限沙箱),打勾。<b>先投票再揭数字(第 23 分钟重启点②):“你平均按“允许”的比例是多少?”</b>然后揭 93%——弹窗疲劳真实存在;OS 级沙箱(Seatbelt / Landlock)让弹窗降 84%。<br>补一句给直接领导:“轻形态不是偷懒,是设计——弹窗降 84% 就是证据。”再补笼子効应:沙箱断网装不了依赖时,它会自己憋 workaround——你以为它笨,其实它被关在笼子里。落原则牌 2。">
-  <div class="kick">悬案④ 破案 · 出厂人设 + 权限沙箱层 · 2.5′</div>
+<!-- S16 权限与运行环境 -->
+<section class="slide" data-sect="拆 Harness" data-notes="对应权限与运行环境。<b>先投票再揭数字(第 23 分钟重启点②):“你平均按“允许”的比例是多少?”</b>然后揭 93%——弹窗疲劳真实存在;OS 级沙箱(Seatbelt / Landlock)让弹窗降 84%。<br>补一句给直接领导:“轻形态不是偷懒,是设计——弹窗降 84% 就是证据。”再补笼子効应:沙箱断网装不了依赖时,它会自己憋 workaround——你以为它笨,其实它被关在笼子里。落原则牌。">
+  <div class="kick">权限与运行环境 · 2.5′</div>
   <h2>事事请示 vs 闷头就干，<br>是“设计”出来的性格</h2>
   <div class="nums">
     <div><div class="n">93%</div><div class="cap">用户平均批准率——“点允许”几周就变机械动作,人肉监督名存实亡</div></div>
     <div><div class="n">−84%</div><div class="cap">OS 级沙箱让权限弹窗下降——轻 + 隔离不是偷懒,是设计</div></div>
   </div>
-  <span class="chip">② 权限设计的目标是减少打断，而非增加确认</span>
+  <span class="chip">权限设计的目标是减少打断，而非增加确认</span>
   <div class="src">来源：<a href="https://arxiv.org/pdf/2604.14228" target="_blank" rel="noopener">93% approval rate</a> · <a href="https://www.anthropic.com/engineering/claude-code-sandboxing" target="_blank" rel="noopener">Anthropic sandboxing: prompts −84%</a></div>
 </section>
 
-<!-- S17 快闪两层 -->
-<section class="slide" data-sect="组2 · 拆整车" data-notes="快闪 1 分钟,就是快闪,别超时。subagent 真相:没有魔法,一次带独立上下文的递归调用,主 agent 只拿最终结论——在陌生大仓里翻 50 个文件的活丢给它,主上下文只花“一句话的钱”。推理参数:reasoning effort / thinking 预算界面上未必露出,但都在报文里。">
-  <div class="kick">快闪 · 剩下两层,各 30″</div>
-  <h2>控制流 &amp; 推理参数</h2>
+<!-- S17 控制流与编排 -->
+<section class="slide" data-sect="拆 Harness" data-notes="控制流单独讲 1 分钟。核心句:控制流不是模型更聪明,而是 harness 在模型外面决定任务怎么推进。先讲普通 agent loop,再讲 subagent 是独立上下文的递归调用,最后引出 goal / workflow:外层保存目标或脚本,决定继续、并发、验证、收口。下一页 Codex Goal 和再下一页 Ultracode 都是这个轴上的例子。">
+  <div class="kick">控制流与编排 · 1′</div>
+  <h2>控制流：<br>谁在替模型推进任务？</h2>
   <div class="cols">
-    <div class="col"><h3>控制流</h3><p>subagent 没有魔法：一次带独立上下文的递归调用；主上下文只花“一句话的钱”</p></div>
-    <div class="col"><h3>推理参数</h3><p>报文里看不见的旋钮：同一个模型,不同 thinking 档位 ≈ 不同模型</p></div>
+    <div class="col"><h3>agent loop</h3><p>模型给 tool call → harness 执行 → 结果回填 → 再问模型。</p></div>
+    <div class="col"><h3>subagent</h3><p>把一小段任务丢进独立上下文,主 agent 只拿最终结论。</p></div>
+    <div class="col"><h3>goal / workflow</h3><p>外层保存目标或脚本,决定继续、并发、验证和收口。</p></div>
   </div>
+  <div class="bigline">重点不是“多了一个脑子”，而是循环被谁组织。</div>
 </section>
 
-<!-- S18 Codex Goal 属于 harness -->
-<section class="slide" data-sect="组2 · 拆整车" data-notes="<b>新增页:</b>承接“控制流”快闪,先只讲 Codex Goal。台词:“Goal 不是 workflow,也不是模型突然会项目管理。它是 harness 持有一个目标状态,在空闲时继续推进,每一轮仍然交给模型判断下一步,但‘还要不要继续、怎么验证、何时停’是外层控制流在管。”">
-  <div class="kick">控制流层 · Codex Goal</div>
+<!-- S18 推理档位 -->
+<section class="slide" data-sect="拆 Harness" data-notes="推理档位单独讲 45 秒。核心句:它不是控制流,它只改变每一轮模型调用的思考预算。low/normal 更快更便宜,high/xhigh 更慢更贵,适合规划、复杂排查和高风险编辑。很多界面不直接展示这个旋钮,但报文里会出现 reasoning effort / thinking budget / max tokens 一类字段。">
+  <div class="kick">推理档位 · 45″</div>
+  <h2>推理档位：<br>同一模型，也有档位</h2>
+  <div class="cols">
+    <div class="col"><h3>低档位</h3><p>快、便宜,适合短答、格式化、低风险小改。</p></div>
+    <div class="col"><h3>高档位 / xhigh</h3><p>慢、贵,适合规划、复杂排查和高风险编辑。</p></div>
+    <div class="col"><h3>报文视角</h3><p>界面不一定露出,但请求里能看到 thinking / reasoning / max tokens。</p></div>
+  </div>
+  <div class="bigline">它改变“这一轮想多深”，不负责“整个任务怎么跑”。</div>
+</section>
+
+<!-- S19 Codex Goal 属于 harness -->
+<section class="slide" data-sect="拆 Harness" data-notes="<b>新增页:</b>承接“控制流”快闪,先只讲 Codex Goal。台词:“Goal 不是 workflow,也不是模型突然会项目管理。它是 harness 持有一个目标状态,在空闲时继续推进,每一轮仍然交给模型判断下一步,但‘还要不要继续、怎么验证、何时停’是外层控制流在管。”">
+  <div class="kick">控制流与编排 · Codex Goal</div>
   <h2><a href="goal.html" target="_blank" rel="noopener">Codex Goal</a>：<br>把“继续做”变成 harness 状态</h2>
   <div class="cols">
     <div class="col"><h3>模型负责什么</h3><p>读当前上下文,做一轮推理,产出下一步文本或工具调用</p></div>
@@ -340,9 +452,9 @@ li::before{content:"";position:absolute;left:0;top:12px;width:9px;height:9px;bor
   <div class="src">细讲 goal：<a href="goal.html" target="_blank" rel="noopener">Codex Goal 怎么实现</a></div>
 </section>
 
-<!-- S19 Claude Code Workflow 属于 harness -->
-<section class="slide" data-sect="组2 · 拆整车" data-notes="<b>新增页:</b>解释 Claude Code 里的 Ultracode 标签。台词:“你们可能见过这个模式名:Ultracode - xhigh + workflows。它不是说模型换了,而是这轮被放进了更重的控制流:xhigh 给更多推理预算,workflow 让 harness 按编排脚本调度一组 agent。也就是说,同一个模型被不同的壳组织起来,体感就会完全不同。”">
-  <div class="kick">控制流层 · Claude Code Workflow</div>
+<!-- S20 Claude Code Workflow 属于 harness -->
+<section class="slide" data-sect="拆 Harness" data-notes="<b>新增页:</b>解释 Claude Code 里的 Ultracode 标签。台词:“你们可能见过这个模式名:Ultracode - xhigh + workflows。它不是说模型换了,而是这轮被放进了更重的控制流:xhigh 给更多推理预算,workflow 让 harness 按编排脚本调度一组 agent。也就是说,同一个模型被不同的壳组织起来,体感就会完全不同。”">
+  <div class="kick">控制流与编排 · Claude Code Workflow</div>
   <h2><a href="deck.html" target="_blank" rel="noopener">Workflow</a>：<br>Claude Code 里的“Ultracode”</h2>
   <div class="chain">
     <div class="row"><b>屏幕上看到的标签:</b>&nbsp;<code>(Ultracode - xhigh + workflows)</code></div>
@@ -355,67 +467,69 @@ li::before{content:"";position:absolute;left:0;top:12px;width:9px;height:9px;bor
   <div class="src">细讲 workflow：<a href="deck.html" target="_blank" rel="noopener">用确定的代码，编排不确定的智能</a> · <a href="workflow-anatomy.html" target="_blank" rel="noopener">Claude Code workflow 怎么实现</a></div>
 </section>
 
-<!-- S20 七层总表 -->
-<section class="slide" data-sect="组2 · 拆整车" data-notes="30 秒一图收拢。双编码原则:讲哪层,手指哪层。台词:“你平时所有的想不通,都能在这七层里的某一层,找到报文级答案。”(正式场建议把这页做成一张纵剖面解剖图,讲哪层亮哪层——不要 7 页 bullet。)">
-  <h2>七层，一图收拢</h2>
+<!-- S21 Anthropic Workflow 来源 -->
+<section class="slide" data-sect="拆 Harness" data-notes="这页交代来源:workflow 不是我自己造出来的词,而是 Anthropic 在 Claude Code dynamic workflows 文章里正式写出来的能力。重点读标题和两张图:Claude Code 可以为具体任务动态生成 harness,把拆分、并发、验证、汇总这些步骤写成 workflow。Ultracode 只是屏幕上的入口标签之一。">
+  <div class="kick">控制流与编排 · 来源</div>
+  <h2>Workflow 的来源：<br>Anthropic 把它叫 dynamic workflows</h2>
+  <div class="workflow-origin">
+    <figure class="workflow-shot" role="button" tabindex="0" aria-label="放大 Anthropic dynamic workflows 图">
+      <img src="https://cdn.prod.website-files.com/68a44d4040f98a4adf2207b6/6a1f1684f559cc83ff4b465b_image1.png" alt="Anthropic dynamic workflows article illustration">
+    </figure>
+    <figure class="workflow-shot" role="button" tabindex="0" aria-label="放大 Anthropic workflow patterns 图">
+      <img src="https://cdn.prod.website-files.com/68a44d4040f98a4adf2207b6/6a1f16d86247e586b929a407_image10.png" alt="Anthropic Claude Code workflow illustration">
+    </figure>
+  </div>
+  <div class="workflow-origin-note">workflow 不是“模型更聪明”,而是 Claude Code 让 harness 可以按任务临时生成一套编排方式。</div>
+  <div class="src">来源：<a href="https://claude.com/blog/a-harness-for-every-task-dynamic-workflows-in-claude-code" target="_blank" rel="noopener">Anthropic · A harness for every task: Dynamic workflows in Claude Code</a></div>
+</section>
+
+<!-- S22 六块总表 -->
+<section class="slide" data-sect="拆 Harness" data-notes="30 秒一图收拢。双编码原则:讲哪块,手指哪块。台词:“你平时所有的想不通,都能在这六块里的某一块,找到报文级线索。”">
+  <h2>六块，一图收拢</h2>
   <div class="layers">
-    <div class="lr"><span class="no">①</span>System Prompt 出厂人设<span class="re">✓ 悬案④</span></div>
-    <div class="lr"><span class="no">②</span>工具与编辑格式<span class="re">✓ 悬案①</span></div>
-    <div class="lr"><span class="no">③</span>上下文工程<span class="re">✓ 悬案②</span></div>
-    <div class="lr"><span class="no">④</span>控制流<span class="re dim">快闪</span></div>
-    <div class="lr"><span class="no">⑤</span>权限与沙箱<span class="re">✓ 悬案④</span></div>
-    <div class="lr"><span class="no">⑥</span>推理参数<span class="re dim">快闪</span></div>
-    <div class="lr"><span class="no">⑦</span>输入组装<span class="re">✓ 悬案③</span></div>
+    <div class="lr"><span class="no">①</span>出厂人设与 Prompt<span class="re">✓ System Prompt 改动史</span></div>
+    <div class="lr"><span class="no">②</span>工具接口与编辑格式<span class="re">✓ tools schema / apply_patch / Edit</span></div>
+    <div class="lr"><span class="no">③</span>输入与上下文<span class="re">✓ Hi 首包 / IDE 注入 / 长会话压缩</span></div>
+    <div class="lr"><span class="no">④</span>权限与运行环境<span class="re">✓ 允许弹窗 / OS 沙箱 / CLI 边界</span></div>
+    <div class="lr"><span class="no">⑤</span>控制流与编排<span class="re">✓ subagent / Goal / Workflow</span></div>
+    <div class="lr"><span class="no">⑥</span>推理档位<span class="re">✓ thinking / xhigh</span></div>
   </div>
   <div class="src">来源：<a href="https://arxiv.org/pdf/2604.14228" target="_blank" rel="noopener">Dive into Claude Code</a> · <a href="https://code.claude.com/docs/en/how-claude-code-works" target="_blank" rel="noopener">How Claude Code works</a></div>
 </section>
 
-<!-- S21 桥 · 100行走读 -->
-<section class="slide" data-sect="桥 · 100 行 agent" data-notes="<b>桥三步的第 1 步(30″):</b>“到这里,整车拆完了。拆完你会发现一个反直觉的事实:骨架是便宜的——100 行就有了,论文说只有 1.6% 是模型决策;贵的,是刚才每一层上的那些工程决策。”一屏预写代码、while 循环高亮,跑一个提前测通的小任务或放 20 秒 gif——<b>不现场手搓</b>。<br>完整 6 分钟版留作 Q&amp;A 暗牌:有人问“怎么写的”就现场展开;repo 链接会后发群。">
-  <div class="kick">桥 · 100 行 agent 走读 · 2.5′</div>
-  <h2>骨架是便宜的，<br>贵的是七层上的工程决策</h2>
-  <div class="codebox"><pre><span class="hl">while (true)</span> {
-  const res = await llm(messages, tools)   // SP 10 行 + 3 个工具
-  if (!res.tool_calls) break               // 不再调工具 = 干完了
-  for (const c of res.tool_calls)
-    messages.push(await run(c))            // read / edit / shell
-}</pre></div>
-  <div class="src">100 行 TypeScript,零依赖,能修真 bug——参考：<a href="https://www.anthropic.com/engineering/building-effective-agents" target="_blank" rel="noopener">Building effective agents</a></div>
-</section>
-
 <!-- S22 翻转主语 -->
-<section class="slide" data-sect="桥 · 100 行 agent" data-notes="<b>桥三步的第 2 步,全场最关键的一句(45″,逐字稿):</b>“这句话反过来说才值钱:既然 diff 来自工程决策而不是模型,那这些决策就不是只有 Anthropic 和 OpenAI 有资格做——你在自己的工作流里每天都在做一模一样的决策,只是以前你不知道自己在做。上半场看的是厂商怎么拧旋钮——下半场,轮到你拧。”落原则牌 3。">
+<section class="slide" data-sect="从厂商到自己" data-notes="<b>桥三步的第 2 步,全场最关键的一句(45″,逐字稿):</b>“这句话反过来说才值钱:既然 diff 来自工程决策而不是模型,那这些决策就不是只有 Anthropic 和 OpenAI 有资格做——你在自己的工作流里每天都在做一模一样的决策,只是以前你不知道自己在做。上半场看的是厂商怎么拧旋钮——下半场,轮到你拧。”落原则牌。">
   <div class="kick">全场最关键的一句</div>
   <div class="big" style="font-size:34px">这些决策,不是只有<br>Anthropic 和 OpenAI 有资格做——<br>你每天都在做。</div>
   <ul style="margin-top:22px">
-    <li>你挑哪些文件喂给 agent —— 你在做<b>上下文工程</b></li>
+    <li>你挑哪些文件喂给 agent —— 你在做<b>输入与上下文</b></li>
     <li>你让不让它自己跑测试 —— 你在做<b>权限设计</b></li>
     <li>你开一个 agent 去 review 另一个 —— 你在做<b>控制流</b></li>
   </ul>
-  <span class="chip">③ 能力长在 harness，不长在 prompt</span>
+  <span class="chip">能力长在 harness，不长在 prompt</span>
 </section>
 
 <!-- S23 旋钮映射 -->
-<section class="slide" data-sect="桥 · 100 行 agent" data-notes="<b>桥三步的第 3 步(30″):</b>亮地图。“接下来讲的不是新东西,是同一张地图的应用篇。”左边是你日常工作流里的动作,右边是它对应的层——厂商拧的旋钮和你拧的,是同一排。">
+<section class="slide" data-sect="从厂商到自己" data-notes="<b>桥三步的第 3 步(30″):</b>亮地图。“接下来讲的不是新东西,是同一张地图的实践映射。”左边是你日常工作流里的动作,右边是它对应的层——厂商拧的旋钮和你拧的,是同一排。">
   <h2>同一张地图，轮到你拧</h2>
   <div class="map">
     <div class="mr"><span class="act">接 Figma MCP 读设计稿</span><span class="ar">→</span><span class="ly">② 工具层</span></div>
-    <div class="mr"><span class="act">给编码 agent 设限制、调参数</span><span class="ar">→</span><span class="ly">⑤ 权限 + ⑥ 推理参数</span></div>
-    <div class="mr"><span class="act">开第二个 agent 做 Code Review</span><span class="ar">→</span><span class="ly">④ 控制流</span></div>
-    <div class="mr"><span class="act">验收问题做成结构化表格</span><span class="ar">→</span><span class="ly">③ 上下文工程</span></div>
-    <div class="mr"><span class="act">agent 读表格直接修复</span><span class="ar">→</span><span class="ly">⑦ 输入组装</span></div>
+    <div class="mr"><span class="act">给编码 agent 设限制、调参数</span><span class="ar">→</span><span class="ly">④ 权限与运行环境 + ⑥ 推理档位</span></div>
+    <div class="mr"><span class="act">开第二个 agent 做 Code Review</span><span class="ar">→</span><span class="ly">⑤ 控制流与编排</span></div>
+    <div class="mr"><span class="act">验收问题做成结构化表格</span><span class="ar">→</span><span class="ly">③ 输入与上下文</span></div>
+    <div class="mr"><span class="act">agent 读表格直接修复</span><span class="ar">→</span><span class="ly">③ 输入与上下文</span></div>
   </div>
 </section>
 
-<!-- S24 组3 divider + 通用模式 -->
-<section class="slide" data-sect="组3 · 应用篇" data-notes="10 秒,先抽象后实例,把非前端同学拉进场:“这套改造的通用模式就一行。我拿我最熟的前端流程当例子——后端把「设计稿」换成「API 契约」,QA 把「验收表」换成「缺陷表」,完全同构。”">
-  <div class="kick">组 3 · 应用篇 · 29.5′–39′</div>
+<!-- S24 实践映射 + 通用模式 -->
+<section class="slide" data-sect="实践映射" data-notes="10 秒,先抽象后实例,把非前端同学拉进场:“这套改造的通用模式就一行。我拿我最熟的前端流程当例子——后端把「设计稿」换成「API 契约」,QA 把「验收表」换成「缺陷表」,完全同构。”">
+  <div class="kick">实践映射 · 29.5′–39′</div>
   <div class="big" style="font-size:31px">规格化输入 → 生成 → 自动审查<br>→ 结构化反馈 → 闭环修复</div>
   <div class="sub" style="margin-top:24px">前端是例子。后端换成“API 契约”，QA 换成“缺陷表”，完全同构。</div>
 </section>
 
 <!-- S25 工作流前后对比 -->
-<section class="slide" data-sect="组3 · 应用篇" data-notes="4 分钟,<b>第 31-33 分钟注意力重启点③:媒介切录屏</b>,放关键环节的真实录屏。重点讲最出效果的闭环:设计/QA 把问题填进表格→agent 读表逐条修——返工从“人肉传话”变成“结构化输入”。收一句:“人从流水线上的工人,变成流水线的设计者。”<br>⬜ <b>此页需要你的真实素材:</b>实际用的限制/参数、互审 prompt、验收表格式、一个真实闭环案例 + 录屏。">
+<section class="slide" data-sect="实践映射" data-notes="4 分钟,<b>第 31-33 分钟注意力重启点③:媒介切录屏</b>,放关键环节的真实录屏。重点讲最出效果的闭环:设计/QA 把问题填进表格→agent 读表逐条修——返工从“人肉传话”变成“结构化输入”。收一句:“人从流水线上的工人,变成流水线的设计者。”<br>⬜ <b>此页需要你的真实素材:</b>实际用的限制/参数、互审 prompt、验收表格式、一个真实闭环案例 + 录屏。">
   <h2>同一条流水线,改造前后</h2>
   <div class="cols">
     <div class="col warn"><h3>传统七步 · 人肉搬运信息</h3><p>读设计稿 → 编码 → 自测 → QA → 修 bug → 设计验收 → 再修——每个箭头,都是你在两个环节之间当翻译</p></div>
@@ -426,7 +540,7 @@ li::before{content:"";position:absolute;left:0;top:12px;width:9px;height:9px;bor
 </section>
 
 <!-- S26 背包类比 -->
-<section class="slide" data-sect="组3 · 应用篇" data-notes="<b>讲稿定稿(约 400 字,可照读):</b>把模型想成雇来砍柴的天才樵夫:力气吓人,却每天早上失忆,只背得动一个背包——背包就是上下文窗口。MD、Tool、CLI、MCP 都在抢它。<br>MD 是背包里的字条:哪座山柴好、东家的规矩。它只改变“知道什么”,不给能力——写一万遍“去砍树”,没斧子照样砍不断;字条按字数占背包,塞多了关键那张被稀释,即 context rot。<br>Tool 是斧子:砍下去世界真的改变,还能上锁——权限、沙箱只装得到斧子上,装不到字条上。但每把斧子附一张说明卡(schema),卡也占背包,挂五十把就选不过来。<br>CLI 是山下五金铺:人类五十年的现成工具。只付一把钥匙的背包成本——Bash 这一个 tool——整个生态随便借。代价是工具为人设计、没护栏,沙箱防的就是这扇门。<br>MCP 是集市统一摊位标准:Figma、Jira 按规格摆摊,谁都能用。但摊位后面还是斧子,每签一家,背包多一册说明。<br>为什么不能全 MD?字条不砍树,没有可拦截的执行点。全 Tool 呢?说明卡压垮背包,多数内容本来就只是知识。">
+<section class="slide" data-sect="实践映射" data-notes="<b>讲稿定稿(约 400 字,可照读):</b>把模型想成雇来砍柴的天才樵夫:力气吓人,却每天早上失忆,只背得动一个背包——背包就是上下文窗口。MD、Tool、CLI、MCP 都在抢它。<br>MD 是背包里的字条:哪座山柴好、东家的规矩。它只改变“知道什么”,不给能力——写一万遍“去砍树”,没斧子照样砍不断;字条按字数占背包,塞多了关键那张被稀释,即 context rot。<br>Tool 是斧子:砍下去世界真的改变,还能上锁——权限、沙箱只装得到斧子上,装不到字条上。但每把斧子附一张说明卡(schema),卡也占背包,挂五十把就选不过来。<br>CLI 是山下五金铺:人类五十年的现成工具。只付一把钥匙的背包成本——Bash 这一个 tool——整个生态随便借。代价是工具为人设计、没护栏,沙箱防的就是这扇门。<br>MCP 是集市统一摊位标准:Figma、Jira 按规格摆摊,谁都能用。但摊位后面还是斧子,每签一家,背包多一册说明。<br>为什么不能全 MD?字条不砍树,没有可拦截的执行点。全 Tool 呢?说明卡压垮背包,多数内容本来就只是知识。">
   <div class="kick">给 agent 配装备 · 3′</div>
   <h2>失忆樵夫,与背包经济学</h2>
   <div class="grid2">
@@ -439,69 +553,62 @@ li::before{content:"";position:absolute;left:0;top:12px;width:9px;height:9px;bor
   <div class="src">来源：<a href="https://code.claude.com/docs/en/memory" target="_blank" rel="noopener">CLAUDE.md / memory</a> · <a href="https://www.anthropic.com/news/model-context-protocol" target="_blank" rel="noopener">Model Context Protocol</a> · <a href="https://arxiv.org/abs/2602.07962" target="_blank" rel="noopener">context rot</a></div>
 </section>
 
-<!-- S27 判断准则表 -->
-<section class="slide" data-sect="组3 · 应用篇" data-notes="<b>Q&amp;A 弹药,背熟两发:</b><br><b>追问 1“协议层只有 messages 和 tools 两个通道,你这四分法不存在吧?”</b>→ 完全同意,这正是抓包最重要的发现:四分法不是协议分类,是<b>设计决策分类</b>——同一个能力走哪条路,背包占用、护栏粒度、维护成本、复用范围完全不同。协议层 2 个通道,决策层 2×2,官方文档只讲协议,抓包才让你看见四个决策怎么坍缩进两个通道。<br><b>追问 2“五金铺全能且近零成本,为什么还要专用斧子?”</b>→ 三个抓包可见的理由:护栏粒度(权限 hook 挂在工具名上,Bash 里 cat 和 rm -rf 只能按最危险的管);结构化结果(Edit 不唯一命中直接报错,harness 兜得住);可靠性经济学(高频操作 1% 失败率差异就是产品分水岭)。准则:高频关键配斧子,长尾走五金铺——Claude Code 十几个工具加一个 Bash,就是官方实例。">
-  <h2>怎么配?一张判断表</h2>
-  <table class="tbl">
-    <tr><th>层</th><th>放什么</th><th>代价</th></tr>
-    <tr><td>MD</td><td>只需“被读到”的知识 → 越短越好</td><td>按字数常驻背包,过量 = context rot</td></tr>
-    <tr><td>Tool</td><td>高频、关键、要护栏的动作 → 才封 Tool</td><td>schema 说明卡也占背包</td></tr>
-    <tr><td>CLI</td><td>人类已有现成工具 → 别重造轮子</td><td>无护栏 = 最大攻击面,沙箱防的就是它</td></tr>
-    <tr><td>MCP</td><td>跨 agent / 跨团队标准化接入 → 才开</td><td>不是第四种能力,是工具的供应链</td></tr>
-  </table>
-  <div class="src">底层结构 2×2：(知识 vs 能力)×(自有 vs 生态)。参考：<a href="https://code.claude.com/docs/en/permissions" target="_blank" rel="noopener">Claude Code permissions</a> · <a href="https://www.anthropic.com/engineering/building-effective-agents" target="_blank" rel="noopener">Tool design</a></div>
-</section>
-
-<!-- S28 三条策略 + 实测结论 -->
-<section class="slide" data-sect="组3 · 应用篇" data-notes="2 分钟。只给三条,都反直觉——完整七条进附录。实测对比只放 30 秒结论页:“完整实测数据(两个任务 × 三家 × 轮数 / token / 用时)会后发群,扫码自取。”Trae 列标注置信度——<b>方法的诚实,本身就是这场分享的卖点。</b><br>⬜ 实测数据待填(修 bug 任务 + 检索任务)。<br><b>承上启下:</b>“环境搭好了,循环就可以交出去了——交出去之后是什么样子?最后 2 分钟,往前看一步。”">
-  <div class="kick">只带走三条,都反直觉 · 2′</div>
-  <ul style="font-size:24px">
-    <li>编辑反复失败,<b>先换家</b>再怀疑自己——格式八字不合,不是模型笨</li>
-    <li>会话变笨就<b>重开</b>;大范围扫描交给 subagent,保主上下文干净</li>
-    <li>难题调<b>高</b> thinking,杂活调<b>低</b>——一个模型当两个用</li>
-  </ul>
-  <div class="src">完整七条策略 + 三家实测数据(两任务 × 轮数 / token / 用时)会后发群;Trae 列已标注置信度。⬜ 实测数据待填</div>
-</section>
-
-<!-- S29 四悬案验收 -->
-<section class="slide" data-sect="收尾" data-notes="30 秒,逐个点勾:“编辑格式层、上下文层、输入组装层、人设加权限层——四个悬案,一个都没悬空。”完成感就是 Q&amp;A 前的“终”(峰终定律:未闭合的缺口会变成挫败,闭合的缺口就是满足感)。">
-  <h2>四个悬案，验收</h2>
-  <div class="grid2">
-    <div class="case done"><span class="st">✓</span><span>① 同样模型、同任务，不同 agent 的执行表现不同<span class="lay">② 工具与编辑格式层</span></span></div>
-    <div class="case done"><span class="st">✓</span><span>② 会话越长越笨<span class="lay">③ 上下文工程层</span></span></div>
-    <div class="case done"><span class="st">✓</span><span>③ IDE 秒懂,CLI 装傻<span class="lay">⑦ 输入组装层</span></span></div>
-    <div class="case done"><span class="st">✓</span><span>④ 事事请示 vs 闷头就干<span class="lay">① 人设 + ⑤ 权限沙箱层</span></span></div>
-  </div>
-  <div class="src">报文级答案,一个都没悬空。</div>
-</section>
-
 <!-- S30 推演 90 秒 -->
-<section class="slide" data-sect="收尾" data-notes="一根演进轴讲完,90 秒,不展开细节层级。台词骨架:“过去,人跑循环,agent 是副驾;现在,agent 跑循环,人盯结果;下一步,把「什么算完成、怎么验证、何时停」写成契约交给它——Codex 的 goal 就是这个方向,evidence-gated;再往后,是多 agent 并行的车队调度,直到全公司共用的系统。每往上一级,人的角色就从执行退一步,往设计规则进一步。”然后落 Dario 引言,制造紧迫感但不贩卖焦虑。">
-  <div class="kick">往前看一步 · 90″</div>
-  <div class="axis">
-    <div class="stop"><b>辅助驾驶</b><p>人跑循环,agent 副驾——今天多数人在这里</p></div>
-    <div class="stop"><b>自动驾驶</b><p>“什么算完成”写成契约,agent 自己跑到达标或卡住</p></div>
-    <div class="stop"><b>车队调度</b><p>多 agent 并行 + 隔离,人只做合并治理</p></div>
-    <div class="stop"><b>公司系统</b><p>标准化 + 治理,从个人手艺变团队资产</p></div>
+<section class="slide" data-sect="收尾" data-notes="90 秒。这里不要讲成递进轴,而是四种采用形态:看两件事——循环是谁在跑,治理半径到个人、团队还是组织。台词骨架:“今天大多数人还在辅助驾驶:人拆任务、人验收,agent 加速局部工作。再往前一步,可以把完成标准写成契约,让单个 agent 自己跑到达标或卡住。团队里会出现多 agent 并行,重点变成隔离、合并和治理。更长期,workflow / skill / MCP / 权限会沉淀成公司系统,从个人手艺变团队资产。”然后落 Dario 引言,制造紧迫感但不贩卖焦虑。">
+  <div class="kick">往前看一步 · 四种落点,不是递进轴</div>
+  <h2>同样是 agent,控制权和治理半径不同</h2>
+  <div class="mode-map">
+    <div class="mode-card">
+      <span class="scope">人主导 · 个人使用</span>
+      <b>辅助驾驶</b>
+      <p>人拆任务、人判断完成,agent 做副驾和局部加速。</p>
+    </div>
+    <div class="mode-card">
+      <span class="scope">agent 主导 · 单任务闭环</span>
+      <b>自动驾驶</b>
+      <p>把完成标准写成契约,agent 自己跑到达标或卡住。</p>
+    </div>
+    <div class="mode-card">
+      <span class="scope">多 agent · 团队协作</span>
+      <b>车队调度</b>
+      <p>多 agent 并行 + 隔离,人主要做合并、验收和治理。</p>
+    </div>
+    <div class="mode-card">
+      <span class="scope">标准化 · 组织资产</span>
+      <b>公司系统</b>
+      <p>workflow / skill / MCP / 权限沉淀下来,从个人手艺变团队能力。</p>
+    </div>
   </div>
+  <div class="mode-note">这四个不是升级路线,而是不同场景下的控制权分配。</div>
   <div class="quote" style="font-size:28px;margin-top:30px">“coding 是 AI 进展最快的方向。”</div>
   <div class="src">—— Dario Amodei,Dwarkesh 访谈,2026 · Anthropic 已有工程 lead 基本不写代码</div>
 </section>
 
-<!-- S31 第三个乘数 -->
-<section class="slide" data-sect="收尾" data-notes="60 秒。“全场回答的是「模型 × Agent」的 diff;但对个人产出,完整公式是三个乘数。前两个是厂商给的,你只能选;第三个完全在你手里,而且复利增长。七层里每个留了口子的地方——CLAUDE.md、skill、memory、MCP / CLI——都值得把你的积累写进去。”">
-  <h2>产出 = 模型 × Agent × 你的积累</h2>
-  <ul>
-    <li><b>多用</b>——使用量本身就是投资,手感是练出来的</li>
-    <li><b>Skill / 工作流</b>——重复的活沉淀成可复用流程,一次投入长期生效</li>
-    <li><b>Memory / 规范</b>——把“这个仓库怎么干活”写进它的出厂设置</li>
-    <li><b>MCP / CLI</b>——agent 的能力边界 = 它的工具边界</li>
-  </ul>
-  <div class="bigline">同模型不同 agent,有 diff——这是今天讲的;<br>同 agent 不同人,diff 更大——这是各位回去做的。</div>
+<!-- S31 个人乘数 -->
+<section class="slide" data-sect="收尾" data-notes="60 秒。“全场回答的是「模型 × Agent」的 diff;但对个人产出,完整公式是四个乘数。前两个是厂商给的,你只能选;后两个在你手里,而且复利增长。软件层面可以沉淀 skill、memory、MCP / CLI;交互层面可以降低输入成本,比如麦克风和 Typeless,让想法更快进入 agent 循环。”">
+  <h2>产出 = 模型 × Agent × 积累 × 交互方式</h2>
+  <div class="multiplier-groups">
+    <div class="multiplier-box">
+      <h3>积累</h3>
+      <ul>
+        <li><b>多用</b>——使用量本身就是投资,手感是练出来的</li>
+        <li><b>Skill / 工作流</b>——重复的活沉淀成可复用流程,一次投入长期生效</li>
+        <li><b>Memory / 规范</b>——把“这个仓库怎么干活”写进它的出厂设置</li>
+        <li><b>MCP / CLI</b>——agent 的能力边界 = 它的工具边界</li>
+      </ul>
+    </div>
+    <div class="multiplier-box">
+      <h3>交互方式</h3>
+      <ul>
+        <li><b>麦克风</b>——把输入通道从“打字”扩展到“说话”</li>
+        <li><b>Typeless</b>——把口述整理成更适合 agent 执行的文本</li>
+      </ul>
+    </div>
+  </div>
 </section>
 
 <!-- S32 结尾大字 -->
-<section class="slide" data-sect="收尾" data-notes="<b>口播定稿(约 78 字):</b>“同模型不同 agent 有 diff——这是今天讲的;同 agent 不同人,diff 只会更大——这是各位回去就能做的。前两个乘数是厂商的,第三个只在你手里。58 年前《全球概览》创刊第一句,送给大家:吾辈如神,理应胜任。”<br>时间富余加一拍:“顺便说一句,乔布斯那句 Stay hungry, Stay foolish,也出自这本杂志的封底。”<br>⚠ 出处必须标 <b>Stewart Brand 1968《全球概览》创刊词</b>,严禁说“最近很火的书”——中文版 2026 年 6 月才出,被较真听众查到会伤“看报文说话”的人设。">
+<section class="slide" data-sect="收尾" data-notes="<b>口播定稿(约 78 字):</b>“同模型不同 agent 有 diff——这是今天讲的;同 agent 不同人,diff 只会更大——这是各位回去就能做的。前两个乘数是厂商的,后两个在你手里。58 年前《全球概览》创刊第一句,送给大家:吾辈如神,理应胜任。”<br>时间富余加一拍:“顺便说一句,乔布斯那句 Stay hungry, Stay foolish,也出自这本杂志的封底。”<br>⚠ 出处必须标 <b>Stewart Brand 1968《全球概览》创刊词</b>,严禁说“最近很火的书”——中文版 2026 年 6 月才出,被较真听众查到会伤“看报文说话”的人设。">
   <div class="quote" style="font-size:40px">“We are as gods and might as well get good at it.”</div>
   <div class="big" style="margin-top:28px">吾辈如神，理应胜任。</div>
   <div class="src">Stewart Brand，《Whole Earth Catalog》创刊词，1968</div>
@@ -514,13 +621,20 @@ li::before{content:"";position:absolute;left:0;top:12px;width:9px;height:9px;bor
 
 </div>
 <div class="counter" id="counter">1 / 32</div>
-<div class="hint">← → 翻页/展开 · 按 S 看口播</div>
+<div class="hint">← → 翻页</div>
 <div class="sect" id="sect"></div>
 <div class="notes" id="notes"></div>
+<div class="image-lightbox" id="imageLightbox" aria-hidden="true">
+  <button type="button" id="imageLightboxClose" aria-label="关闭放大图片">×</button>
+  <img id="imageLightboxImg" src="" alt="">
+</div>
 <script>
 const slides=[...document.querySelectorAll('.slide')];
 const prog=document.getElementById('prog'),counter=document.getElementById('counter'),
       notesEl=document.getElementById('notes'),sectEl=document.getElementById('sect');
+const lightbox=document.getElementById('imageLightbox'),
+      lightboxImg=document.getElementById('imageLightboxImg'),
+      lightboxClose=document.getElementById('imageLightboxClose');
 let i=0,fragment=0,showNotes=false;
 function hashIndex(){
   const m=location.hash.match(/^#(?:p|slide-)?(\d+)$/i);
@@ -556,13 +670,47 @@ function prev(){
   if(fragment>0){fragment-=1;render(false);return}
   go(i-1);
 }
+function openLightbox(img){
+  lightboxImg.src=img.currentSrc||img.src;
+  lightboxImg.alt=img.alt||'';
+  lightbox.classList.add('show');
+  lightbox.setAttribute('aria-hidden','false');
+}
+function closeLightbox(){
+  lightbox.classList.remove('show');
+  lightbox.setAttribute('aria-hidden','true');
+  lightboxImg.src='';
+}
 document.addEventListener('keydown',e=>{
+  if(lightbox.classList.contains('show')){
+    if(e.key==='Escape')closeLightbox();
+    e.preventDefault();
+    return;
+  }
   if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();next()}
   else if(e.key==='ArrowLeft'){prev()}
   else if(e.key==='Home'){go(0)}
   else if(e.key==='End'){go(slides.length-1)}
   else if(e.key==='s'||e.key==='S'){showNotes=!showNotes;notesEl.classList.toggle('show',showNotes)}
 });
+document.querySelectorAll('.workflow-shot').forEach(shot=>{
+  shot.addEventListener('click',()=>{
+    const img=shot.querySelector('img');
+    if(img)openLightbox(img);
+  });
+  shot.addEventListener('keydown',e=>{
+    if(e.key==='Enter'||e.key===' '){
+      e.preventDefault();
+      e.stopPropagation();
+      const img=shot.querySelector('img');
+      if(img)openLightbox(img);
+    }
+  });
+});
+lightbox.addEventListener('click',e=>{
+  if(e.target===lightbox)closeLightbox();
+});
+lightboxClose.addEventListener('click',closeLightbox);
 window.addEventListener('hashchange',()=>{
   const n=hashIndex();
   if(n!==null){i=n;fragment=0;render(false)}
