@@ -162,6 +162,23 @@
   .stat .l{font-size:13.5px;color:var(--ink2);margin-top:6px}
   .stat.a .n{color:var(--accent)} .stat.g .n{color:var(--ok)} .stat.r .n{color:var(--no)} .stat.o .n{color:var(--accent2)}
 
+  .model-story{max-width:900px;margin:18px 0 0}
+  .route-card{border:1px solid var(--line);background:var(--soft);border-radius:16px;padding:16px 18px;margin:10px 0}
+  .route-card.main{background:var(--accent-bg);border-color:var(--accent)}
+  .route-top{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+  .route-tag{font-family:var(--mono);font-size:13px;font-weight:800;border-radius:999px;padding:5px 10px;border:1px solid var(--line);background:var(--bg);color:var(--ink2)}
+  .route-card.main .route-tag{border-color:var(--accent);color:var(--accent);background:var(--bg)}
+  .route-title{font-size:22px;font-weight:800;color:var(--ink);line-height:1.25}
+  .route-desc{font-size:16px;color:var(--ink2);line-height:1.55}
+  .route-arrow{font-family:var(--mono);font-size:18px;color:var(--ink3);padding-left:24px;line-height:1}
+  .model-meter{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+  .meter{border:1px solid var(--line);border-radius:14px;padding:13px 15px;background:var(--bg)}
+  .meter b{display:block;font-size:30px;line-height:1.08;font-family:var(--mono);color:var(--accent);letter-spacing:-.03em}
+  .meter.warn b{color:var(--accent2)}
+  .meter span{display:block;margin-top:5px;font-size:14px;line-height:1.45;color:var(--ink2)}
+  .tradeoff{margin-top:14px;border-left:4px solid var(--accent2);background:var(--a2-bg);border-radius:12px;padding:12px 15px;font-size:17px;line-height:1.55;color:var(--ink2)}
+  .tradeoff b{color:var(--ink)}
+
   /* 工具降级阶梯 */
   .ladder{display:flex;flex-direction:column;gap:8px;margin:16px 0;max-width:740px}
   .rung{display:flex;justify-content:space-between;align-items:center;gap:12px;border:1px solid var(--line);border-radius:11px;padding:11px 15px;flex-wrap:wrap}
@@ -396,14 +413,23 @@
   <section class="slide">
     <div class="inner">
       <div class="eyebrow">真实例子 · 模型真相</div>
-      <h2>Opus 只指挥,干活的全是 Haiku</h2>
-      <div class="stats">
-        <div class="stat a"><div class="n">1</div><div class="l">编排者 = Opus 4.8 / xhigh(我)</div></div>
-        <div class="stat o"><div class="n">81</div><div class="l">干活的 = Haiku 4.5(find+verify 全是)</div></div>
-        <div class="stat"><div class="n">364<span style="font-size:.55em">万</span></div><div class="l">总 token · 3,640,435(全烧在 Haiku)</div></div>
+      <h2>真正花钱的,不是“指挥官”</h2>
+      <div class="model-story">
+        <div class="route-card main">
+          <div class="route-top"><span class="route-tag">Opus 4.8 / xhigh</span><span class="route-title">1 个编排者</span></div>
+          <div class="route-desc">负责理解需求、拆分 workflow、决定两层 find → verify 怎么跑。</div>
+        </div>
+        <div class="route-arrow">↓ 通过 <code>agentType:'Explore'</code> 派活</div>
+        <div class="route-card">
+          <div class="route-top"><span class="route-tag">Haiku 4.5</span><span class="route-title">81 个执行 agent</span></div>
+          <div class="route-desc">11 个 find agent 找问题;70 个 verify agent 对每条 finding 独立复核。</div>
+          <div class="model-meter">
+            <div class="meter"><b>3,640,435</b><span>tokens 全烧在 Haiku 上,不是 Opus 上</span></div>
+            <div class="meter warn"><b>1/15</b><span>约等于同量 Opus 的十五分之一成本</span></div>
+          </div>
+        </div>
+        <div class="tradeoff"><b>代价也很清楚:</b>每条发现只由 1 个 Haiku 单票判真伪,便宜但单薄,这就是 49% 误报的结构根因。</div>
       </div>
-      <p>两层都传了 <code>agentType:'Explore'</code> → 模型被覆盖成便宜的 Haiku。<b>364 万 token 全烧在 Haiku 上</b>,约合同量 Opus 的 <b>1/15</b> 成本(另 1,890 次工具调用)。</p>
-      <p><b>便宜但单薄</b>:每条发现只 1 个 Haiku 单票判真伪 → 49% 误报的结构根因。</p>
     </div>
   </section>
 

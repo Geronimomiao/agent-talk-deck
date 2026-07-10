@@ -3,16 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=2">
 <title>聊聊 Harness</title>
 <style>
 :root{
   --bg:#faf9f7;--surface:#fff;--surface2:#f1efe8;--text:#26241f;--text2:#5f5e5a;--text3:#8a8980;
-  --border:rgba(0,0,0,.12);--blue-bg:#e6f1fb;--blue:#0c447c;--blue-bd:#185fa5;
+  --border:rgba(0,0,0,.12);--blue-bg:#e6f1fb;--blue:#0c447c;--blue-bd:#185fa5;--accent:#185fa5;
   --ok-bg:#e1f5ee;--ok:#085041;--red:#a32d2d;--red-bg:#f8e8e8;--amber-bg:#faeeda;--amber:#854f0b;
 }
 @media(prefers-color-scheme:dark){:root{
   --bg:#1b1a18;--surface:#262521;--surface2:#33312c;--text:#ece9e2;--text2:#b4b2a9;--text3:#888780;
-  --border:rgba(255,255,255,.14);--blue-bg:#0c447c;--blue:#b5d4f4;--blue-bd:#85b7eb;
+  --border:rgba(255,255,255,.14);--blue-bg:#0c447c;--blue:#b5d4f4;--blue-bd:#85b7eb;--accent:#85b7eb;
   --ok-bg:#085041;--ok:#9fe1cb;--red:#f09595;--red-bg:#5a2020;--amber-bg:#633806;--amber:#fac775;
 }}
 *{box-sizing:border-box}
@@ -33,6 +34,25 @@ h2 a{color:inherit;text-decoration:none;border-bottom:3px solid rgba(24,95,165,.
 h2 a:hover{color:var(--blue);border-bottom-color:var(--blue-bd)}
 .history-links a{color:var(--blue);text-decoration:none;border-bottom:3px solid rgba(24,95,165,.28)}
 .history-links a:hover{border-bottom-color:var(--blue-bd)}
+.history-title-row{display:flex;align-items:flex-end;justify-content:space-between;gap:28px}
+.history-title-row h2{margin-bottom:0}
+.history-switch{display:inline-flex;align-items:center;gap:8px;margin:0 4px 0 0;color:var(--blue);touch-action:pan-y;user-select:none;transform:translateY(10px)}
+.history-switch button{width:18px;height:28px;border:0;background:transparent;color:var(--blue);font-family:inherit;font-size:22px;line-height:1;cursor:pointer;opacity:.72;padding:0}
+.history-switch button:hover,.history-switch button:focus-visible{opacity:1;outline:none}
+.history-agent-name{min-width:108px;text-align:center;font-size:19px;line-height:1.25;font-weight:600;color:var(--blue);cursor:ew-resize}
+.history-grid{display:block;margin-top:14px}
+.history-card{display:none;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 22px;min-height:340px}
+.history-card.active{display:block;animation:historyFade .18s ease}
+@keyframes historyFade{from{opacity:.55;transform:translateY(4px)}to{opacity:1;transform:none}}
+.history-card h3{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.history-card ul{margin:0}
+.history-card li{font-size:18px;line-height:1.42;margin:14px 0;padding-left:22px;color:var(--text2)}
+.history-card li::before{top:10px;width:7px;height:7px;border-radius:2px}
+.history-card a{color:var(--blue);text-decoration:none;border-bottom:2px solid rgba(24,95,165,.24);font-weight:600}
+.history-card a:hover{border-bottom-color:var(--blue-bd)}
+.history-card .date{display:inline-block;margin-left:8px;font-size:14px;line-height:1.2;color:var(--text3);font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.history-card .kw{display:block;margin:5px 0 4px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14.5px;line-height:1.34;color:var(--text3)}
+.history-card .desc{display:block;max-width:900px}
 .sub{font-size:22px;color:var(--text2);line-height:1.55;text-wrap:balance}
 .big{font-size:40px;font-weight:600;line-height:1.42;text-wrap:balance}
 .huge{font-size:150px;font-weight:600;line-height:1;color:var(--blue-bd)}
@@ -43,6 +63,8 @@ li::before{content:"";position:absolute;left:0;top:12px;width:9px;height:9px;bor
 .src{font-size:16px;color:var(--text3);margin-top:22px;line-height:1.5}
 .src a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(24,95,165,.32)}
 .src a:hover{border-bottom-color:var(--blue-bd)}
+.trace-footer{display:flex;justify-content:space-between;align-items:baseline;gap:24px}
+.trace-footer span:last-child{text-align:right;white-space:nowrap}
 .chip{display:inline-block;margin-top:20px;font-size:18px;font-weight:600;padding:9px 18px;border-radius:10px;
   background:var(--amber-bg);color:var(--amber);border:1px solid var(--border)}
 .chip::before{content:"原则牌 ";font-weight:400;opacity:.75}
@@ -158,8 +180,79 @@ li::before{content:"";position:absolute;left:0;top:12px;width:9px;height:9px;bor
 .workflow-origin{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px}
 .workflow-shot{margin:0;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px;cursor:zoom-in}
 .workflow-shot img{display:block;width:100%;height:250px;object-fit:contain;border-radius:10px;background:#fff}
+.workflow-timeline{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:16px 0 10px}
+.workflow-time{display:block;border:1px solid var(--border);border-radius:10px;padding:10px 12px;background:var(--surface);text-decoration:none;transition:border-color .18s ease,box-shadow .18s ease,transform .18s ease}
+.workflow-time:hover,.workflow-time:focus-visible{border-color:var(--accent);box-shadow:0 8px 22px rgba(0,0,0,.08);transform:translateY(-1px);outline:none}
+.workflow-time b{display:block;font-size:17px;line-height:1.25;color:var(--text);margin-bottom:5px}
+.workflow-time span{display:block;font-size:14px;line-height:1.42;color:var(--text2)}
 .workflow-origin-note{margin-top:14px;font-size:20px;line-height:1.55;color:var(--text2)}
 .workflow-origin-note b{color:var(--text)}
+.workflow-demo{display:grid;grid-template-columns:minmax(280px,.58fr) minmax(560px,1.42fr);gap:26px;align-items:center;margin-top:8px}
+.workflow-demo-copy{min-width:0}
+.workflow-demo-copy .bigline{margin-top:18px;font-size:25px}
+.workflow-demo-points{margin-top:16px}
+.workflow-demo-points li{font-size:19px;line-height:1.42;margin:9px 0}
+.workflow-demo-points li::before{top:9px}
+.workflow-case-slide{padding-inline:clamp(54px,6vw,72px)}
+.workflow-case{max-width:1080px;margin-top:8px}
+.workflow-case h2{font-size:38px;margin-bottom:16px;white-space:nowrap}
+.workflow-real-shot{margin:20px 0 0;border:1px solid var(--border);border-radius:16px;background:var(--surface);overflow:hidden;box-shadow:0 14px 34px rgba(0,0,0,.06);cursor:zoom-in}
+.workflow-real-shot img{display:block;width:100%;height:auto}
+.zoomable-shot{cursor:zoom-in}
+.workflow-run-caption{margin-top:14px;font-size:18px;line-height:1.55;color:var(--text2)}
+.workflow-run-caption b{color:var(--text)}
+.workflow-flow{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px 22px}
+.workflow-flow-step{display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px;align-items:start;padding:12px 0}
+.workflow-flow-step:not(:last-child){border-bottom:1px solid var(--border)}
+.workflow-flow-step .num{width:30px;height:30px;border-radius:8px;background:var(--blue-bg);color:var(--blue);display:flex;align-items:center;justify-content:center;font-weight:650;font-size:16px}
+.workflow-flow-step h3{margin:0 0 4px;font-size:19px;line-height:1.25;color:var(--text)}
+.workflow-flow-step p{margin:0;font-size:16px;line-height:1.48;color:var(--text2)}
+.workflow-flow-result{margin-top:14px;background:var(--amber-bg);border:1px solid rgba(133,79,11,.24);border-radius:14px;padding:16px 18px;color:var(--amber)}
+.workflow-flow-result b{display:block;color:var(--amber);font-size:42px;line-height:1.05;margin-bottom:4px}
+.workflow-flow-result span{display:block;font-size:17px;line-height:1.45}
+.workflow-cost{max-width:none;padding-inline:clamp(54px,7vw,92px)}
+.workflow-cost h2{font-size:42px;line-height:1.18;margin-bottom:32px}
+.workflow-cost .cols{margin-top:0;gap:20px}
+.workflow-cost .col{min-height:144px;padding:22px 24px;border-radius:12px}
+.workflow-cost .col h3{font-size:21px}
+.workflow-cost .col p{font-size:20px;line-height:1.55}
+.workflow-cost .col p b{font-weight:600;color:var(--text)}
+.workflow-cost .metric{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:700;color:var(--blue)}
+.workflow-cost .bigline{margin-top:40px;font-size:35px}
+.workflow-play{max-width:1080px;margin:0 auto;width:100%}
+.workflow-play h2{margin-bottom:18px}
+.workflow-play>.src{margin-top:4px;font-size:15px}
+.wf-live{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px 16px;box-shadow:none}
+.wf-pill{display:none}
+.wf-pill .dot{width:8px;height:8px;border-radius:50%;background:var(--blue-bd)}
+.wf-code{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;line-height:1.5;white-space:pre-wrap;color:var(--text)}
+.wf-code .ln{border-radius:5px;padding:1px 5px;margin:0 -5px;transition:background .15s,box-shadow .15s}
+.wf-code .ln.af{background:var(--blue-bg);box-shadow:inset 3px 0 0 var(--blue-bd)}
+.wf-code .ln.av{background:var(--amber-bg);box-shadow:inset 3px 0 0 var(--amber)}
+.wf-code .cmt{color:var(--text3)}
+.wf-ctrl{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:9px 0 8px}
+.wf-btn{border:1px solid rgba(24,95,165,.28);background:var(--blue-bg);color:var(--blue);border-radius:10px;padding:7px 12px;cursor:pointer;font-size:14px;font-weight:600}
+.wf-btn.secondary{border-color:var(--border);background:var(--surface);color:var(--text2)}
+.wf-btn:disabled{opacity:.48;cursor:default}
+.wf-count{font-size:14.5px;color:var(--text2)}
+.wf-count b{color:var(--blue);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:18px}
+.wf-status-find{color:var(--blue)}
+.wf-status-verify{color:var(--amber)}
+.wf-status-done{color:var(--ok)}
+.wf-prog{height:4px;background:var(--border);border-radius:999px;overflow:hidden;margin-bottom:8px}
+.wf-prog i{display:block;height:100%;width:0;background:var(--blue-bd)}
+.wf-lanes{display:flex;flex-direction:column;gap:4px}
+.wf-lane{display:flex;align-items:center;gap:8px}
+.wf-find{flex-shrink:0;width:156px;font-size:11.5px;border-radius:8px;padding:5px 8px;border:1px solid var(--border);background:var(--surface2);color:var(--text3);transition:.2s;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wf-find.running{border-color:rgba(24,95,165,.32);background:var(--blue-bg);color:var(--blue);animation:fpulse 1s infinite}
+.wf-find.done{border-color:var(--blue-bd);background:var(--blue-bg);color:var(--blue)}
+@keyframes fpulse{0%,100%{opacity:1}50%{opacity:.55}}
+.wf-verifies{display:flex;flex-wrap:wrap;gap:4px;flex:1;min-width:0}
+.wf-v{width:12px;height:12px;border-radius:4px;background:var(--surface2);border:1px solid var(--border);transform:scale(0);transition:transform .18s}
+.wf-v.spawned{transform:scale(1)}
+.wf-v.running{background:var(--amber-bg);border-color:rgba(133,79,11,.28);animation:fpulse .9s infinite}
+.wf-v.ok{background:var(--ok);border-color:var(--ok)}
+.wf-v.no{background:var(--red);border-color:var(--red)}
 .image-lightbox{position:fixed;inset:0;z-index:120;display:none;align-items:center;justify-content:center;
   padding:5vh 5vw;background:rgba(0,0,0,.72)}
 .image-lightbox.show{display:flex}
@@ -197,7 +290,17 @@ li::before{content:"";position:absolute;left:0;top:12px;width:9px;height:9px;bor
   .ground-reveal{transform:translateY(18px)}
   .triad{grid-template-columns:1fr}
   .trace-mini{grid-template-columns:1fr}
+  .trace-footer{display:block}
+  .trace-footer span:last-child{display:block;text-align:left;white-space:normal;margin-top:6px}
+  .history-title-row{align-items:flex-start;gap:16px;flex-direction:column}
+  .history-switch{margin:0}
+  .history-card{min-height:0}
+  .workflow-timeline{grid-template-columns:1fr}
   .workflow-origin{grid-template-columns:1fr}
+  .workflow-demo{grid-template-columns:1fr}
+  .workflow-case{grid-template-columns:1fr}
+  .workflow-case h2{white-space:normal}
+  .wf-find{width:150px;font-size:12px}
 }
 </style>
 </head>
@@ -353,19 +456,42 @@ li::before{content:"";position:absolute;left:0;top:12px;width:9px;height:9px;bor
     <a class="deck-btn neutral" href="trace_viewer.html?lab=hi&amp;v=claude" target="_blank" rel="noopener">打开 Claude 抓包 →</a>
     <a class="deck-btn neutral" href="trace_viewer.html?lab=hi&amp;v=codex" target="_blank" rel="noopener">打开 Codex 抓包 →</a>
   </div>
-  <div class="src">数据源：<a href="https://github.com/Geronimomiao/agent-talk-deck" target="_blank" rel="noopener">本仓库</a>抓包样本 trace_hi_claude.json。Powered by <a href="https://github.com/liaohch3/claude-tap" target="_blank" rel="noopener">claude-tap</a>。</div>
+  <div class="src trace-footer">
+    <span>数据源：<a href="https://github.com/Geronimomiao/agent-talk-deck" target="_blank" rel="noopener">本仓库</a>抓包样本 trace_hi_claude.json</span>
+    <span>Powered by <a href="https://github.com/liaohch3/claude-tap" target="_blank" rel="noopener">claude-tap</a></span>
+  </div>
 </section>
 
 <!-- S12 拆 Harness + SP 改动史 -->
 <section class="slide" data-sect="拆 Harness" data-notes="开胃段 2 分钟,挑 2-3 个最戏剧性的版本 diff 讲(数据源:phistory 历史版本)。收一句:“这部踩坑史,就是我们拆车的说明书。”<br><b>免疫台词(预埋,防现场 challenge):</b>“你们今晚回去抓,报文很可能跟我的不一样——版本一直在改,而这个改动史本身,就是今天讲的官方踩坑史。”所有硬数字标:来源 + 抓包日期 + agent 版本号。">
   <div class="kick">拆 Harness · 14′–27′</div>
-  <h2>System Prompt 的改动史，<br>就是官方踩坑史</h2>
-  <ul class="history-links">
-    <li><a href="https://phistory.cc/?agent=claude-code&from=1.0.43&to=1.0.44" target="_blank" rel="noopener">Claude Code 1.0.44</a>：写死 “fewer than 4 lines”，把“少说话”直接塞进 prompt</li>
-    <li><a href="https://phistory.cc/?agent=claude-code&from=2.1.142&to=2.1.143" target="_blank" rel="noopener">Claude Code 2.1.143</a>：代码注释规则收紧，默认不写注释，只在 WHY 不明显时补</li>
-    <li><a href="https://phistory.cc/?agent=claude-code&from=2.0.20&to=2.0.21" target="_blank" rel="noopener">Claude Code 2.0.21</a>：TodoWrite / 计划跟踪进入系统提示，计划从性格变成工具协议</li>
-  </ul>
-  <div class="src">数据源：<a href="https://phistory.cc/" target="_blank" rel="noopener">Phistory · Agent CLI System Prompt Diff History</a> 抓取官方 CLI 包的 prompt 快照；不是官方 release note。</div>
+  <div class="history-title-row">
+    <h2>System Prompt 的改动史，<br>就是官方踩坑史</h2>
+    <div class="history-switch" aria-label="切换 Agent">
+      <button type="button" class="history-prev" aria-label="上一个 Agent">&lt;</button>
+      <span class="history-agent-name" aria-live="polite">Claude Code</span>
+      <button type="button" class="history-next" aria-label="下一个 Agent">&gt;</button>
+    </div>
+  </div>
+  <div class="history-grid">
+    <div class="history-card active" data-agent="Claude Code">
+      <h3>Claude Code</h3>
+      <ul>
+        <li><a href="https://phistory.cc/?agent=claude-code&from=2.1.141&to=2.1.142" target="_blank" rel="noopener">2.1.141 → 2.1.142</a><span class="date">2026-05-14</span><span class="kw">TaskCreate · TaskGet · TaskList · TaskUpdate · owner · blockedBy</span><span class="desc">从“记一份 todo”变成任务系统。任务可以被查询、认领、更新、标记依赖，复杂工作开始可调度。</span></li>
+        <li><a href="https://phistory.cc/?agent=claude-code&from=2.1.153&to=2.1.154" target="_blank" rel="noopener">2.1.153 → 2.1.154</a><span class="date">2026-05-28</span><span class="kw">Harness · Memory · Agent · Workflow · system-reminder · hooks</span><span class="desc">从长 prompt 变成模块化 harness。权限、记忆、hook、子代理、workflow 都被写成可执行边界。</span></li>
+        <li><a href="https://phistory.cc/?agent=claude-code&from=2.1.202&to=2.1.203" target="_blank" rel="noopener">2.1.202 → 2.1.203</a><span class="date">2026-07-07</span><span class="kw">Monitor · worktree path · teammate · background · stdout events</span><span class="desc">从单线程交互助手走向后台 runner。它能监听日志、切 worktree、和 teammate 协作，把长任务挂起来跑。</span></li>
+      </ul>
+    </div>
+    <div class="history-card" data-agent="Codex">
+      <h3>Codex</h3>
+      <ul>
+        <li><a href="https://phistory.cc/?agent=codex&from=0.114.0&to=0.115.0" target="_blank" rel="noopener">0.114.0 → 0.115.0</a><span class="date">2026-03-16</span><span class="kw">spawn_agent · sub-agent · model routing · effort · openai-docs</span><span class="desc">从单 agent 做到底，变成主 agent 会拆旁路任务，按任务选择子代理、模型和推理档位。</span></li>
+        <li><a href="https://phistory.cc/?agent=codex&from=0.124.0&to=0.125.0" target="_blank" rel="noopener">0.124.0 → 0.125.0</a><span class="date">2026-04-24</span><span class="kw">Frontend guidance · Playwright screenshots · code review · apply_patch</span><span class="desc">从“能改代码”升级到“要验体验”。前端审美、截图校验、review 输出和编辑纪律都前置成默认规范。</span></li>
+        <li><a href="https://phistory.cc/?agent=codex&from=0.132.0&to=0.133.0" target="_blank" rel="noopener">0.132.0 → 0.133.0</a><span class="date">2026-05-21</span><span class="kw">tool_search · deferred tools · GoalService · complete · blocked</span><span class="desc">从一次性塞满工具，变成按需发现工具；Goal 也从一句目标，变成 complete/blocked 的状态机。</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="src">数据源：<a href="https://phistory.cc/" target="_blank" rel="noopener">Phistory · Agent CLI System Prompt Diff History</a></div>
 </section>
 
 <!-- S13 工具与编辑格式层 -->
@@ -394,14 +520,16 @@ li::before{content:"";position:absolute;left:0;top:12px;width:9px;height:9px;bor
 </section>
 
 <!-- S15 输入与上下文 · 输入组装 -->
-<section class="slide" data-sect="拆 Harness" data-notes="对应现象③。最短的一层,1.5 分钟别恋战。IDE 系(Trae / Cursor)自动携带打开的文件、光标位置、选中代码;CLI 你不说就没有。它不是装傻,是真没看见。顺带一句:你的消息也从来不是裸发的——模板包装、@引用展开、reminder 注入,各家都不同。">
+<section class="slide" data-sect="拆 Harness" data-notes="对应现象③。这里不要只讲“IDE 会带文件”。更深一层:agent 看到的不是你打的那句话,而是壳编译出来的 prompt bundle。第一层是显式输入:你的文字、@ 文件、图片。第二层是环境输入:cwd、打开文件、选区、git diff、项目记忆。第三层是隐藏脚手架:system reminder、工具 schema、压缩摘要、权限提示。不同产品的上下文编译器不同,所以同一句 prompt 进模型前已经不是同一个东西。落到实践:别问“它为什么没懂”,先问“它到底看见了什么”。">
   <div class="kick">输入与上下文 · 输入组装 · 1.5′</div>
-  <h2>“同样的 prompt”，<br>根本不是同样的输入</h2>
-  <ul>
-    <li>IDE 自动携带：打开的文件、光标位置、选中的代码</li>
-    <li>CLI 你不说就没有——它不是装傻，是真没看见</li>
-    <li>你的消息也不是裸发的：模板包装、@引用展开、注入提醒</li>
-  </ul>
+  <h2>Prompt 不是直接送进模型，<br>会先被“上下文编译”</h2>
+  <div class="cols">
+    <div class="col"><h3>显式输入</h3><p>你打的文字、@ 文件、图片、粘贴的报错。</p></div>
+    <div class="col"><h3>环境输入</h3><p>cwd、打开文件、选区、git diff、项目记忆。</p></div>
+    <div class="col"><h3>隐藏脚手架</h3><p>system reminder、工具 schema、压缩摘要、权限提示。</p></div>
+  </div>
+  <div class="bigline">所以“同样的 prompt”进模型前，<br>可能已经是三份不同的 prompt bundle。</div>
+  <div class="src">实践判断：别先问“它为什么没懂”，先问“它到底看见了什么”。</div>
 </section>
 
 <!-- S16 权限与运行环境 -->
@@ -453,34 +581,80 @@ li::before{content:"";position:absolute;left:0;top:12px;width:9px;height:9px;bor
 </section>
 
 <!-- S20 Claude Code Workflow 属于 harness -->
-<section class="slide" data-sect="拆 Harness" data-notes="<b>新增页:</b>解释 Claude Code 里的 Ultracode 标签。台词:“你们可能见过这个模式名:Ultracode - xhigh + workflows。它不是说模型换了,而是这轮被放进了更重的控制流:xhigh 给更多推理预算,workflow 让 harness 按编排脚本调度一组 agent。也就是说,同一个模型被不同的壳组织起来,体感就会完全不同。”">
+<section class="slide" data-sect="拆 Harness" data-notes="<b>新增页:</b>解释 Claude Code 里的 Ultracode 标签,并交代来源。台词:“这里的时间线其实是先有 dynamic workflows,再被打包进 Ultracode。2026-05-28 的 2.1.154 开始要求支持 dynamic workflows,Anthropic 2026-06-02 发文正式讲这个 harness 思路;到 2026-07-07 的 2.1.203,/effort ultracode 才把 xhigh 和自动 workflow 编排合成一个模式。”">
   <div class="kick">控制流与编排 · Claude Code Workflow</div>
-  <h2><a href="deck.html" target="_blank" rel="noopener">Workflow</a>：<br>Claude Code 里的“Ultracode”</h2>
-  <div class="chain">
-    <div class="row"><b>屏幕上看到的标签:</b>&nbsp;<code>(Ultracode - xhigh + workflows)</code></div>
-    <div class="so">拆开看 ↓</div>
-    <div class="row"><b>xhigh:</b>&nbsp;更高推理预算,让模型先规划、拆解,再决定怎么行动</div>
-    <div class="so">再加上 ↓</div>
-    <div class="row"><b>workflows:</b>&nbsp;把拆分、并发、合并、验证交给 harness 的编排脚本</div>
+  <h2><a href="deck.html" target="_blank" rel="noopener">Workflow</a>：</h2>
+  <div class="workflow-timeline">
+    <a class="workflow-time" href="https://code.claude.com/docs/en/workflows#:~:text=Dynamic%20workflows%20require%20Claude%20Code%20v2.1.154" target="_blank" rel="noopener"><b>2026-05-28</b><span>Claude Code v2.1.154+ 开始支持 dynamic workflows</span></a>
+    <a class="workflow-time" href="https://claude.com/blog/a-harness-for-every-task-dynamic-workflows-in-claude-code" target="_blank" rel="noopener"><b>2026-06-02</b><span>A harness for every task: Dynamic workflows in Claude Code</span></a>
+    <a class="workflow-time" href="https://code.claude.com/docs/en/workflows#let-claude-decide-with-ultracode" target="_blank" rel="noopener"><b>2026-07-07</b><span>v2.1.203+ 把 xhigh + 自动 workflow 编排打包成 Ultracode</span></a>
   </div>
-  <div class="bigline">所以 Ultracode 更像“高推理档位 + workflow 调度”,不是单纯换了一个更聪明的模型。</div>
-  <div class="src">细讲 workflow：<a href="deck.html" target="_blank" rel="noopener">用确定的代码，编排不确定的智能</a> · <a href="workflow-anatomy.html" target="_blank" rel="noopener">Claude Code workflow 怎么实现</a></div>
-</section>
-
-<!-- S21 Anthropic Workflow 来源 -->
-<section class="slide" data-sect="拆 Harness" data-notes="这页交代来源:workflow 不是我自己造出来的词,而是 Anthropic 在 Claude Code dynamic workflows 文章里正式写出来的能力。重点读标题和两张图:Claude Code 可以为具体任务动态生成 harness,把拆分、并发、验证、汇总这些步骤写成 workflow。Ultracode 只是屏幕上的入口标签之一。">
-  <div class="kick">控制流与编排 · 来源</div>
-  <h2>Workflow 的来源：<br>Anthropic 把它叫 dynamic workflows</h2>
   <div class="workflow-origin">
     <figure class="workflow-shot" role="button" tabindex="0" aria-label="放大 Anthropic dynamic workflows 图">
-      <img src="https://cdn.prod.website-files.com/68a44d4040f98a4adf2207b6/6a1f1684f559cc83ff4b465b_image1.png" alt="Anthropic dynamic workflows article illustration">
+      <img src="assets/claude-workflow-dynamic-wide.png" alt="Anthropic dynamic workflows article illustration">
     </figure>
     <figure class="workflow-shot" role="button" tabindex="0" aria-label="放大 Anthropic workflow patterns 图">
-      <img src="https://cdn.prod.website-files.com/68a44d4040f98a4adf2207b6/6a1f16d86247e586b929a407_image10.png" alt="Anthropic Claude Code workflow illustration">
+      <img src="assets/claude-workflow-patterns.png" alt="Anthropic Claude Code workflow illustration">
     </figure>
   </div>
-  <div class="workflow-origin-note">workflow 不是“模型更聪明”,而是 Claude Code 让 harness 可以按任务临时生成一套编排方式。</div>
-  <div class="src">来源：<a href="https://claude.com/blog/a-harness-for-every-task-dynamic-workflows-in-claude-code" target="_blank" rel="noopener">Anthropic · A harness for every task: Dynamic workflows in Claude Code</a></div>
+  <div class="workflow-origin-note">所以 Ultracode 不是“换了一个更聪明的模型”,而是把更高推理档位和 workflow harness 编排绑成一个入口。</div>
+  <div class="src">来源：<a href="https://claude.com/blog/a-harness-for-every-task-dynamic-workflows-in-claude-code" target="_blank" rel="noopener">Anthropic · A harness for every task: Dynamic workflows in Claude Code</a> · <a href="https://code.claude.com/docs/en/workflows" target="_blank" rel="noopener">Claude Code workflows docs</a></div>
+</section>
+
+<!-- S19 Workflow 真实案例 -->
+<section class="slide workflow-case-slide" data-sect="拆 Harness" data-notes="<b>新增页:</b>先讲真实 prompt。台词:“这次我真正输入的 prompt 只有这一句。重点不是我手写了 81 条 prompt,而是在 Claude Code 开启 Ultracode 的情况下,模型判断这个任务适合 workflow,于是自行触发了两层编排:先找问题,再逐条复核。下一页再播放它怎么长出来。”">
+  <div class="kick">控制流与编排 · 真实案例</div>
+  <div class="workflow-case">
+    <div>
+      <h2>一句真实 prompt，触发了一套 workflow</h2>
+      <figure class="workflow-real-shot" role="button" tabindex="0" aria-label="放大 Claude Code Ultracode 真实截图">
+        <img src="assets/claude-code-ultracode-real-redacted.jpg" alt="Claude Code 中输入真实 prompt 并打开 Ultracode 的脱敏截图">
+      </figure>
+      <div class="workflow-run-caption">关键不是“prompt 写得多长”，而是 <b>Claude Code Ultracode</b> 判断任务需要先探索、再复核，于是自行触发 workflow。</div>
+    </div>
+  </div>
+  <div class="src">数据：脱敏 workflow 示例 <code>wf_public_demo_81</code> · 见 <a href="workflow.html#code" target="_blank" rel="noopener">workflow.html#code</a></div>
+</section>
+
+<!-- S20 Workflow 播放 -->
+<section class="slide" data-sect="拆 Harness" data-notes="<b>新增页:</b>播放上一页那次 workflow。台词:“下一页看它具体怎么长出来。第一层不是 81 个同时出现,而是先按 11 个代码分区开 find agent;find 产出 70 条 finding 后,第二层再为每条 finding 开 verify agent。点播放的时候注意左边蓝色是 find,右边小方块是 verify。这个画面要表达的不是动画,而是控制流已经从一次问答变成了一张任务图。”">
+  <div class="workflow-play">
+    <div class="kick">控制流与编排 · 播放 workflow</div>
+    <h2>从一句话到两层 agent 网络</h2>
+    <div class="wf-live" aria-label="81 个 agent workflow 播放面板">
+      <div class="wf-pill"><span class="dot"></span><span>④ 点播放 · 看 81 个 agent 两层长出来</span></div>
+      <div class="wf-code" id="wfFoSync"></div>
+      <div class="wf-ctrl">
+        <button class="wf-btn" id="wfFoPlay" type="button">▶ 播放</button>
+        <button class="wf-btn secondary" id="wfFoReset" type="button">↺ 重置</button>
+        <div class="wf-count" id="wfFoCount">第一层:11 个 find agent · 等待播放</div>
+      </div>
+      <div class="wf-prog"><i id="wfFoBar"></i></div>
+      <div class="wf-lanes" id="wfFoLanes"></div>
+    </div>
+    <div class="src">播放逻辑同 <a href="workflow.html#code" target="_blank" rel="noopener">workflow.html#code</a> · 11 个 find agent 先跑,70 个 verify agent 随 findings 生成。</div>
+  </div>
+</section>
+
+<!-- S21 Workflow 模型成本 -->
+<section class="slide workflow-cost" data-sect="拆 Harness" data-notes="承接上一页播放图。台词:“刚才看到 81 个 agent 两层长出来,但真正的成本结构不是指挥官最贵,而是把大量 token 挪到执行层。指挥官是 Opus 4.8 / xhigh,负责理解需求和生成 workflow;真正大量消耗发生在 81 个 Haiku 执行 agent 上。这个设计的好处是把 364 万 token 放到便宜模型上,约等于同量 Opus 的十五分之一成本;代价是验证变薄,每条 finding 只由一个 Haiku 复核,误报率也随之上来。”">
+  <div class="kick">真实例子 · 模型真相</div>
+  <h2>成本被挪到了<br>执行层</h2>
+  <div class="cols">
+    <div class="col">
+      <h3>Opus 4.8 / xhigh</h3>
+      <p><b>1 个编排者</b><br>理解需求、拆分 workflow、决定两层 find → verify 怎么跑。</p>
+    </div>
+    <div class="col">
+      <h3>Haiku 4.5</h3>
+      <p><b>81 个执行 agent</b><br>11 个 find agent 找问题；70 个 verify agent 独立复核。</p>
+    </div>
+    <div class="col">
+      <h3>成本结构</h3>
+      <p><span class="metric">3,640,435</span> tokens 全烧在 Haiku 上，约等于同量 Opus 的 <span class="metric">1/15</span> 成本。</p>
+    </div>
+  </div>
+  <div class="bigline">省下的是模型成本，<br>变薄的是验证厚度。</div>
 </section>
 
 <!-- S22 六块总表 -->
@@ -497,7 +671,7 @@ li::before{content:"";position:absolute;left:0;top:12px;width:9px;height:9px;bor
   <div class="src">来源：<a href="https://arxiv.org/pdf/2604.14228" target="_blank" rel="noopener">Dive into Claude Code</a> · <a href="https://code.claude.com/docs/en/how-claude-code-works" target="_blank" rel="noopener">How Claude Code works</a></div>
 </section>
 
-<!-- S22 翻转主语 -->
+<!-- S23 翻转主语 -->
 <section class="slide" data-sect="从厂商到自己" data-notes="<b>桥三步的第 2 步,全场最关键的一句(45″,逐字稿):</b>“这句话反过来说才值钱:既然 diff 来自工程决策而不是模型,那这些决策就不是只有 Anthropic 和 OpenAI 有资格做——你在自己的工作流里每天都在做一模一样的决策,只是以前你不知道自己在做。上半场看的是厂商怎么拧旋钮——下半场,轮到你拧。”落原则牌。">
   <div class="kick">全场最关键的一句</div>
   <div class="big" style="font-size:34px">这些决策,不是只有<br>Anthropic 和 OpenAI 有资格做——<br>你每天都在做。</div>
@@ -509,7 +683,7 @@ li::before{content:"";position:absolute;left:0;top:12px;width:9px;height:9px;bor
   <span class="chip">能力长在 harness，不长在 prompt</span>
 </section>
 
-<!-- S23 旋钮映射 -->
+<!-- S24 旋钮映射 -->
 <section class="slide" data-sect="从厂商到自己" data-notes="<b>桥三步的第 3 步(30″):</b>亮地图。“接下来讲的不是新东西,是同一张地图的实践映射。”左边是你日常工作流里的动作,右边是它对应的层——厂商拧的旋钮和你拧的,是同一排。">
   <h2>同一张地图，轮到你拧</h2>
   <div class="map">
@@ -519,13 +693,6 @@ li::before{content:"";position:absolute;left:0;top:12px;width:9px;height:9px;bor
     <div class="mr"><span class="act">验收问题做成结构化表格</span><span class="ar">→</span><span class="ly">③ 输入与上下文</span></div>
     <div class="mr"><span class="act">agent 读表格直接修复</span><span class="ar">→</span><span class="ly">③ 输入与上下文</span></div>
   </div>
-</section>
-
-<!-- S24 实践映射 + 通用模式 -->
-<section class="slide" data-sect="实践映射" data-notes="10 秒,先抽象后实例,把非前端同学拉进场:“这套改造的通用模式就一行。我拿我最熟的前端流程当例子——后端把「设计稿」换成「API 契约」,QA 把「验收表」换成「缺陷表」,完全同构。”">
-  <div class="kick">实践映射 · 29.5′–39′</div>
-  <div class="big" style="font-size:31px">规格化输入 → 生成 → 自动审查<br>→ 结构化反馈 → 闭环修复</div>
-  <div class="sub" style="margin-top:24px">前端是例子。后端换成“API 契约”，QA 换成“缺陷表”，完全同构。</div>
 </section>
 
 <!-- S25 工作流前后对比 -->
@@ -542,7 +709,7 @@ li::before{content:"";position:absolute;left:0;top:12px;width:9px;height:9px;bor
 <!-- S26 背包类比 -->
 <section class="slide" data-sect="实践映射" data-notes="<b>讲稿定稿(约 400 字,可照读):</b>把模型想成雇来砍柴的天才樵夫:力气吓人,却每天早上失忆,只背得动一个背包——背包就是上下文窗口。MD、Tool、CLI、MCP 都在抢它。<br>MD 是背包里的字条:哪座山柴好、东家的规矩。它只改变“知道什么”,不给能力——写一万遍“去砍树”,没斧子照样砍不断;字条按字数占背包,塞多了关键那张被稀释,即 context rot。<br>Tool 是斧子:砍下去世界真的改变,还能上锁——权限、沙箱只装得到斧子上,装不到字条上。但每把斧子附一张说明卡(schema),卡也占背包,挂五十把就选不过来。<br>CLI 是山下五金铺:人类五十年的现成工具。只付一把钥匙的背包成本——Bash 这一个 tool——整个生态随便借。代价是工具为人设计、没护栏,沙箱防的就是这扇门。<br>MCP 是集市统一摊位标准:Figma、Jira 按规格摆摊,谁都能用。但摊位后面还是斧子,每签一家,背包多一册说明。<br>为什么不能全 MD?字条不砍树,没有可拦截的执行点。全 Tool 呢?说明卡压垮背包,多数内容本来就只是知识。">
   <div class="kick">给 agent 配装备 · 3′</div>
-  <h2>失忆樵夫,与背包经济学</h2>
+  <h2>给 Agent 配装备：上下文背包怎么装</h2>
   <div class="grid2">
     <div class="case"><span><b>MD = 背包里的字条</b><span class="lay">该“知道”的:规范、约定、坑——只改变输出,不给能力</span></span></div>
     <div class="case"><span><b>Tool = 手里的斧子</b><span class="lay">该“做”的:可校验、可拦截——护栏只能装在斧子上</span></span></div>
@@ -585,8 +752,8 @@ li::before{content:"";position:absolute;left:0;top:12px;width:9px;height:9px;bor
 </section>
 
 <!-- S31 个人乘数 -->
-<section class="slide" data-sect="收尾" data-notes="60 秒。“全场回答的是「模型 × Agent」的 diff;但对个人产出,完整公式是四个乘数。前两个是厂商给的,你只能选;后两个在你手里,而且复利增长。软件层面可以沉淀 skill、memory、MCP / CLI;交互层面可以降低输入成本,比如麦克风和 Typeless,让想法更快进入 agent 循环。”">
-  <h2>产出 = 模型 × Agent × 积累 × 交互方式</h2>
+<section class="slide" data-sect="收尾" data-notes="60 秒。“全场回答的是「模型 × Agent」的 diff;但个人杠杆,完整公式是四个乘数。前两个是厂商给的,你只能选;后两个在你手里,而且复利增长。软件层面可以沉淀 skill、memory、MCP / CLI;交互层面可以降低输入成本,比如麦克风和 Typeless,让想法更快进入 agent 循环。”">
+  <h2>个人杠杆 = 模型 × Agent × 积累 × 交互方式</h2>
   <div class="multiplier-groups">
     <div class="multiplier-box">
       <h3>积累</h3>
@@ -681,7 +848,157 @@ function closeLightbox(){
   lightbox.setAttribute('aria-hidden','true');
   lightboxImg.src='';
 }
+function escHtml(s){
+  return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+}
+function initHistorySwitch(){
+  document.querySelectorAll('.history-grid').forEach(grid=>{
+    const slide=grid.closest('.slide');
+    const cards=[...grid.querySelectorAll('.history-card')];
+    const switcher=slide?.querySelector('.history-switch');
+    if(!switcher||cards.length<2)return;
+    const name=switcher.querySelector('.history-agent-name');
+    const prevBtn=switcher.querySelector('.history-prev');
+    const nextBtn=switcher.querySelector('.history-next');
+    let active=Math.max(0,cards.findIndex(card=>card.classList.contains('active')));
+    const show=n=>{
+      active=(n+cards.length)%cards.length;
+      cards.forEach((card,k)=>{
+        const on=k===active;
+        card.classList.toggle('active',on);
+        card.setAttribute('aria-hidden',on?'false':'true');
+      });
+      name.textContent=cards[active].dataset.agent||cards[active].querySelector('h3')?.textContent||'Agent';
+    };
+    prevBtn.addEventListener('click',()=>show(active-1));
+    nextBtn.addEventListener('click',()=>show(active+1));
+    switcher.addEventListener('keydown',e=>{
+      if(e.key==='ArrowLeft'){e.preventDefault();e.stopPropagation();show(active-1)}
+      else if(e.key==='ArrowRight'){e.preventDefault();e.stopPropagation();show(active+1)}
+    });
+    [switcher,grid].forEach(target=>{
+      let startX=0,startY=0,tracking=false;
+      target.addEventListener('pointerdown',e=>{
+        if(e.button!==undefined&&e.button!==0)return;
+        startX=e.clientX;
+        startY=e.clientY;
+        tracking=true;
+      });
+      target.addEventListener('pointerup',e=>{
+        if(!tracking)return;
+        tracking=false;
+        const dx=e.clientX-startX;
+        const dy=e.clientY-startY;
+        if(Math.abs(dx)<46||Math.abs(dx)<Math.abs(dy)*1.4)return;
+        show(dx<0?active+1:active-1);
+      });
+      target.addEventListener('pointercancel',()=>{tracking=false});
+    });
+    show(active);
+  });
+}
+async function initWorkflowFanout(){
+  const root=document.getElementById('wfFoLanes');
+  if(!root)return;
+  const sync=document.getElementById('wfFoSync');
+  const play=document.getElementById('wfFoPlay');
+  const reset=document.getElementById('wfFoReset');
+  const count=document.getElementById('wfFoCount');
+  const bar=document.getElementById('wfFoBar');
+  let data;
+  try{
+    data=await fetch('chain-data.json?t='+Date.now()).then(r=>r.json());
+  }catch(e){
+    count.textContent='数据加载失败';
+    play.disabled=true;
+    reset.disabled=true;
+    return;
+  }
+  const lanes=data.real.zonesFull.map(z=>{
+    const total=z.confirmed+z.rejected;
+    const findDur=1.4+total*0.22;
+    const seq=[];
+    let ok=z.confirmed,no=z.rejected;
+    while(ok||no){
+      if(ok){seq.push('ok');ok--;}
+      if(no){seq.push('no');no--;}
+    }
+    const verifies=seq.map((res,k)=>({res,start:findDur+0.06*k,end:findDur+0.06*k+1.0}));
+    return {z,findEnd:findDur,verifies};
+  });
+  const maxT=Math.max(...lanes.map(l=>l.verifies.length?Math.max(...l.verifies.map(v=>v.end)):l.findEnd));
+  const build=()=>{
+    root.innerHTML=lanes.map((l,i)=>{
+      const dots=l.verifies.map((_,k)=>`<span class="wf-v" id="wf_v_${i}_${k}"></span>`).join('');
+      return `<div class="wf-lane"><div class="wf-find" id="wf_f_${i}" title="${escHtml(l.z.label)}">find · ${escHtml(l.z.label)}</div><div class="wf-verifies">${dots}</div></div>`;
+    }).join('');
+    sync.innerHTML=
+      `<span class="ln" id="wfLnPipe">await pipeline(ZONES,</span>\n`+
+      `  <span class="ln" id="wfLnFind">(zone) => agent(findPrompt(zone), {…}),  <span class="cmt">// 第一层:11 个 find</span></span>\n`+
+      `  <span class="ln" id="wfLnVerify">(res)  => parallel(res.findings.map(f =>\n           agent(verifyPrompt(f), {…})))  <span class="cmt">// 第二层:每条发现 1 个 verify</span></span>\n)`;
+  };
+  let raf=null;
+  const renderFanout=t=>{
+    let runningFind=false,runningVerify=false,spawned=11;
+    lanes.forEach((l,i)=>{
+      const find=document.getElementById('wf_f_'+i);
+      if(t<l.findEnd){
+        find.className='wf-find running';
+        runningFind=true;
+      }else{
+        find.className='wf-find done';
+      }
+      l.verifies.forEach((v,k)=>{
+        const el=document.getElementById(`wf_v_${i}_${k}`);
+        if(t<v.start){
+          el.className='wf-v';
+        }else if(t<v.end){
+          el.className='wf-v spawned running';
+          spawned++;
+          runningVerify=true;
+        }else{
+          el.className='wf-v spawned '+v.res;
+          spawned++;
+        }
+      });
+    });
+    count.innerHTML=
+      `当前 <b>${spawned}</b> 个 agent`+
+      (runningFind?' · <span class="wf-status-find">find 执行中</span>':'')+
+      (runningFind&&runningVerify?' + ':(runningVerify?' · ':''))+
+      (runningVerify?'<span class="wf-status-verify">verify 执行中</span>':'')+
+      (!runningFind&&!runningVerify&&t>0?' · <span class="wf-status-done">全部完成 (11 find + 70 verify)</span>':'');
+    document.getElementById('wfLnFind').className='ln'+(runningFind?' af':'');
+    document.getElementById('wfLnVerify').className='ln'+(runningVerify?' av':'');
+    bar.style.width=Math.min(100,t/maxT*100)+'%';
+  };
+  const resetFanout=()=>{
+    if(raf)cancelAnimationFrame(raf);
+    raf=null;
+    build();
+    count.textContent='第一层:11 个 find agent · 等待播放';
+    bar.style.width='0';
+    play.disabled=false;
+  };
+  const playFanout=()=>{
+    resetFanout();
+    play.disabled=true;
+    const t0=performance.now();
+    const duration=6200;
+    const step=now=>{
+      const t=(now-t0)/duration*maxT;
+      renderFanout(Math.min(t,maxT));
+      if(t<maxT)raf=requestAnimationFrame(step);
+      else play.disabled=false;
+    };
+    raf=requestAnimationFrame(step);
+  };
+  play.addEventListener('click',playFanout);
+  reset.addEventListener('click',resetFanout);
+  resetFanout();
+}
 document.addEventListener('keydown',e=>{
+  if(e.target.closest('button,a')&&(e.key===' '||e.key==='Enter'))return;
   if(lightbox.classList.contains('show')){
     if(e.key==='Escape')closeLightbox();
     e.preventDefault();
@@ -693,7 +1010,9 @@ document.addEventListener('keydown',e=>{
   else if(e.key==='End'){go(slides.length-1)}
   else if(e.key==='s'||e.key==='S'){showNotes=!showNotes;notesEl.classList.toggle('show',showNotes)}
 });
-document.querySelectorAll('.workflow-shot').forEach(shot=>{
+document.querySelectorAll('.workflow-shot,.workflow-real-shot,.zoomable-shot').forEach(shot=>{
+  if(!shot.hasAttribute('tabindex'))shot.setAttribute('tabindex','0');
+  if(!shot.hasAttribute('role'))shot.setAttribute('role','button');
   shot.addEventListener('click',()=>{
     const img=shot.querySelector('img');
     if(img)openLightbox(img);
@@ -718,6 +1037,8 @@ window.addEventListener('hashchange',()=>{
 const initialHash=hashIndex();
 if(initialHash!==null)i=initialHash;
 render();
+initHistorySwitch();
+initWorkflowFanout();
 </script>
 </body>
 </html>

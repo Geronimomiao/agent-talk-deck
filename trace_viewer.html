@@ -144,6 +144,8 @@
   .resizer{flex:0 0 5px;cursor:col-resize;background:var(--line2);position:relative;transition:background .12s}
   .resizer:hover,.resizer.dragging{background:var(--req)}
   .resizer::before{content:"";position:absolute;inset:0 -4px;}
+  .main.sidebar-hidden .list{width:0!important;min-width:0;flex:0 0 0;padding:0;overflow:hidden}
+  .main.sidebar-hidden .resizer{display:none}
   #expandSidebar{display:none;position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:50;
     background:var(--ink);color:var(--paper2);border:0;border-radius:0 6px 6px 0;padding:14px 5px;
     writing-mode:vertical-rl;font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:600;
@@ -1074,13 +1076,16 @@ setMode(hasParams?(sp.get('view')==='raw'?'packets':'overview'):'guide');
   const setLS=(k,v)=>{try{localStorage.setItem(k,String(v));}catch(e){}};
   const btn=document.createElement('button');btn.id='expandSidebar';btn.textContent='▸ 侧栏';btn.title='展开侧栏';document.body.appendChild(btn);
   const W=()=>listEl.offsetWidth;
-  const upd=()=>{btn.style.display=(!document.body.classList.contains('guide')&&W()<10)?'block':'none';};
+  const isHidden=()=>mainEl.classList.contains('sidebar-hidden');
+  const upd=()=>{const hide=!document.body.classList.contains('guide')&&(isHidden()||W()<10);
+    mainEl.classList.toggle('sidebar-hidden',hide);
+    btn.style.display=hide?'block':'none';};
   window.__updSidebar=upd;
-  const setW=w=>{listEl.style.width=w+'px';upd();};
+  const setW=w=>{const hide=w<10;mainEl.classList.toggle('sidebar-hidden',hide);listEl.style.width=(hide?0:w)+'px';upd();};
   const openW=()=>{const v=parseInt(getLS(KO)||'');return (v>=120)?v:316;};
   let drag=false;
   rz.addEventListener('mousedown',e=>{drag=true;rz.classList.add('dragging');document.body.style.userSelect='none';e.preventDefault();});
-  window.addEventListener('mousemove',e=>{if(!drag)return;const left=mainEl.getBoundingClientRect().left;let w=e.clientX-left;if(w<120)w=0;else if(w>680)w=680;listEl.style.width=w+'px';upd();});
+  window.addEventListener('mousemove',e=>{if(!drag)return;const left=mainEl.getBoundingClientRect().left;let w=e.clientX-left;if(w<120)w=0;else if(w>680)w=680;setW(w);});
   window.addEventListener('mouseup',()=>{if(!drag)return;drag=false;rz.classList.remove('dragging');document.body.style.userSelect='';const w=W();setLS(K,w);if(w>=120)setLS(KO,w);});
   rz.addEventListener('dblclick',()=>{const w=W()<10?openW():0;setW(w);setLS(K,w);});       // 双击:隐藏 ↔ 上次宽度
   btn.onclick=()=>{const w=openW();setW(w);setLS(K,w);};                                      // 浮标:展开到上次宽度
